@@ -10,5 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// No models yet for Lab 1 Issue 1 (project foundation).
-// The Category model is added in Issue 3 (feature/3-category-seed).
+// Issue 3: Create and seed IT request categories (feature/3-category-seed).
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
