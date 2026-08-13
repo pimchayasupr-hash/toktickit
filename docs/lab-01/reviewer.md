@@ -17,6 +17,6 @@
 - **PR Link 1:** https://github.com/supa-gif173/toktickit/pull/7
 - **My Review Comment:** "LGTM! All acceptance criteria for Issue 4 have been satisfied: GET /api/categories endpoint, PostgreSQL integration via Prisma, React UI category rendering, automated test suites, and target branch lab1-staging are verified. Approved!"
 - **Partner's Response:** "Thank you for the review and approval!"
-- **PR Link 2:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/9
+- **PR Link 3:** https://github.com/supa-gif173/toktickit/pull/9
 - **My Review Comment:** "LGTM! All acceptance criteria have been satisfied: Code implementation, database setup, API endpoints, and automated tests are properly configured and pass all test suites. Target branch is correctly set to lab1-staging. Approved!"
 - **Partner's Response:** "Thank you for the review and approval!"
