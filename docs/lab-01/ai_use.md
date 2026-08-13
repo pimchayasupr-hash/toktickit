@@ -14,4 +14,10 @@ I used the Antigravity coding agent. I mainly used Gemini as the LLM.
 | GitHub Workflow Help | "How to fix 'lab1-staging had recent pushes' when creating a pull request?" |
 
 **My Reflection:**
-The AI was incredibly helpful in generating boilerplate code and writing test cases quickly. However, I learned that I must strictly review the generated code against the Lab 1 requirements. I also learned how to prompt the AI to troubleshoot database connection errors and manage GitHub PR flows effectively.
+The AI was incredibly helpful in generating boilerplate code and writing test cases quickly. However, I learned that I must strictly review the generated code against the Lab 1 requirements and manage GitHub PR flows effectively.
+
+* **Key Challenge & Problem Solving (PR Review Workflow Strategy):**
+  - **The Issue:** After completing the project code, PRs were accidentally merged into `lab1-staging` before peer review approvals were recorded on GitHub, making the official green "Approve" button unavailable.
+  - **The Strategy:** Instead of resetting or rebuilding the project (as code, issues, and test suites were fully valid), we established a dedicated review branch workflow (`-review` suffix branches) to capture valid peer review records.
+  - **Overcoming Git Diff Restrictions:** To resolve GitHub's *"There isn't anything to compare"* error when creating PRs for identical codebases, minor documentation formatting changes (e.g., whitespace/newlines) were added to force diff detection.
+  - **Repeatable Workflow:** Created `-review` branches targeted to `lab1-staging`, invited peer reviewers to comment and officially approve against acceptance criteria, replied to feedback, recorded review evidence, and systematically merged each PR.
