@@ -14,6 +14,6 @@
 - **My Response (Issue 4):** "[รอสิ่งที่เราตอบ]"
 
 ## PRs I Reviewed (เราไปคอมเมนต์งานเพื่อนว่าอย่างไร)
-- **PR Link:** [ใส่ลิงก์ PR ที่เราไปตรวจ]
-- **My Review Comment:** "[ใส่สิ่งที่เราคอมเมนต์]"
-- **Partner's Response:** "[ใส่สิ่งที่เพื่อนตอบ]"
+- **PR Link:** https://github.com/supa-gif173/toktickit/pull/6
+- **My Review Comment:** "LGTM! All acceptance criteria have been satisfied: Code implementation, database setup, API endpoints, and automated tests are properly configured and pass all test suites. Target branch is correctly set to lab1-staging. Approved!"
+- **Partner's Response:** "Thank you for the review and approval!"
