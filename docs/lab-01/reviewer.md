@@ -7,8 +7,8 @@
 
 ## PRs Reviewed by Partner (เพื่อนคอมเมนต์งานเราว่าอย่างไร)
 - **PR Link:** https://github.com/pimchayasupr-hash/toktickit/pull/12
-- **Review Comment:** "LGTM! The database setup and seeding satisfy all acceptance criteria for Issue 3: The schema for IT request categories is correctly defined in the database. Initial seed data for categories is successfully inserted. Target branch is correctly set to lab1-staging. Approved!"
-- **My Response:** "Thank you for reviewing and approving PR #12! I appreciate your confirmation that the Category schema, seed data, and target branch setup satisfy all acceptance criteria for Issue 3."
+- **Review Comment:** "All acceptance criteria for Issue 3 (Create and seed IT request categories) have been satisfied:\nPrisma Schema: Category model is properly defined with id, unique name, and createdAt.\nDatabase Migration: Migration files created to set up the Category table in PostgreSQL.\nSeeding Script: server/prisma/seed.ts safely upserts the 4 required categories (Account and Access, Hardware, Software, Network) without creating duplicates on repeated runs.\nSecurity: No database credentials or .env files are committed.\nGit Flow: Target branch is correctly set to lab1-staging."
+- **My Response:** "Thank you @Beethoven190 for the thorough review and approval! I appreciate your confirmation regarding the Prisma schema, idempotent seeding script, security checks, and Git flow setup for Issue 3."
 
 ## PRs I Reviewed (เราไปคอมเมนต์งานเพื่อนว่าอย่างไร)
 - **PR Link:** [ใส่ลิงก์ PR ที่เราไปตรวจ]
