@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
-// Issue 2: API health check.
+// 1. Health Check
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
@@ -16,23 +16,49 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// Issue 4: Display the IT request category list.
+// 2. Active Development Requesters (Feature 1)
+app.get('/api/requesters', async (_req: Request, res: Response) => {
+  try {
+    const requesters = await prisma.requester.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    res.status(200).json({ requesters });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch development requesters.',
+      },
+    });
+  }
+});
+
+// Categories (Lab 1 Compatibility)
 app.get('/api/categories', async (_req: Request, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
       },
-      orderBy: {
-        id: 'asc',
-      },
+      orderBy: { id: 'asc' },
     });
 
     res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({
-      error: 'Failed to fetch categories',
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch categories.',
+      },
     });
   }
 });
