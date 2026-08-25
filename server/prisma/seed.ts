@@ -2,23 +2,65 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Order matches Section 10.2 of the Lab 1 spec (GET /api/categories response).
-const CATEGORY_NAMES = ['Account and Access', 'Hardware', 'Software', 'Network'] as const;
+const REQUESTERS = [
+  { name: 'Jennifer Anderson', email: 'jennifer.anderson@example.com' },
+  { name: 'Michael Brown', email: 'michael.brown@example.com' },
+  { name: 'Sarah Jenkins', email: 'sarah.jenkins@example.com' },
+  { name: 'David Kim', email: 'david.kim@example.com' },
+] as const;
+
+const CATEGORIES = [
+  'Account and Access',
+  'Hardware',
+  'Software',
+  'Network',
+] as const;
+
+const RELATED_SYSTEMS = [
+  'Email',
+  'Campus Wi-Fi',
+  'VPN',
+  'LEB2 App',
+  'Grade Submission App',
+  'Printer',
+  'Corporate Laptop',
+] as const;
 
 async function main() {
-  for (const name of CATEGORY_NAMES) {
-    // upsert on the unique `name` field makes this seed safe to re-run:
-    // existing categories are left untouched, missing ones are created,
-    // and no duplicates are ever inserted.
-    await prisma.category.upsert({
-      where: { name },
-      update: {},
-      create: { name },
+  // Seed Development Requesters
+  for (const requester of REQUESTERS) {
+    await prisma.requester.upsert({
+      where: { email: requester.email },
+      update: { name: requester.name, isActive: true },
+      create: { name: requester.name, email: requester.email, isActive: true },
     });
   }
 
+  // Seed Categories
+  for (const name of CATEGORIES) {
+    await prisma.category.upsert({
+      where: { name },
+      update: { isActive: true },
+      create: { name, isActive: true },
+    });
+  }
+
+  // Seed Related Systems
+  for (const name of RELATED_SYSTEMS) {
+    await prisma.relatedSystem.upsert({
+      where: { name },
+      update: { isActive: true },
+      create: { name, isActive: true },
+    });
+  }
+
+  const requesters = await prisma.requester.findMany({ orderBy: { id: 'asc' } });
   const categories = await prisma.category.findMany({ orderBy: { id: 'asc' } });
-  console.log(`Seeded ${categories.length} categories:`, categories.map((c) => c.name));
+  const relatedSystems = await prisma.relatedSystem.findMany({ orderBy: { id: 'asc' } });
+
+  console.log(`Seeded ${requesters.length} requesters`);
+  console.log(`Seeded ${categories.length} categories`);
+  console.log(`Seeded ${relatedSystems.length} related systems`);
 }
 
 main()
@@ -29,3 +71,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

@@ -10,9 +10,88 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Issue 3: Create and seed IT request categories (feature/3-category-seed).
+model Requester {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tickets Ticket[]
+
+  @@index([isActive])
+}
+
 model Category {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tickets Ticket[]
+
+  @@index([isActive])
 }
+
+model RelatedSystem {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  tickets Ticket[]
+
+  @@index([isActive])
+}
+
+model Ticket {
+  id                 Int      @id @default(autoincrement())
+  ticketNumber       String   @unique
+  clientSubmissionId String?  @unique
+  requesterId        Int
+  categoryId         Int
+  relatedSystemId    Int
+  summary            String
+  description        String
+  requestedPriority  String   // e.g. "LOW", "MEDIUM", "HIGH", "URGENT"
+  currentStatus      String   @default("NEW")
+  itPriority         String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  requester     Requester     @relation(fields: [requesterId], references: [id])
+  category      Category      @relation(fields: [categoryId], references: [id])
+  relatedSystem RelatedSystem @relation(fields: [relatedSystemId], references: [id])
+  attachments   Attachment[]
+
+  @@index([requesterId])
+  @@index([requesterId, updatedAt])
+  @@index([categoryId])
+  @@index([relatedSystemId])
+  @@index([requestedPriority])
+  @@index([currentStatus])
+}
+
+model Attachment {
+  id               Int       @id @default(autoincrement())
+  ticketId         Int
+  originalFilename String
+  storedFilename   String
+  mimeType         String
+  sizeBytes        Int
+  storagePath      String
+  isRemoved        Boolean   @default(false)
+  removedAt        DateTime?
+  removalReason    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+
+  @@index([ticketId])
+  @@index([ticketId, isRemoved])
+}
+
