@@ -40,7 +40,7 @@ app.get('/api/requesters', async (_req: Request, res: Response) => {
   }
 });
 
-// Categories (Lab 1 Compatibility)
+// 3. Active Categories (Issue 2)
 app.get('/api/categories', async (_req: Request, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
@@ -52,12 +52,35 @@ app.get('/api/categories', async (_req: Request, res: Response) => {
       orderBy: { id: 'asc' },
     });
 
-    res.status(200).json(categories);
+    res.status(200).json({ categories });
   } catch (error) {
     res.status(500).json({
       error: {
         code: 'INTERNAL_ERROR',
         message: 'Failed to fetch categories.',
+      },
+    });
+  }
+});
+
+// 4. Active Related Systems (Issue 2)
+app.get('/api/related-systems', async (_req: Request, res: Response) => {
+  try {
+    const relatedSystems = await prisma.relatedSystem.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: { id: 'asc' },
+    });
+
+    res.status(200).json({ relatedSystems });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch related systems.',
       },
     });
   }

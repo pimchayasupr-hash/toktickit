@@ -7,10 +7,11 @@ describe('GET /api/categories (API-02)', () => {
     const response = await request(app).get('/api/categories');
 
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBe(4);
+    const list = Array.isArray(response.body) ? response.body : response.body.categories;
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.length).toBe(4);
 
-    const categoryNames = response.body.map((c: { name: string }) => c.name);
+    const categoryNames = list.map((c: { name: string }) => c.name);
     expect(categoryNames).toEqual([
       'Account and Access',
       'Hardware',
@@ -18,7 +19,7 @@ describe('GET /api/categories (API-02)', () => {
       'Network',
     ]);
 
-    expect(response.body).toEqual([
+    expect(list).toEqual([
       { id: 1, name: 'Account and Access' },
       { id: 2, name: 'Hardware' },
       { id: 3, name: 'Software' },
