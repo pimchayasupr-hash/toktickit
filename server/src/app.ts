@@ -25,7 +25,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // 2. Active Development Requesters
 app.get('/api/requesters', async (_req: Request, res: Response) => {
   try {
-    const requesters = await prisma.requesterUser.findMany({
+    const requesters = await prisma.requester.findMany({
       where: { isActive: true },
       select: {
         id: true,

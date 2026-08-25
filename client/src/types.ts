@@ -1,4 +1,4 @@
-export interface RequesterUser {
+export interface Requester {
   id: number;
   name: string;
   email: string;
@@ -42,7 +42,7 @@ export interface Ticket {
   updatedAt: string;
   category: Category;
   relatedSystem: RelatedSystem;
-  requester: RequesterUser;
+  requester: Requester;
   attachments?: Attachment[];
 }
 

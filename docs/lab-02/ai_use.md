@@ -8,7 +8,7 @@
 | :--- | :--- | :--- |
 | 1 | Lab 2 Spec Verification | "https://github.com/ploychanokimsu-lgtm/toktickit/pull/22/changes ช่วยเข้าไปดูงานเพื่อนและรีวิวให้หน่อยจริงนะเข้าไปดูจริงๆ" |
 | 2 | Implementation Planning | "เรามาทำแล็บสองตามไฟล์ PDF ที่ส่งมาแล้วก็สี่ไฟล์นี้ที่ฉันทำมาแล้ว" |
-| 3 | Prisma Models & Seed | "Extend Prisma schema for Lab 2 models (RequesterUser, Category, RelatedSystem, Ticket, Attachment) and update seed script for idempotent execution." |
+| 3 | Prisma Models & Seed | "Extend Prisma schema for Lab 2 models (Requester, Category, RelatedSystem, Ticket, Attachment) and update seed script for idempotent execution." |
 | 4 | Express REST APIs | "Implement Express backend endpoints for Lab 2: /api/requesters, /api/related-systems, /api/tickets (CRUD, search, filter, sort, pagination), attachment upload, download, and soft removal." |
 | 5 | Zen Green Theme & UI | "Build Zen Green design system tokens and responsive React components (DevRequesterSelect, Navbar, MyTickets, CreateTicket, TicketDetail) adhering to ui-spec.md." |
 | 6 | API & Integration Testing | "Write backend Supertest integration tests for Lab 2 endpoints and verify ownership protection and attachment handling." |

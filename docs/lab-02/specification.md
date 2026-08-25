@@ -623,7 +623,7 @@ Required theme tokens include:
 
 The PostgreSQL database shall support the following concepts.
 
-### 7.1 RequesterUser
+### 7.1 Requester
 
 Proposed fields:
 

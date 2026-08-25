@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, RequesterUser } from '@prisma/client';
+import { PrismaClient, Requester } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export interface RequesterRequest extends Request {
-  requester?: RequesterUser;
+  requester?: Requester;
 }
 
 export const requireRequester = async (
@@ -37,7 +37,7 @@ export const requireRequester = async (
   }
 
   try {
-    const requester = await prisma.requesterUser.findFirst({
+    const requester = await prisma.requester.findFirst({
       where: {
         id: requesterId,
         isActive: true,

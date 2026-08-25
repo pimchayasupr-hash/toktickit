@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { RequesterUser } from '../types';
+import { Requester } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 interface RequesterContextType {
   selectedRequesterId: number | null;
-  currentRequester: RequesterUser | null;
-  requesters: RequesterUser[];
+  currentRequester: Requester | null;
+  requesters: Requester[];
   isLoading: boolean;
   error: string | null;
   selectRequester: (id: number) => void;
@@ -22,7 +22,7 @@ export const RequesterProvider: React.FC<{ children: ReactNode }> = ({ children 
     return saved ? parseInt(saved, 10) : null;
   });
 
-  const [requesters, setRequesters] = useState<RequesterUser[]>([]);
+  const [requesters, setRequesters] = useState<Requester[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +35,7 @@ export const RequesterProvider: React.FC<{ children: ReactNode }> = ({ children 
         throw new Error(`Failed to load requesters (HTTP ${res.status})`);
       }
       const data = await res.json();
-      const list: RequesterUser[] = data.requesters || [];
+      const list: Requester[] = data.requesters || [];
       setRequesters(list);
 
       // Validate saved requester still exists in active list

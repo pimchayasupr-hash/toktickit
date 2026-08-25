@@ -29,7 +29,7 @@ const RELATED_SYSTEMS = [
 async function main() {
   // Seed Development Requesters
   for (const requester of REQUESTERS) {
-    await prisma.requesterUser.upsert({
+    await prisma.requester.upsert({
       where: { email: requester.email },
       update: { name: requester.name, isActive: true },
       create: { name: requester.name, email: requester.email, isActive: true },
@@ -54,7 +54,7 @@ async function main() {
     });
   }
 
-  const requesters = await prisma.requesterUser.findMany({ orderBy: { id: 'asc' } });
+  const requesters = await prisma.requester.findMany({ orderBy: { id: 'asc' } });
   const categories = await prisma.category.findMany({ orderBy: { id: 'asc' } });
   const relatedSystems = await prisma.relatedSystem.findMany({ orderBy: { id: 'asc' } });
 
