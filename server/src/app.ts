@@ -52,7 +52,8 @@ app.get('/api/categories', async (_req: Request, res: Response) => {
       orderBy: { id: 'asc' },
     });
 
-    res.status(200).json(categories);
+    res.status(200).json({ categories });
+    return;
   } catch (error) {
     res.status(500).json({
       error: {
@@ -60,6 +61,7 @@ app.get('/api/categories', async (_req: Request, res: Response) => {
         message: 'Failed to fetch categories.',
       },
     });
+    return;
   }
 });
 
@@ -76,6 +78,7 @@ app.get('/api/related-systems', async (_req: Request, res: Response) => {
     });
 
     res.status(200).json({ relatedSystems });
+    return;
   } catch (error) {
     res.status(500).json({
       error: {
@@ -83,6 +86,7 @@ app.get('/api/related-systems', async (_req: Request, res: Response) => {
         message: 'Failed to fetch related systems.',
       },
     });
+    return;
   }
 });
 
