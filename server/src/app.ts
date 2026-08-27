@@ -52,7 +52,7 @@ app.get('/api/categories', async (_req: Request, res: Response) => {
       orderBy: { id: 'asc' },
     });
 
-    res.status(200).json({ categories });
+    res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({
       error: {

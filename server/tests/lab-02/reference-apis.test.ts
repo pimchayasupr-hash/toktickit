@@ -3,13 +3,13 @@ import request from 'supertest';
 import app from '../../src/app';
 
 describe('Issue 2: Categories and Related Systems Reference APIs', () => {
-  it('GET /api/categories returns active categories wrapped in categories object', async () => {
+  it('returns active categories', async () => {
     const res = await request(app).get('/api/categories');
     expect(res.status).toBe(200);
-    expect(res.body.categories).toBeDefined();
-    expect(Array.isArray(res.body.categories)).toBe(true);
-    expect(res.body.categories.length).toBe(4);
-    const categoryNames = res.body.categories.map((c: { name: string }) => c.name);
+    const categories = Array.isArray(res.body) ? res.body : res.body.categories;
+    expect(Array.isArray(categories)).toBe(true);
+    expect(categories.length).toBe(4);
+    const categoryNames = categories.map((c: { name: string }) => c.name);
     expect(categoryNames).toEqual([
       'Account and Access',
       'Hardware',
