@@ -1,27 +1,29 @@
 import { useState } from 'react';
+import { RequesterProvider, useRequester } from './context/RequesterContext';
+import { Navbar } from './components/Navbar';
+import { DevRequesterSelect } from './components/DevRequesterSelect';
+import { CreateTicket } from './components/CreateTicket';
+import { MyTickets } from './components/MyTickets';
+import { TicketDetail } from './components/TicketDetail';
 
-interface Category {
-  id: number;
-  name: string;
-}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-interface HealthResponse {
-  status: string;
-  service: string;
-}
+function MainAppContent() {
+  const { selectedRequesterId } = useRequester();
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  const [activeTab, setActiveTab] = useState<'my-tickets' | 'create-ticket'>('my-tickets');
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
-function App() {
+  // Lab 1 Health Check Compatibility State
   const [systemStatus, setSystemStatus] = useState<'Online' | 'Offline' | null>(null);
   const [serviceName, setServiceName] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lab1Categories, setLab1Categories] = useState<{ id: number; name: string }[]>([]);
+  const [isLoadingHealth, setIsLoadingHealth] = useState<boolean>(false);
+  const [healthError, setHealthError] = useState<string | null>(null);
 
   const handleCheckSystem = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
+    setIsLoadingHealth(true);
+    setHealthError(null);
 
     try {
       const [healthResponse, categoriesResponse] = await Promise.all([
@@ -37,104 +39,86 @@ function App() {
         throw new Error(`Categories request failed with status ${categoriesResponse.status}`);
       }
 
-      const healthData: HealthResponse = await healthResponse.json();
-      const categoriesData: Category[] = await categoriesResponse.json();
+      const healthData = await healthResponse.json();
+      const categoriesData = await categoriesResponse.json();
 
       setSystemStatus('Online');
       setServiceName(healthData.service || 'TokTickIT API');
-      setCategories(categoriesData);
+      setLab1Categories(Array.isArray(categoriesData) ? categoriesData : categoriesData.categories || []);
     } catch (error) {
       setSystemStatus('Offline');
-      setCategories([]);
+      setLab1Categories([]);
       const message =
         error instanceof Error
           ? error.message
           : 'Unable to connect to the backend service. Please ensure the server is running.';
-      setErrorMessage(`System Status: Offline (${message})`);
+      setHealthError(`System Status: Offline (${message})`);
     } finally {
-      setIsLoading(false);
+      setIsLoadingHealth(false);
     }
   };
 
-  return (
-    <div className="container py-5">
-      <div className="row justify-content-center">
-        <div className="col-12 col-md-8 col-lg-6">
-          <div className="card shadow-sm border-0">
-            <div className="card-body p-4">
-              <h1 className="h3 mb-3 text-center fw-bold">TokTickIT IT Service Desk</h1>
-              <p className="text-muted text-center mb-4">
-                Internal Service Desk Portal for IT Support Requests
-              </p>
+  // If no Development Requester is selected, render Selection screen
+  if (!selectedRequesterId) {
+    return (
+      <div>
+        <DevRequesterSelect />
 
-              <div className="d-grid mb-4">
+        {/* Hidden / Embedded Lab 1 Test Compatibility Container */}
+        <div className="container py-3 opacity-75">
+          <div className="card shadow-sm border-0">
+            <div className="card-body p-3">
+              <h1 className="h5 mb-2 text-center fw-bold">TokTickIT IT Service Desk</h1>
+              <div className="d-grid mb-2">
                 <button
                   type="button"
                   id="check-system-btn"
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-outline-secondary btn-sm"
                   onClick={handleCheckSystem}
-                  disabled={isLoading}
+                  disabled={isLoadingHealth}
                 >
-                  {isLoading ? (
-                    <>
-                      <span
-                        className="spinner-border spinner-border-sm me-2"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                      Loading...
-                    </>
-                  ) : (
-                    'Check System'
-                  )}
+                  {isLoadingHealth ? 'Loading...' : 'Check System'}
                 </button>
               </div>
 
-              {isLoading && (
-                <div className="text-center my-3 text-secondary" data-testid="loading-indicator">
-                  <p className="mb-0">Loading system status and categories...</p>
+              {isLoadingHealth && (
+                <div className="text-center my-2 text-secondary" data-testid="loading-indicator">
+                  <p className="mb-0 small">Loading system status and categories...</p>
                 </div>
               )}
 
-              {errorMessage && (
-                <div className="alert alert-danger mt-3" role="alert" data-testid="error-alert">
-                  <h6 className="alert-heading fw-bold mb-1">System Error</h6>
-                  <p className="mb-0">{errorMessage}</p>
+              {healthError && (
+                <div className="alert alert-danger mt-2 p-2 small" role="alert" data-testid="error-alert">
+                  <p className="mb-0">{healthError}</p>
                 </div>
               )}
 
               {systemStatus && (
-                <div className="card bg-light border-0 p-3 mb-4" data-testid="status-card">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <span className="fw-semibold">System Status:</span>
+                <div className="card bg-light border-0 p-2 my-2" data-testid="status-card">
+                  <div className="d-flex justify-content-between align-items-center small">
+                    <span>System Status:</span>
                     <span
-                      className={`badge ${
-                        systemStatus === 'Online' ? 'bg-success' : 'bg-danger'
-                      } fs-6 px-3 py-2`}
+                      className={`badge ${systemStatus === 'Online' ? 'bg-success' : 'bg-danger'}`}
                       data-testid="system-status-badge"
                     >
                       {systemStatus}
                     </span>
                   </div>
                   {serviceName && systemStatus === 'Online' && (
-                    <div className="mt-2 text-muted small">
-                      Service: <span className="fw-medium text-dark">{serviceName}</span>
+                    <div className="mt-1 small">
+                      Service: <span>{serviceName}</span>
                     </div>
                   )}
                 </div>
               )}
 
-              {categories.length > 0 && (
-                <div className="mt-4" data-testid="categories-section">
-                  <h2 className="h5 fw-bold mb-3">Supported Request Categories</h2>
-                  <ul className="list-group" id="categories-list">
-                    {categories.map((category) => (
-                      <li
-                        key={category.id}
-                        className="list-group-item d-flex justify-content-between align-items-center py-2 px-3"
-                      >
-                        <span>{category.name}</span>
-                        <span className="badge bg-secondary rounded-pill">#{category.id}</span>
+              {lab1Categories.length > 0 && (
+                <div className="mt-2" data-testid="categories-section">
+                  <h6 className="fw-bold mb-2">Supported Request Categories</h6>
+                  <ul className="list-group list-group-flush" id="categories-list">
+                    {lab1Categories.map((c) => (
+                      <li key={c.id} className="list-group-item py-1 px-2 small">
+                        {c.name}
                       </li>
                     ))}
                   </ul>
@@ -144,7 +128,54 @@ function App() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-vh-100 d-flex flex-column bg-light">
+      <Navbar
+        activeTab={activeTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setSelectedTicketId(null);
+        }}
+      />
+
+      <main className="flex-grow-1 container py-5">
+        {selectedTicketId ? (
+          <TicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
+        ) : activeTab === 'create-ticket' ? (
+          <CreateTicket
+            onSuccess={(createdTicket) => {
+              setSelectedTicketId(createdTicket.id);
+              setActiveTab('my-tickets');
+            }}
+          />
+        ) : (
+          <MyTickets
+            onSelectTicket={(ticketId) => setSelectedTicketId(ticketId)}
+            onCreateNewTicket={() => {
+              setSelectedTicketId(null);
+              setActiveTab('create-ticket');
+            }}
+          />
+        )}
+      </main>
+
+      <footer className="bg-white border-top py-3 text-center text-muted small mt-auto">
+        <div className="container">
+          TokTickIT Service Desk • CPE334 Lab 2 MVP • Zen Green Design System
+        </div>
+      </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <RequesterProvider>
+      <MainAppContent />
+    </RequesterProvider>
   );
 }
 
