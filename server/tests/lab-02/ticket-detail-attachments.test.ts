@@ -8,11 +8,12 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   let createdAttachmentId: number;
 
   it('Setup: Create a test ticket for Issue 5 tests', async () => {
+    const clientSubmissionId = `sub-issue5-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const res = await request(app)
       .post('/api/tickets')
       .set('X-Development-Requester-Id', String(requesterId))
       .send({
-        clientSubmissionId: `sub-issue5-${Date.now()}`,
+        clientSubmissionId,
         categoryId: 1,
         relatedSystemId: 1,
         summary: 'Issue 5 test ticket for attachments',

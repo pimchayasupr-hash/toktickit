@@ -4,20 +4,18 @@ const prisma = new PrismaClient();
 
 export async function generateTicketNumber(): Promise<string> {
   const year = new Date().getFullYear();
-  const count = await prisma.ticket.count();
-  const sequence = (count + 1).toString().padStart(6, '0');
-  let ticketNumber = `TKT-${year}-${sequence}`;
+  let candidate = (await prisma.ticket.count()) + 1;
 
-  let attempts = 0;
-  while (attempts < 10) {
+  while (candidate < 999999) {
+    const sequence = candidate.toString().padStart(6, '0');
+    const ticketNumber = `TKT-${year}-${sequence}`;
     const existing = await prisma.ticket.findUnique({ where: { ticketNumber } });
     if (!existing) {
       return ticketNumber;
     }
-    attempts++;
-    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
-    ticketNumber = `TKT-${year}-${randomSuffix}`;
+    candidate++;
   }
 
-  return ticketNumber;
+  const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+  return `TKT-${year}-${randomSuffix}`;
 }
