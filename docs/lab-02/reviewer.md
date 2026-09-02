@@ -19,6 +19,11 @@
 - **My Response:** "Thank you @MiMikoChAn913 for the thorough review and approval! Merging to lab2-staging."
 - **Status:** Approved and Merged into `lab2-staging`.
 
+- **PR Link (Issue 4):** https://github.com/pimchayasupr-hash/toktickit/pull/20
+- **Review Comment:** "LGTM! Implemented My Tickets list with search, filter, sort, pagination, desktop table, mobile cards, and requester ownership boundary. Approved and Merged!"
+- **My Response:** "Thank you for reviewing and merging Issue 4! Moving on to Issue 5."
+- **Status:** Approved and Merged into `lab2-staging`.
+
 ## PRs I Reviewed (เราไปคอมเมนต์งานเพื่อนว่าอย่างไร)
 - **PR Link 1:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/22
 - **My Review Comment:** "LGTM! 🚀 Impressive work on the documentation for Lab 2 specifications and Lab 1 updates! Updated with clear step-by-step installation guides, environment setup, Prisma commands, Git workflow rules, and verified test results. Approved! 🎉"
