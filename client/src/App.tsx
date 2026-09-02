@@ -12,6 +12,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000
 function MainAppContent() {
   const { selectedRequesterId } = useRequester();
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+function MainAppContent() {
+  const { selectedRequesterId } = useRequester();
+
   const [activeTab, setActiveTab] = useState<'my-tickets' | 'create-ticket'>('my-tickets');
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
