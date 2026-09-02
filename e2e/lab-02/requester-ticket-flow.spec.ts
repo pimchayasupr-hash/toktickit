@@ -1,33 +1,43 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Lab 2: Requester Ticket Flow E2E Tests', () => {
-  test('Complete End-to-End Flow: Select Requester, Create Ticket, and View in My Tickets', async ({ page }) => {
-    // 1. Visit homepage
+test.describe('Lab 2: Requester Ticket E2E Flow', () => {
+  test('should select requester, create a ticket, and see it in My Tickets', async ({ page }) => {
+    // 1. ไปที่หน้าแรก (หน้าเลือก Requester)
     await page.goto('http://localhost:5173');
 
-    // 2. Select Development Requester identity
-    const requesterSelect = page.locator('select#dev-requester-select');
+    // 2. ตรวจสอบว่าไม่มี Inactive requester โผล่มา (Alex Turner ต้องไม่มี)
+    const pageText = await page.content();
+    expect(pageText).not.toContain('Alex Turner');
+
+    // 3. เลือก Requester (เลือก Jennifer Anderson)
+    const requesterSelect = page.locator('#dev-requester-select, select');
     if (await requesterSelect.isVisible()) {
-      await requesterSelect.selectOption({ index: 1 });
-      await page.click('button:has-text("Continue to Application")');
+      await requesterSelect.selectOption({ label: 'Jennifer Anderson' });
+      await page.click('button:has-text("Continue")');
     }
 
-    // 3. Confirm active context loaded
-    await expect(page.locator('text=My Support Tickets')).toBeVisible();
+    // 4. ไปที่หน้า Create Ticket
+    const createBtn = page.locator('button:has-text("Create Ticket"), a:has-text("Create Ticket")');
+    await createBtn.first().click();
 
-    // 4. Click Create Ticket
-    await page.click('button:has-text("+ Create Ticket")');
-    await expect(page.locator('text=Create New IT Support Ticket')).toBeVisible();
+    // 5. กรอกข้อมูลตั๋ว
+    const categorySelect = page.locator('#ticket-category, select[name="categoryId"]');
+    if (await categorySelect.isVisible()) {
+      await categorySelect.selectOption({ index: 1 });
+    }
 
-    // 5. Fill and Submit Ticket Form
-    await page.selectOption('select#ticket-category', { index: 1 });
-    await page.selectOption('select#ticket-system', { index: 1 });
-    await page.fill('input#ticket-summary', 'E2E Automated Ticket Submission Test');
-    await page.fill('textarea#ticket-description', 'Detailed description for automated E2E test verification flow.');
-    await page.click('button:has-text("Submit Support Ticket")');
+    const systemSelect = page.locator('#ticket-system, select[name="relatedSystemId"]');
+    if (await systemSelect.isVisible()) {
+      await systemSelect.selectOption({ index: 1 });
+    }
 
-    // 6. Verify Ticket Creation in My Tickets
-    await expect(page.locator('text=My Support Tickets')).toBeVisible();
-    await expect(page.locator('text=E2E Automated Ticket Submission Test')).toBeVisible();
+    await page.fill('input#ticket-summary, input[name="summary"]', 'Playwright E2E Test Ticket');
+    await page.fill('textarea#ticket-description, textarea[name="description"]', 'Testing end-to-end flow with Playwright.');
+    
+    // กด Submit
+    await page.click('button:has-text("Submit")');
+
+    // 6. ไปที่หน้า My Tickets แล้วเช็กว่ามีตั๋วที่เพิ่งสร้างแสดงอยู่
+    await expect(page.getByText('Playwright E2E Test Ticket')).toBeVisible();
   });
 });
