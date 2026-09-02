@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { DevRequesterSelect } from './components/DevRequesterSelect';
 import { CreateTicket } from './components/CreateTicket';
 import { MyTickets } from './components/MyTickets';
+import { TicketDetail } from './components/TicketDetail';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -11,6 +12,7 @@ function MainAppContent() {
   const { selectedRequesterId } = useRequester();
 
   const [activeTab, setActiveTab] = useState<'my-tickets' | 'create-ticket'>('my-tickets');
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
   // Lab 1 Health Check Compatibility State
   const [systemStatus, setSystemStatus] = useState<'Online' | 'Offline' | null>(null);
@@ -133,16 +135,29 @@ function MainAppContent() {
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setSelectedTicketId(null);
+        }}
       />
 
       <main className="flex-grow-1 container py-5">
-        {activeTab === 'create-ticket' ? (
-          <CreateTicket onSuccess={() => setActiveTab('my-tickets')} />
+        {selectedTicketId ? (
+          <TicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
+        ) : activeTab === 'create-ticket' ? (
+          <CreateTicket
+            onSuccess={(createdTicket) => {
+              setSelectedTicketId(createdTicket.id);
+              setActiveTab('my-tickets');
+            }}
+          />
         ) : (
           <MyTickets
-            onSelectTicket={(ticketId) => console.log('Selected ticket:', ticketId)}
-            onCreateNewTicket={() => setActiveTab('create-ticket')}
+            onSelectTicket={(ticketId) => setSelectedTicketId(ticketId)}
+            onCreateNewTicket={() => {
+              setSelectedTicketId(null);
+              setActiveTab('create-ticket');
+            }}
           />
         )}
       </main>
