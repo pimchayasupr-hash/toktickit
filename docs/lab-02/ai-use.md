@@ -13,6 +13,8 @@
 | 5 | Zen Green Theme & UI | "Build Zen Green design system tokens and responsive React components (DevRequesterSelect, Navbar, MyTickets, CreateTicket, TicketDetail) adhering to ui-spec.md." |
 | 6 | API & Integration Testing | "Write backend Supertest integration tests for Lab 2 endpoints and verify ownership protection and attachment handling." |
 | 7 | UI Testing Suite | "Write frontend Vitest integration tests for Development Requester switching, ticket list filtering, and form state transitions." |
+| 8 | Screenshot Directories Setup | "Create artifacts/lab-02/screenshots/create-ticket/, my-tickets/, and ticket-detail/ with .gitkeep files for Git tracking per Section 12." |
+| 9 | Playwright E2E Testing | "Set up Playwright for E2E testing in e2e/lab-02/requester-ticket-flow.spec.ts covering inactive requester exclusion, requester selection, ticket creation, and My Tickets verification." |
 
 ## My Reflection
 
