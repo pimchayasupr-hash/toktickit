@@ -24,8 +24,17 @@
 - **My Response:** "Thank you for reviewing and merging Issue 4! Moving on to Issue 5."
 - **Status:** Approved and Merged into `lab2-staging`.
 
+- **PR Link (Issue 5):** https://github.com/pimchayasupr-hash/toktickit/pull/21
+- **Review Comment:** "I've reviewed the changes for Issue 5. The implementation of Ticket Detail, file upload with constraints, download, and soft removal with reason modal is clean, secure, and robust. All ACs and tests pass. LGTM!"
+- **My Response:** "Thank you @MiMikoChAn913 for reviewing and merging Issue 5! All 5 Lab 2 features are now integrated into lab2-staging."
+- **Status:** Approved and Merged into `lab2-staging`.
+
 ## PRs I Reviewed (เราไปคอมเมนต์งานเพื่อนว่าอย่างไร)
 - **PR Link 1:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/22
 - **My Review Comment:** "LGTM! 🚀 Impressive work on the documentation for Lab 2 specifications and Lab 1 updates! Updated with clear step-by-step installation guides, environment setup, Prisma commands, Git workflow rules, and verified test results. Approved! 🎉"
+- **Partner's Response:** "Thank you for the review and approval!"
+
+- **PR Link 2:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/23
+- **My Review Comment:** "LGTM! 🚀 Excellent work on the Lab 2 data model schema, PostgreSQL migration, and idempotent seed script! Models Category, RelatedSystem, RequesterUser, Ticket, and Attachment are well-defined with proper Enums and index coverage. Approved! 🎉"
 - **Partner's Response:** "Thank you for the review and approval!"
 
