@@ -195,5 +195,97 @@ app.post('/api/tickets', requireRequester, async (req: RequesterRequest, res: Re
   }
 });
 
+// 6. My Tickets List & Filtering (Issue 4)
+app.get('/api/tickets', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+  try {
+    const requesterId = req.requester!.id;
+    const { status, categoryId, relatedSystemId, priority, search, sort, page = '1', pageSize = '10' } = req.query;
+
+    const where: any = {
+      requesterId,
+    };
+
+    if (status && typeof status === 'string' && status.trim() !== '') {
+      where.currentStatus = status.trim();
+    }
+
+    if (categoryId) {
+      const parsedCat = parseInt(categoryId as string, 10);
+      if (!isNaN(parsedCat)) where.categoryId = parsedCat;
+    }
+
+    if (relatedSystemId) {
+      const parsedSys = parseInt(relatedSystemId as string, 10);
+      if (!isNaN(parsedSys)) where.relatedSystemId = parsedSys;
+    }
+
+    if (priority && typeof priority === 'string' && priority.trim() !== '') {
+      where.requestedPriority = priority.trim();
+    }
+
+    if (search && typeof search === 'string' && search.trim() !== '') {
+      const query = search.trim();
+      where.OR = [
+        { ticketNumber: { contains: query, mode: 'insensitive' } },
+        { summary: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+      ];
+    }
+
+    // Pagination
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(pageSize as string, 10) || 10));
+    const skip = (pageNum - 1) * limitNum;
+
+    // Sorting
+    let orderBy: any = { updatedAt: 'desc' };
+    if (sort === 'createdAt_desc') orderBy = { createdAt: 'desc' };
+    else if (sort === 'createdAt_asc') orderBy = { createdAt: 'asc' };
+    else if (sort === 'updatedAt_asc') orderBy = { updatedAt: 'asc' };
+    else if (sort === 'priority_desc') orderBy = { requestedPriority: 'desc' };
+    else if (sort === 'priority_asc') orderBy = { requestedPriority: 'asc' };
+
+    const [total, tickets] = await Promise.all([
+      prisma.ticket.count({ where }),
+      prisma.ticket.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limitNum,
+        include: {
+          category: { select: { id: true, name: true } },
+          relatedSystem: { select: { id: true, name: true } },
+          requester: { select: { id: true, name: true, email: true } },
+          attachments: {
+            where: { isRemoved: false },
+            select: { id: true, originalFilename: true, mimeType: true, sizeBytes: true },
+          },
+        },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limitNum) || 1;
+
+    res.status(200).json({
+      tickets,
+      pagination: {
+        total,
+        page: pageNum,
+        pageSize: limitNum,
+        totalPages,
+      },
+    });
+    return;
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch tickets.',
+      },
+    });
+    return;
+  }
+});
+
 export default app;
 

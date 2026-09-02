@@ -3,6 +3,7 @@ import { RequesterProvider, useRequester } from './context/RequesterContext';
 import { Navbar } from './components/Navbar';
 import { DevRequesterSelect } from './components/DevRequesterSelect';
 import { CreateTicket } from './components/CreateTicket';
+import { MyTickets } from './components/MyTickets';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -139,12 +140,10 @@ function MainAppContent() {
         {activeTab === 'create-ticket' ? (
           <CreateTicket onSuccess={() => setActiveTab('my-tickets')} />
         ) : (
-          <div className="alert alert-success zen-card p-4">
-            <h4 className="fw-bold text-success mb-2">Development Requester Active Context</h4>
-            <p className="mb-0">
-              You are currently operating as a Development Requester. Feature 3 (Create Ticket) is active.
-            </p>
-          </div>
+          <MyTickets
+            onSelectTicket={(ticketId) => console.log('Selected ticket:', ticketId)}
+            onCreateNewTicket={() => setActiveTab('create-ticket')}
+          />
         )}
       </main>
 
