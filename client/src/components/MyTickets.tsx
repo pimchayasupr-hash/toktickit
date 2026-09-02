@@ -1,139 +1,124 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRequester } from '../context/RequesterContext';
-import { Ticket, Category, RelatedSystem } from '../types';
+import { Ticket, Category, RelatedSystem, Pagination } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 interface MyTicketsProps {
   onSelectTicket: (ticketId: number) => void;
-  onCreateNewTicket: () => void;
+  onCreateNewClick: () => void;
 }
 
-export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewTicket }) => {
+export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewClick }) => {
   const { selectedRequesterId } = useRequester();
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [relatedSystems, setRelatedSystems] = useState<RelatedSystem[]>([]);
-
-  // Filter & Search State
-  const [search, setSearch] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedSystem, setSelectedSystem] = useState<string>('');
-  const [selectedPriority, setSelectedPriority] = useState<string>('');
-  const [sort, setSort] = useState<string>('updatedAt_desc');
-
-  // Pagination State
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [totalTickets, setTotalTickets] = useState<number>(0);
-
-  // UI State
+  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, totalCount: 0, totalPages: 1 });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load reference categories & related systems
+  // Filters & Sorting State
+  const [search, setSearch] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [relatedSystemId, setRelatedSystemId] = useState<string>('');
+  const [requestedPriority, setRequestedPriority] = useState<string>('');
+  const [currentStatus, setCurrentStatus] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('updatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
+
+  // Reference options
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [relatedSystems, setRelatedSystems] = useState<RelatedSystem[]>([]);
+
   useEffect(() => {
-    const fetchReferences = async () => {
-      try {
-        const [catRes, sysRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/categories`),
-          fetch(`${API_BASE_URL}/api/related-systems`),
-        ]);
-
-        if (catRes.ok) {
-          const catData = await catRes.json();
-          setCategories(Array.isArray(catData) ? catData : catData.categories || []);
-        }
-
-        if (sysRes.ok) {
-          const sysData = await sysRes.json();
-          setRelatedSystems(sysData.relatedSystems || []);
-        }
-      } catch (err) {
-        // Silent reference fail fallback
-      }
-    };
-
-    fetchReferences();
+    // Load categories & related systems for filter dropdowns
+    Promise.all([
+      fetch(`${API_BASE_URL}/api/categories`).then((res) => res.json()),
+      fetch(`${API_BASE_URL}/api/related-systems`).then((res) => res.json()),
+    ]).then(([catData, sysData]) => {
+      setCategories(Array.isArray(catData) ? catData : catData.categories || []);
+      setRelatedSystems(sysData.relatedSystems || []);
+    }).catch(() => {});
   }, []);
 
-  // Fetch Tickets
-  const fetchTickets = useCallback(async () => {
+  const fetchTickets = async () => {
     if (!selectedRequesterId) return;
 
     setIsLoading(true);
     setError(null);
 
-    const params = new URLSearchParams();
-    if (search.trim()) params.append('search', search.trim());
-    if (selectedCategory) params.append('categoryId', selectedCategory);
-    if (selectedSystem) params.append('relatedSystemId', selectedSystem);
-    if (selectedPriority) params.append('priority', selectedPriority);
-    if (sort) params.append('sort', sort);
-    params.append('page', String(page));
-    params.append('pageSize', '10');
+    const queryParams = new URLSearchParams();
+    if (search.trim()) queryParams.set('search', search.trim());
+    if (categoryId) queryParams.set('categoryId', categoryId);
+    if (relatedSystemId) queryParams.set('relatedSystemId', relatedSystemId);
+    if (requestedPriority) queryParams.set('requestedPriority', requestedPriority);
+    if (currentStatus) queryParams.set('currentStatus', currentStatus);
+    queryParams.set('sortBy', sortBy);
+    queryParams.set('sortOrder', sortOrder);
+    queryParams.set('page', String(page));
+    queryParams.set('limit', String(limit));
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/tickets?${params.toString()}`, {
+      const res = await fetch(`${API_BASE_URL}/api/tickets?${queryParams.toString()}`, {
         headers: {
           'X-Development-Requester-Id': String(selectedRequesterId),
         },
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: Failed to load tickets.`);
+        throw new Error(`Failed to load tickets (HTTP ${res.status})`);
       }
 
       const data = await res.json();
       setTickets(data.tickets || []);
-      setTotalTickets(data.pagination?.total || 0);
-      setTotalPages(data.pagination?.totalPages || 1);
+      if (data.pagination) setPagination(data.pagination);
     } catch (err: any) {
-      setError(err.message || 'Unable to connect to service.');
-      setTickets([]);
+      setError(err.message || 'Unable to connect to server.');
     } finally {
       setIsLoading(false);
     }
-  }, [selectedRequesterId, search, selectedCategory, selectedSystem, selectedPriority, sort, page]);
+  };
 
   useEffect(() => {
     fetchTickets();
-  }, [fetchTickets]);
+  }, [selectedRequesterId, search, categoryId, relatedSystemId, requestedPriority, currentStatus, sortBy, sortOrder, page, limit]);
 
   const handleClearFilters = () => {
     setSearch('');
-    setSelectedCategory('');
-    setSelectedSystem('');
-    setSelectedPriority('');
-    setSort('updatedAt_desc');
+    setCategoryId('');
+    setRelatedSystemId('');
+    setRequestedPriority('');
+    setCurrentStatus('');
+    setSortBy('updatedAt');
+    setSortOrder('desc');
     setPage(1);
   };
 
-  const hasActiveFilters = Boolean(search || selectedCategory || selectedSystem || selectedPriority);
+  const hasActiveFilters = Boolean(search || categoryId || relatedSystemId || requestedPriority || currentStatus);
 
   return (
     <div className="container py-4">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 className="h3 fw-bold text-success m-0">My Support Tickets</h2>
-          <p className="text-muted small m-0">Track and manage your submitted IT requests</p>
+          <h2 className="h3 fw-bold text-success m-0">My IT Support Tickets</h2>
+          <p className="text-muted small m-0">Track and review your submitted support requests</p>
         </div>
-        <button type="button" className="btn btn-zen-primary shadow-sm" onClick={onCreateNewTicket}>
-          + Create New Ticket
+        <button type="button" className="btn btn-zen-primary" onClick={onCreateNewClick}>
+          + Create Ticket
         </button>
       </div>
 
-      {/* Search and Filters Card */}
+      {/* Filter & Search Controls */}
       <div className="zen-card p-3 mb-4">
         <div className="row g-2 mb-3">
-          {/* Search Input */}
           <div className="col-12 col-md-4">
-            <label className="form-label small text-muted mb-1">Search Keywords</label>
             <input
               type="text"
-              className="form-control form-control-sm"
-              placeholder="Search by ticket number, summary..."
+              className="form-control"
+              placeholder="🔍 Search ticket # or summary..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -142,14 +127,12 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
             />
           </div>
 
-          {/* Category Filter */}
           <div className="col-6 col-md-2">
-            <label className="form-label small text-muted mb-1">Category</label>
             <select
-              className="form-select form-select-sm"
-              value={selectedCategory}
+              className="form-select"
+              value={categoryId}
               onChange={(e) => {
-                setSelectedCategory(e.target.value);
+                setCategoryId(e.target.value);
                 setPage(1);
               }}
             >
@@ -162,14 +145,12 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
             </select>
           </div>
 
-          {/* System Filter */}
           <div className="col-6 col-md-2">
-            <label className="form-label small text-muted mb-1">System</label>
             <select
-              className="form-select form-select-sm"
-              value={selectedSystem}
+              className="form-select"
+              value={relatedSystemId}
               onChange={(e) => {
-                setSelectedSystem(e.target.value);
+                setRelatedSystemId(e.target.value);
                 setPage(1);
               }}
             >
@@ -182,185 +163,227 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
             </select>
           </div>
 
-          {/* Priority Filter */}
           <div className="col-6 col-md-2">
-            <label className="form-label small text-muted mb-1">Priority</label>
             <select
-              className="form-select form-select-sm"
-              value={selectedPriority}
+              className="form-select"
+              value={requestedPriority}
               onChange={(e) => {
-                setSelectedPriority(e.target.value);
+                setRequestedPriority(e.target.value);
                 setPage(1);
               }}
             >
               <option value="">All Priorities</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="HIGH">HIGH</option>
+              <option value="URGENT">URGENT</option>
             </select>
           </div>
 
-          {/* Sort By */}
           <div className="col-6 col-md-2">
-            <label className="form-label small text-muted mb-1">Sort By</label>
-            <select className="form-select form-select-sm" value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="updatedAt_desc">Last Updated (Newest)</option>
-              <option value="updatedAt_asc">Last Updated (Oldest)</option>
-              <option value="createdAt_desc">Date Created (Newest)</option>
-              <option value="createdAt_asc">Date Created (Oldest)</option>
-              <option value="priority_desc">Priority (High to Low)</option>
+            <select
+              className="form-select"
+              value={currentStatus}
+              onChange={(e) => {
+                setCurrentStatus(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="">All Statuses</option>
+              <option value="NEW">NEW</option>
             </select>
           </div>
         </div>
 
-        {hasActiveFilters && (
-          <div className="d-flex justify-content-between align-items-center pt-2 border-top extra-small">
-            <span className="text-muted">Filtering active criteria</span>
-            <button type="button" className="btn btn-link btn-sm p-0 text-decoration-none text-danger" onClick={handleClearFilters}>
-              Reset Filters
+        <div className="d-flex justify-content-between align-items-center pt-2 border-top">
+          <div className="d-flex align-items-center gap-2">
+            <span className="small text-muted">Sort by:</span>
+            <select
+              className="form-select form-select-sm w-auto"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="updatedAt">Last Updated</option>
+              <option value="createdAt">Created Date</option>
+              <option value="ticketNumber">Ticket Number</option>
+              <option value="summary">Summary</option>
+            </select>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            >
+              {sortOrder === 'asc' ? '⬆ Ascending' : '⬇ Descending'}
             </button>
           </div>
-        )}
+
+          {hasActiveFilters && (
+            <button type="button" className="btn btn-sm btn-outline-danger" onClick={handleClearFilters}>
+              Clear Filters
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Loading Indicator */}
+      {/* Content States */}
       {isLoading && (
-        <div className="text-center py-5">
+        <div className="text-center py-5 zen-card">
           <div className="spinner-border text-success" role="status"></div>
-          <p className="text-muted small mt-2">Loading your tickets...</p>
+          <p className="text-muted mt-2">Loading your tickets...</p>
         </div>
       )}
 
-      {/* Error Alert */}
-      {error && !isLoading && (
-        <div className="alert alert-danger p-3 my-3" role="alert">
-          <h6 className="fw-bold mb-1">Error Loading Tickets</h6>
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          <h6 className="fw-bold mb-1">Failed to load tickets</h6>
           <p className="mb-0 small">{error}</p>
         </div>
       )}
 
-      {/* Content Area */}
-      {!isLoading && !error && (
+      {!isLoading && !error && tickets.length === 0 && !hasActiveFilters && (
+        <div className="text-center py-5 zen-card bg-zen-pale">
+          <span className="display-4">🎟️</span>
+          <h4 className="fw-bold text-success mt-3">No Tickets Found</h4>
+          <p className="text-muted mb-3">You have not submitted any IT support tickets yet.</p>
+          <button type="button" className="btn btn-zen-primary" onClick={onCreateNewClick}>
+            Create Your First Ticket
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !error && tickets.length === 0 && hasActiveFilters && (
+        <div className="text-center py-5 zen-card">
+          <span className="display-5">🔍</span>
+          <h5 className="fw-bold mt-2">No Matching Tickets</h5>
+          <p className="text-muted mb-3">No tickets matched your current search and filter criteria.</p>
+          <button type="button" className="btn btn-outline-secondary btn-sm" onClick={handleClearFilters}>
+            Clear Search & Filters
+          </button>
+        </div>
+      )}
+
+      {!isLoading && !error && tickets.length > 0 && (
         <>
-          {tickets.length === 0 ? (
-            <div className="zen-card text-center py-5 px-3">
-              <div className="display-6 text-muted mb-2">📋</div>
-              {hasActiveFilters ? (
-                <>
-                  <h5 className="fw-bold text-secondary">No Matching Tickets Found</h5>
-                  <p className="text-muted small">Try adjusting your keywords or filter parameters.</p>
-                  <button type="button" className="btn btn-sm btn-outline-secondary mt-2" onClick={handleClearFilters}>
-                    Clear Search Filters
-                  </button>
-                </>
-              ) : (
-                <>
-                  <h5 className="fw-bold text-secondary">No Tickets Created Yet</h5>
-                  <p className="text-muted small">You haven't submitted any support requests under this account.</p>
-                  <button type="button" className="btn btn-zen-primary btn-sm mt-2" onClick={onCreateNewTicket}>
-                    Create Your First Ticket
-                  </button>
-                </>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* Desktop Table View */}
-              <div className="d-none d-lg-block zen-card overflow-hidden p-0 mb-4">
-                <table className="table table-hover align-middle mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th className="py-3 ps-4">Ticket No.</th>
-                      <th className="py-3">Summary</th>
-                      <th className="py-3">Category</th>
-                      <th className="py-3">Related System</th>
-                      <th className="py-3">Priority</th>
-                      <th className="py-3">Status</th>
-                      <th className="py-3 pe-4 text-end">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tickets.map((t) => (
-                      <tr key={t.id}>
-                        <td className="ps-4 fw-bold text-success">{t.ticketNumber}</td>
-                        <td className="fw-medium">{t.summary}</td>
-                        <td>
-                          <span className="badge bg-light text-dark border">{t.category?.name}</span>
-                        </td>
-                        <td>
-                          <span className="badge bg-light text-dark border">{t.relatedSystem?.name}</span>
-                        </td>
-                        <td>
-                          <span className={`badge badge-priority-${t.requestedPriority.toLowerCase()}`}>{t.requestedPriority}</span>
-                        </td>
-                        <td>
-                          <span className="badge bg-success-subtle text-success border border-success-subtle">NEW</span>
-                        </td>
-                        <td className="pe-4 text-end">
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-outline-success"
-                            onClick={() => onSelectTicket(t.id)}
-                          >
-                            View Detail
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile / Tablet Card View */}
-              <div className="d-lg-none d-flex flex-column gap-3 mb-4">
+          {/* Desktop Table Layout */}
+          <div className="desktop-table-container zen-card overflow-hidden mb-3">
+            <table className="table table-hover align-middle mb-0 zen-table">
+              <thead>
+                <tr>
+                  <th>Ticket #</th>
+                  <th>Summary</th>
+                  <th>Category</th>
+                  <th>System</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Last Updated</th>
+                  <th className="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
                 {tickets.map((t) => (
-                  <div key={t.id} className="zen-card p-3" onClick={() => onSelectTicket(t.id)}>
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <span className="fw-bold text-success">{t.ticketNumber}</span>
-                      <span className={`badge badge-priority-${t.requestedPriority.toLowerCase()}`}>{t.requestedPriority}</span>
-                    </div>
-                    <h6 className="fw-bold mb-2">{t.summary}</h6>
-                    <div className="d-flex flex-wrap gap-1 mb-3">
+                  <tr key={t.id} className="cursor-pointer" onClick={() => onSelectTicket(t.id)}>
+                    <td className="fw-bold text-success">{t.ticketNumber}</td>
+                    <td className="fw-semibold text-dark">{t.summary}</td>
+                    <td>
                       <span className="badge bg-light text-dark border">{t.category?.name}</span>
+                    </td>
+                    <td>
                       <span className="badge bg-light text-dark border">{t.relatedSystem?.name}</span>
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center pt-2 border-top extra-small text-muted">
-                      <span>Status: NEW</span>
-                      <span className="text-success fw-bold">View Detail →</span>
-                    </div>
-                  </div>
+                    </td>
+                    <td>
+                      <span className={`badge badge-priority-${t.requestedPriority.toLowerCase()}`}>
+                        {t.requestedPriority}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="badge badge-status-new">{t.currentStatus}</span>
+                    </td>
+                    <td className="small text-muted">{new Date(t.updatedAt).toLocaleDateString()}</td>
+                    <td className="text-end">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-zen-outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectTicket(t.id);
+                        }}
+                      >
+                        View Detail
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-              </div>
+              </tbody>
+            </table>
+          </div>
 
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="text-muted small">
-                    Showing page {page} of {totalPages} ({totalTickets} total tickets)
-                  </span>
-                  <div className="btn-group btn-group-sm">
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary"
-                      disabled={page <= 1}
-                      onClick={() => setPage((p) => p - 1)}
-                    >
-                      ← Previous
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                    >
-                      Next →
-                    </button>
+          {/* Mobile Cards Layout */}
+          <div className="mobile-card-container mb-3">
+            <div className="d-flex flex-column gap-3">
+              {tickets.map((t) => (
+                <div key={t.id} className="zen-card p-3" onClick={() => onSelectTicket(t.id)}>
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <span className="fw-bold text-success">{t.ticketNumber}</span>
+                    <span className={`badge badge-priority-${t.requestedPriority.toLowerCase()}`}>
+                      {t.requestedPriority}
+                    </span>
+                  </div>
+                  <h6 className="fw-bold mb-2">{t.summary}</h6>
+                  <div className="d-flex flex-wrap gap-1 mb-2">
+                    <span className="badge bg-light text-dark border extra-small">{t.category?.name}</span>
+                    <span className="badge bg-light text-dark border extra-small">{t.relatedSystem?.name}</span>
+                    <span className="badge badge-status-new extra-small">{t.currentStatus}</span>
+                  </div>
+                  <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top extra-small text-muted">
+                    <span>Updated: {new Date(t.updatedAt).toLocaleDateString()}</span>
+                    <span className="text-success fw-bold">View Detail →</span>
                   </div>
                 </div>
-              )}
-            </>
-          )}
+              ))}
+            </div>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="zen-card p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div className="d-flex align-items-center gap-2 small text-muted">
+              <span>Showing {tickets.length} of {pagination.totalCount} tickets</span>
+              <span className="ms-3">Per page:</span>
+              <select
+                className="form-select form-select-sm w-auto"
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+
+            <div className="d-flex align-items-center gap-2">
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                ← Previous
+              </button>
+              <span className="small fw-semibold px-2">
+                Page {pagination.page} of {pagination.totalPages}
+              </span>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
+                disabled={page >= pagination.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next →
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>

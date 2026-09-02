@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { RequesterProvider, useRequester } from './context/RequesterContext';
 import { Navbar } from './components/Navbar';
 import { DevRequesterSelect } from './components/DevRequesterSelect';
-import { CreateTicket } from './components/CreateTicket';
 import { MyTickets } from './components/MyTickets';
+import { CreateTicket } from './components/CreateTicket';
 import { TicketDetail } from './components/TicketDetail';
+import { Ticket } from './types';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+function MainAppContent() {
+  const { selectedRequesterId } = useRequester();
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
@@ -135,29 +141,24 @@ function MainAppContent() {
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Navbar
         activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-          setSelectedTicketId(null);
-        }}
+        setActiveTab={setActiveTab}
+        onClearSelectedTicket={() => setSelectedTicketId(null)}
       />
 
-      <main className="flex-grow-1 container py-5">
-        {selectedTicketId ? (
+      <main className="flex-grow-1">
+        {selectedTicketId !== null ? (
           <TicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
         ) : activeTab === 'create-ticket' ? (
           <CreateTicket
-            onSuccess={(createdTicket) => {
-              setSelectedTicketId(createdTicket.id);
-              setActiveTab('my-tickets');
+            onSuccess={(newTicket: Ticket) => {
+              setSelectedTicketId(newTicket.id);
             }}
+            onCancel={() => setActiveTab('my-tickets')}
           />
         ) : (
           <MyTickets
-            onSelectTicket={(ticketId) => setSelectedTicketId(ticketId)}
-            onCreateNewTicket={() => {
-              setSelectedTicketId(null);
-              setActiveTab('create-ticket');
-            }}
+            onSelectTicket={(ticketId: number) => setSelectedTicketId(ticketId)}
+            onCreateNewClick={() => setActiveTab('create-ticket')}
           />
         )}
       </main>
