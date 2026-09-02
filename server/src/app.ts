@@ -160,27 +160,39 @@ app.post('/api/tickets', requireRequester, async (req: RequesterRequest, res: Re
       return;
     }
 
-    const ticketNumber = await generateTicketNumber();
-
-    const ticket = await prisma.ticket.create({
-      data: {
-        ticketNumber,
-        clientSubmissionId: clientSubmissionId && typeof clientSubmissionId === 'string' ? clientSubmissionId.trim() : null,
-        requesterId,
-        categoryId: parsedCategoryId,
-        relatedSystemId: parsedRelatedSystemId,
-        summary: trimmedSummary,
-        description: trimmedDescription,
-        requestedPriority,
-        currentStatus: 'NEW',
-      },
-      include: {
-        category: { select: { id: true, name: true } },
-        relatedSystem: { select: { id: true, name: true } },
-        requester: { select: { id: true, name: true, email: true } },
-        attachments: true,
-      },
-    });
+    let ticket;
+    let attempts = 0;
+    while (attempts < 5) {
+      try {
+        const ticketNumber = await generateTicketNumber();
+        ticket = await prisma.ticket.create({
+          data: {
+            ticketNumber,
+            clientSubmissionId: clientSubmissionId && typeof clientSubmissionId === 'string' ? clientSubmissionId.trim() : null,
+            requesterId,
+            categoryId: parsedCategoryId,
+            relatedSystemId: parsedRelatedSystemId,
+            summary: trimmedSummary,
+            description: trimmedDescription,
+            requestedPriority,
+            currentStatus: 'NEW',
+          },
+          include: {
+            category: { select: { id: true, name: true } },
+            relatedSystem: { select: { id: true, name: true } },
+            requester: { select: { id: true, name: true, email: true } },
+            attachments: true,
+          },
+        });
+        break;
+      } catch (err: any) {
+        if (err?.code === 'P2002' && Array.isArray(err?.meta?.target) && err.meta.target.includes('ticketNumber')) {
+          attempts++;
+          continue;
+        }
+        throw err;
+      }
+    }
 
     res.status(201).json({ ticket });
     return;

@@ -6,7 +6,7 @@ describe('Issue 3: Create Ticket API Tests', () => {
   const requesterId = 1;
 
   it('POST /api/tickets creates a new ticket and generates official ticketNumber', async () => {
-    const clientSubmissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const clientSubmissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${Math.random().toString(36).substring(2, 9)}`;
     const res = await request(app)
       .post('/api/tickets')
       .set('X-Development-Requester-Id', String(requesterId))
