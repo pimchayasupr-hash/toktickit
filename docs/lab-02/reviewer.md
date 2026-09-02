@@ -14,6 +14,11 @@
 - **My Response:** "Thank you @ploychanokimsu-lgtm for reviewing and merging Issue 2! Moving on to Issue 3."
 - **Status:** Approved and Merged into `lab2-staging`.
 
+- **PR Link (Issue 3):** https://github.com/pimchayasupr-hash/toktickit/pull/19
+- **Review Comment:** "I've reviewed the changes across the client, server, and test files. The React component logic looks solid, and having the test coverage for ticket creation right away is excellent. LGTM!"
+- **My Response:** "Thank you @MiMikoChAn913 for the thorough review and approval! Merging to lab2-staging."
+- **Status:** Approved and Merged into `lab2-staging`.
+
 ## PRs I Reviewed (เราไปคอมเมนต์งานเพื่อนว่าอย่างไร)
 - **PR Link 1:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/22
 - **My Review Comment:** "LGTM! 🚀 Impressive work on the documentation for Lab 2 specifications and Lab 1 updates! Updated with clear step-by-step installation guides, environment setup, Prisma commands, Git workflow rules, and verified test results. Approved! 🎉"
