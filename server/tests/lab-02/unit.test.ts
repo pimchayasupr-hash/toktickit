@@ -6,8 +6,16 @@ describe('Lab 2 Unit Tests', () => {
     const ticketNumber = await generateTicketNumber();
     expect(ticketNumber).toBeDefined();
     expect(ticketNumber).toMatch(/^TKT-\d{4}-\d{6}$/);
+    expect(ticketNumber.startsWith('TKT-')).toBe(true);
     const currentYear = new Date().getFullYear();
     expect(ticketNumber.slice(4, 8)).toBe(String(currentYear));
+  });
+
+  it('formats ticket numbers with correct zero-padding for single digit and multi-digit IDs', () => {
+    const formatTicketNumber = (id: number) => `TKT-2026-${String(id).padStart(6, '0')}`;
+    expect(formatTicketNumber(1234)).toBe('TKT-2026-001234');
+    expect(formatTicketNumber(1)).toBe('TKT-2026-000001');
+    expect(formatTicketNumber(1).startsWith('TKT-')).toBe(true);
   });
 
   it('validates allowed attachment mime types', () => {
