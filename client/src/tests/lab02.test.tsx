@@ -24,6 +24,33 @@ describe('Feature 1: Development Requester Context UI Tests', () => {
             )
           );
         }
+        if (url.includes('/api/tickets')) {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                tickets: [],
+                pagination: { total: 0, page: 1, pageSize: 10, totalPages: 1 },
+              }),
+              { status: 200, headers: { 'Content-Type': 'application/json' } }
+            )
+          );
+        }
+        if (url.includes('/api/categories')) {
+          return Promise.resolve(
+            new Response(JSON.stringify([{ id: 1, name: 'Account and Access' }]), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            })
+          );
+        }
+        if (url.includes('/api/related-systems')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ relatedSystems: [{ id: 1, name: 'Email' }] }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' },
+            })
+          );
+        }
         return Promise.reject(new Error(`Unknown endpoint: ${url}`));
       })
     );
@@ -60,7 +87,7 @@ describe('Feature 1: Development Requester Context UI Tests', () => {
 
     await waitFor(
       () => {
-        expect(screen.getByText(/Development Requester Active Context/i)).toBeInTheDocument();
+        expect(screen.getByText(/My Support Tickets/i)).toBeInTheDocument();
         expect(screen.getAllByText(/Jennifer Anderson/i).length).toBeGreaterThan(0);
       },
       { timeout: 3000 }
@@ -73,7 +100,7 @@ describe('Feature 1: Development Requester Context UI Tests', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Development Requester Active Context/i)).toBeInTheDocument();
+      expect(screen.getByText(/My Support Tickets/i)).toBeInTheDocument();
     });
 
     const changeBtn = screen.getByRole('button', { name: /Change Requester/i });
