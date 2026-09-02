@@ -980,29 +980,29 @@ A required test shall never be silently skipped.
 
 Before Lab 2 is declared complete:
 
-* [ ] All Unit tests pass.
-* [ ] All API/integration tests pass.
-* [ ] All UI component tests pass.
-* [ ] All UI style tests pass.
-* [ ] All responsive checks pass.
-* [ ] All required E2E tests pass.
-* [ ] Every AC has test evidence.
-* [ ] No required test is skipped.
-* [ ] No required test is disabled.
-* [ ] No required test is commented out.
-* [ ] Ownership tests pass.
-* [ ] Multi-Requester tests pass.
-* [ ] Validation boundary tests pass.
-* [ ] Attachment lifecycle tests pass.
-* [ ] Safe failure tests pass.
-* [ ] Loading states are tested.
-* [ ] Empty states are tested.
-* [ ] No-results states are tested.
-* [ ] Desktop screenshots exist.
-* [ ] Tablet screenshots exist.
-* [ ] Mobile screenshots exist.
-* [ ] Visual checklist is complete.
-* [ ] Actual test-file paths match this document.
-* [ ] Actual test commands are documented.
-* [ ] Final results are updated from `Not implemented` to real results.
-* [ ] Final complete test run is performed on the final `main` branch.
+* [x] All Unit tests pass.
+* [x] All API/integration tests pass.
+* [x] All UI component tests pass.
+* [x] All UI style tests pass.
+* [x] All responsive checks pass.
+* [x] All required E2E tests pass.
+* [x] Every AC has test evidence.
+* [x] No required test is skipped.
+* [x] No required test is disabled.
+* [x] No required test is commented out.
+* [x] Ownership tests pass.
+* [x] Multi-Requester tests pass.
+* [x] Validation boundary tests pass.
+* [x] Attachment lifecycle tests pass.
+* [x] Safe failure tests pass.
+* [x] Loading states are tested.
+* [x] Empty states are tested.
+* [x] No-results states are tested.
+* [x] Desktop screenshots exist.
+* [x] Tablet screenshots exist.
+* [x] Mobile screenshots exist.
+* [x] Visual checklist is complete.
+* [x] Actual test-file paths match this document.
+* [x] Actual test commands are documented.
+* [x] Final results are updated from `Not implemented` to real results.
+* [x] Final complete test run is performed on the final `main` branch.

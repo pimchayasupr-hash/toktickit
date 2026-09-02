@@ -3,10 +3,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const REQUESTERS = [
-  { name: 'Jennifer Anderson', email: 'jennifer.anderson@example.com' },
-  { name: 'Michael Brown', email: 'michael.brown@example.com' },
-  { name: 'Sarah Jenkins', email: 'sarah.jenkins@example.com' },
-  { name: 'David Kim', email: 'david.kim@example.com' },
+  { name: 'Jennifer Anderson', email: 'jennifer.anderson@example.com', isActive: true },
+  { name: 'Michael Brown', email: 'michael.brown@example.com', isActive: true },
+  { name: 'Sarah Jenkins', email: 'sarah.jenkins@example.com', isActive: true },
+  { name: 'David Kim', email: 'david.kim@example.com', isActive: true },
+  { name: 'Alex Turner', email: 'alex.turner@example.com', isActive: false },
 ] as const;
 
 const CATEGORIES = [
@@ -31,8 +32,8 @@ async function main() {
   for (const requester of REQUESTERS) {
     await prisma.requester.upsert({
       where: { email: requester.email },
-      update: { name: requester.name, isActive: true },
-      create: { name: requester.name, email: requester.email, isActive: true },
+      update: { name: requester.name, isActive: requester.isActive },
+      create: { name: requester.name, email: requester.email, isActive: requester.isActive },
     });
   }
 
