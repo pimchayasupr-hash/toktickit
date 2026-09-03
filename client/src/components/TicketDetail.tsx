@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRequester } from '../context/RequesterContext';
-import { Ticket, Attachment } from '../types';
+import type { Ticket, Attachment } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 

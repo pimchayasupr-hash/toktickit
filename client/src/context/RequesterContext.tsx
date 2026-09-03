@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Requester } from '../types';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import type { Requester } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
