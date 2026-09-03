@@ -27,6 +27,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [createdTicket, setCreatedTicket] = useState<Ticket | null>(null);
 
   useEffect(() => {
     const fetchReferenceData = async () => {
@@ -44,10 +45,10 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
 
         if (sysRes.ok) {
           const sysData = await sysRes.json();
-          setRelatedSystems(sysData.relatedSystems || []);
+          setRelatedSystems(Array.isArray(sysData) ? sysData : sysData.relatedSystems || []);
         }
-      } catch (err) {
-        setGeneralError('Failed to load reference data. Please try refreshing the page.');
+      } catch (error) {
+        console.error('Failed to load reference data:', error);
       } finally {
         setLoadingReference(false);
       }
@@ -58,27 +59,14 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFieldErrors({});
-    setGeneralError(null);
-
-    // Client validation
-    const errors: Record<string, string> = {};
-    if (!categoryId) errors.categoryId = 'Category is required.';
-    if (!relatedSystemId) errors.relatedSystemId = 'Related System is required.';
-    if (summary.trim().length < 5 || summary.trim().length > 150) {
-      errors.summary = 'Summary must be between 5 and 150 characters.';
-    }
-    if (description.trim().length < 10 || description.trim().length > 2000) {
-      errors.description = 'Description must be between 10 and 2000 characters.';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
+    if (!selectedRequesterId) {
+      setGeneralError('No Development Requester selected.');
       return;
     }
 
+    setFieldErrors({});
+    setGeneralError(null);
     setIsSubmitting(true);
-    const clientSubmissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/tickets`, {
@@ -88,7 +76,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
           'X-Development-Requester-Id': String(selectedRequesterId),
         },
         body: JSON.stringify({
-          clientSubmissionId,
+          clientSubmissionId: `sub-${Date.now()}`,
           categoryId: Number(categoryId),
           relatedSystemId: Number(relatedSystemId),
           summary: summary.trim(),
@@ -109,7 +97,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
         return;
       }
 
-      onSuccess(data.ticket);
+      setCreatedTicket(data.ticket);
     } catch (err: any) {
       setGeneralError(err.message || 'Unable to connect to server. Please try again.');
     } finally {
@@ -122,6 +110,54 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
       <div className="container py-5 text-center">
         <div className="spinner-border text-success" role="status"></div>
         <p className="mt-2 text-muted">Loading form reference data...</p>
+      </div>
+    );
+  }
+
+  if (createdTicket) {
+    return (
+      <div className="container py-4">
+        <div className="row justify-content-center">
+          <div className="col-12 col-lg-8">
+            <div className="zen-card p-5 text-center">
+              <div className="mb-3">
+                <span className="display-3">✅</span>
+              </div>
+              <h2 className="h3 fw-bold text-success mb-2">Ticket Created Successfully!</h2>
+              <p className="text-muted mb-4">
+                Your support request has been registered in the TokTickIT system.
+              </p>
+
+              <div className="alert alert-success bg-zen-pale border-success p-3 mb-4 mx-auto" style={{ maxWidth: '480px' }}>
+                <div className="small text-muted mb-1">Official Ticket Number</div>
+                <div className="h3 fw-bold text-success m-0">{createdTicket.ticketNumber}</div>
+              </div>
+
+              <div className="d-flex justify-content-center gap-3">
+                <button
+                  type="button"
+                  className="btn btn-zen-primary btn-lg px-4"
+                  onClick={() => onSuccess(createdTicket)}
+                >
+                  View Ticket Details →
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-lg px-4"
+                  onClick={() => {
+                    setCreatedTicket(null);
+                    setSummary('');
+                    setDescription('');
+                    setFieldErrors({});
+                    setGeneralError(null);
+                  }}
+                >
+                  + Create Another Ticket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
