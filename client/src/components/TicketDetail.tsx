@@ -303,7 +303,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                 </div>
                 <div className="d-flex gap-2">
                   <a
-                    href={`${API_BASE_URL}/api/attachments/${att.id}/download`}
+                    href={`${API_BASE_URL}/api/attachments/${att.id}/download?requesterId=${selectedRequesterId}`}
                     className="btn btn-sm btn-outline-success"
                     target="_blank"
                     rel="noreferrer"

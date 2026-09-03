@@ -12,9 +12,12 @@ export const requireRequester = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const requesterIdHeader = req.headers['x-development-requester-id'];
+  const requesterIdRaw =
+    req.headers['x-development-requester-id'] ||
+    req.query['requesterId'] ||
+    req.query['x-development-requester-id'];
 
-  if (!requesterIdHeader) {
+  if (!requesterIdRaw) {
     res.status(400).json({
       error: {
         code: 'INVALID_REQUESTER_CONTEXT',
@@ -24,7 +27,7 @@ export const requireRequester = async (
     return;
   }
 
-  const requesterId = parseInt(Array.isArray(requesterIdHeader) ? requesterIdHeader[0] : requesterIdHeader, 10);
+  const requesterId = parseInt(Array.isArray(requesterIdRaw) ? requesterIdRaw[0] : String(requesterIdRaw), 10);
 
   if (isNaN(requesterId) || requesterId <= 0) {
     res.status(400).json({
