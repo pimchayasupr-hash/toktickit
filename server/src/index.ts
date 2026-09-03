@@ -3,7 +3,7 @@ import app from './app';
 
 dotenv.config();
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
