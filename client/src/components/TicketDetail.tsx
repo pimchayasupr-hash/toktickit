@@ -67,6 +67,21 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
 
     setUploadError(null);
     setUploadSuccess(null);
+
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+    const fileExt = '.' + (selectedFile.name.split('.').pop() || '').toLowerCase();
+
+    if (!ALLOWED_TYPES.includes(selectedFile.type.toLowerCase()) && !ALLOWED_EXTS.includes(fileExt)) {
+      setUploadError(`Invalid file type "${selectedFile.name}". Allowed formats are JPG, PNG, WEBP, and PDF.`);
+      return;
+    }
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setUploadError(`File "${selectedFile.name}" exceeds the 5 MB size limit (${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB).`);
+      return;
+    }
+
     setIsUploading(true);
 
     const formData = new FormData();
