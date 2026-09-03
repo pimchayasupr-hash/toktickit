@@ -38,3 +38,11 @@
 - **My Review Comment:** "LGTM! 🚀 Excellent work on the Lab 2 data model schema, PostgreSQL migration, and idempotent seed script! Models Category, RelatedSystem, RequesterUser, Ticket, and Attachment are well-defined with proper Enums and index coverage. Approved! 🎉"
 - **Partner's Response:** "Thank you for the review and approval!"
 
+- **PR Link 3:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/24
+- **My Review Comment:** "LGTM! 🚀 Great job on implementing the Ticket creation REST API and UI component! Validations, official ticket number formatting, and Vitest suite all pass clean. Approved! 🎉"
+- **Partner's Response:** "Thank you for reviewing and approving!"
+
+- **PR Link 4:** https://github.com/ploychanokimsu-lgtm/toktickit/pull/25
+- **My Review Comment:** "LGTM! 🚀 Implemented My Tickets list, Ticket Detail, and Attachment upload/download/soft-removal lifecycle perfectly. Verified responsive layout and E2E flows. Approved! 🎉"
+- **Partner's Response:** "Thank you for the review and approval!"
+
