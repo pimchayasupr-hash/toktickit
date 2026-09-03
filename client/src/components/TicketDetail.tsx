@@ -289,8 +289,23 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               <input
                 type="file"
                 className="form-control form-control-sm"
-                accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
-                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setSelectedFile(file);
+                  setUploadError(null);
+                  setUploadSuccess(null);
+                  if (file) {
+                    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+                    const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+                    const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
+
+                    if (!ALLOWED_TYPES.includes(file.type.toLowerCase()) && !ALLOWED_EXTS.includes(fileExt)) {
+                      setUploadError(`Invalid file type "${file.name}". Allowed formats are JPG, PNG, WEBP, and PDF.`);
+                    } else if (file.size > 5 * 1024 * 1024) {
+                      setUploadError(`File "${file.name}" exceeds the 5 MB size limit (${(file.size / (1024 * 1024)).toFixed(2)} MB).`);
+                    }
+                  }
+                }}
                 disabled={isUploading}
               />
               <button type="submit" className="btn btn-zen-primary btn-sm" disabled={!selectedFile || isUploading}>
