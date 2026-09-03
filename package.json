@@ -1,0 +1,15 @@
+{
+  "name": "toktickit-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix client",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "test": "npm run test --prefix server && npm run test --prefix client",
+    "test:server": "npm run test --prefix server",
+    "test:client": "npm run test --prefix client"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.1"
+  }
+}
