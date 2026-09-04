@@ -901,7 +901,7 @@ Do not mark tests as Pass before they have actually run successfully.
 Current final test run status:
 
 **Final Test Run Date:** 2026-09-04  
-**Branch / Commit Tested:** `main`  
+**Branch / Commit Tested:** `main` (`128e631`)  
 **Test Frameworks:** Vitest v4.1.10 & Playwright v1.50.1  
 
 **Test Summary:**
