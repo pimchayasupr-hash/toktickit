@@ -342,6 +342,48 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
                 </div>
               </div>
 
+              {/* Optional Attachment File Selection */}
+              <div className="mb-4">
+                <label htmlFor="ticket-attachment" className="form-label fw-semibold">
+                  Attach Initial Supporting File <span className="text-muted extra-small">(Optional)</span>
+                </label>
+                <input
+                  id="ticket-attachment"
+                  type="file"
+                  className={`form-control ${fieldErrors.attachment ? 'is-invalid' : ''}`}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+                      const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+                      const fileExt = '.' + (file.name.split('.').pop() || '').toLowerCase();
+                      if (!ALLOWED_TYPES.includes(file.type.toLowerCase()) && !ALLOWED_EXTS.includes(fileExt)) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          attachment: `Invalid file format "${file.name}". Permitted attachment types are JPG, PNG, WEBP, and PDF.`,
+                        }));
+                      } else if (file.size > 5 * 1024 * 1024) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          attachment: `File "${file.name}" exceeds the 5 MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB).`,
+                        }));
+                      } else {
+                        setFieldErrors((prev) => {
+                          const copy = { ...prev };
+                          delete copy.attachment;
+                          return copy;
+                        });
+                      }
+                    }
+                  }}
+                />
+                {fieldErrors.attachment ? (
+                  <div className="invalid-feedback d-block mt-1">{fieldErrors.attachment}</div>
+                ) : (
+                  <div className="form-text extra-small">Permitted file types: JPG, PNG, WEBP, PDF (Max 5 MB)</div>
+                )}
+              </div>
+
               {/* Action Buttons */}
               <div className="d-flex justify-content-end gap-2">
                 {onCancel && (
