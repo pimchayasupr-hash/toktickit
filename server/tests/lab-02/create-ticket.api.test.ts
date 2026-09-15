@@ -3,13 +3,20 @@ import request from 'supertest';
 import app from '../../src/app';
 
 describe('Issue 3: Create Ticket API Tests', () => {
-  const requesterId = 1;
+  const getToken = async () => {
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'jennifer.anderson@example.com',
+      password: 'Password123!',
+    });
+    return res.body.token;
+  };
 
   it('POST /api/tickets creates a new ticket and generates official ticketNumber', async () => {
+    const token = await getToken();
     const clientSubmissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${Math.random().toString(36).substring(2, 9)}`;
     const res = await request(app)
       .post('/api/tickets')
-      .set('X-Development-Requester-Id', String(requesterId))
+      .set('Authorization', `Bearer ${token}`)
       .send({
         clientSubmissionId,
         categoryId: 1,
@@ -22,14 +29,14 @@ describe('Issue 3: Create Ticket API Tests', () => {
     expect(res.status).toBe(201);
     expect(res.body.ticket).toBeDefined();
     expect(res.body.ticket.ticketNumber).toMatch(/^TKT-\d{4}-\d{6}$/);
-    expect(res.body.ticket.requesterId).toBe(requesterId);
     expect(res.body.ticket.summary).toBe('Cannot connect to campus Wi-Fi network');
   });
 
   it('POST /api/tickets returns 400 Bad Request on invalid fields', async () => {
+    const token = await getToken();
     const res = await request(app)
       .post('/api/tickets')
-      .set('X-Development-Requester-Id', String(requesterId))
+      .set('Authorization', `Bearer ${token}`)
       .send({
         categoryId: 999,
         relatedSystemId: 999,

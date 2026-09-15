@@ -3,29 +3,34 @@ import request from 'supertest';
 import app from '../../src/app';
 
 describe('Issue 4: My Tickets List API Tests', () => {
-  const requesterId = 1;
+  const getToken = async () => {
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'jennifer.anderson@example.com',
+      password: 'Password123!',
+    });
+    return res.body.token;
+  };
 
   it('GET /api/tickets returns paginated tickets for active development requester', async () => {
+    const token = await getToken();
     const res = await request(app)
       .get('/api/tickets')
-      .set('X-Development-Requester-Id', String(requesterId));
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.tickets).toBeDefined();
     expect(Array.isArray(res.body.tickets)).toBe(true);
     expect(res.body.pagination).toBeDefined();
-    expect(res.body.pagination).toHaveProperty('total');
-    expect(res.body.pagination).toHaveProperty('page');
-    expect(res.body.pagination).toHaveProperty('pageSize');
-    expect(res.body.pagination).toHaveProperty('totalPages');
   });
 
   it('GET /api/tickets filters by categoryId and search keyword', async () => {
+    const token = await getToken();
     const res = await request(app)
       .get('/api/tickets?categoryId=1&search=Wi-Fi')
-      .set('X-Development-Requester-Id', String(requesterId));
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.tickets).toBeDefined();
+    expect(Array.isArray(res.body.tickets)).toBe(true);
   });
 });

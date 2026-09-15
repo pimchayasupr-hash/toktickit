@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, Requester } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export interface RequesterRequest extends Request {
-  requester?: Requester;
+  requester?: User;
 }
 
 export const requireRequester = async (
@@ -27,7 +27,8 @@ export const requireRequester = async (
     return;
   }
 
-  const requesterId = parseInt(Array.isArray(requesterIdRaw) ? requesterIdRaw[0] : String(requesterIdRaw), 10);
+  const rawVal = Array.isArray(requesterIdRaw) ? (requesterIdRaw[0] as string) : String(requesterIdRaw);
+  const requesterId = parseInt(rawVal, 10);
 
   if (isNaN(requesterId) || requesterId <= 0) {
     res.status(400).json({
@@ -40,7 +41,7 @@ export const requireRequester = async (
   }
 
   try {
-    const requester = await prisma.requester.findFirst({
+    const requester = await prisma.user.findFirst({
       where: {
         id: requesterId,
         isActive: true,
