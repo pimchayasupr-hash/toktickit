@@ -10,7 +10,7 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
     await page.click('button:has-text("Sign In")');
 
     // Verify User Management is displayed
-    await expect(page.getByText('User Management')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'User Management' })).toBeVisible();
 
     // Open Create User modal
     await page.click('button:has-text("Create New User")');

@@ -10,7 +10,7 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     await page.click('button:has-text("Sign In")');
 
     // Verify Shared Queue is displayed
-    await expect(page.getByText('IT Staff Shared Ticket Queue')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'IT Staff Shared Ticket Queue' })).toBeVisible();
 
     // Search for ticket
     await page.fill('input[placeholder*="Search"]', 'battery');
@@ -23,6 +23,6 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     // Post internal note
     await page.fill('textarea[placeholder*="internal note"]', 'Playwright E2E Internal Note verification.');
     await page.click('button:has-text("Add Internal Note")');
-    await expect(page.getByText('Playwright E2E Internal Note verification.')).toBeVisible();
+    await expect(page.locator('p').filter({ hasText: 'Playwright E2E Internal Note verification.' })).toBeVisible();
   });
 });
