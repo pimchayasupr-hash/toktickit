@@ -1,181 +1,104 @@
-import { useState } from 'react';
-import { RequesterProvider, useRequester } from './context/RequesterContext';
-import { Navbar } from './components/Navbar';
-import { DevRequesterSelect } from './components/DevRequesterSelect';
-import { CreateTicket } from './components/CreateTicket';
+import React, { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { LoginForm } from './components/auth/LoginForm';
+import { ChangePasswordModal } from './components/auth/ChangePasswordModal';
+import { Navbar } from './components/layout/Navbar';
 import { MyTickets } from './components/MyTickets';
+import { CreateTicket } from './components/CreateTicket';
 import { TicketDetail } from './components/TicketDetail';
+import { StaffTicketQueue } from './components/staff/StaffTicketQueue';
+import { StaffTicketDetail } from './components/staff/StaffTicketDetail';
+import { UserManagement } from './components/admin/UserManagement';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-
-function MainAppContent() {
-  const { selectedRequesterId } = useRequester();
-
-  const [activeTab, setActiveTab] = useState<'my-tickets' | 'create-ticket'>('my-tickets');
+const MainAppContent: React.FC = () => {
+  const { user, loading } = useAuth();
+  const [activeTab, setActiveTab] = useState<string>('default');
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
-  // Lab 1 Health Check Compatibility State
-  const [systemStatus, setSystemStatus] = useState<'Online' | 'Offline' | null>(null);
-  const [serviceName, setServiceName] = useState<string | null>(null);
-  const [lab1Categories, setLab1Categories] = useState<{ id: number; name: string }[]>([]);
-  const [isLoadingHealth, setIsLoadingHealth] = useState<boolean>(false);
-  const [healthError, setHealthError] = useState<string | null>(null);
-
-  const handleCheckSystem = async () => {
-    setIsLoadingHealth(true);
-    setHealthError(null);
-
-    try {
-      const [healthResponse, categoriesResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/health`),
-        fetch(`${API_BASE_URL}/api/categories`),
-      ]);
-
-      if (!healthResponse.ok) {
-        throw new Error(`Health check failed with status ${healthResponse.status}`);
-      }
-
-      if (!categoriesResponse.ok) {
-        throw new Error(`Categories request failed with status ${categoriesResponse.status}`);
-      }
-
-      const healthData = await healthResponse.json();
-      const categoriesData = await categoriesResponse.json();
-
-      setSystemStatus('Online');
-      setServiceName(healthData.service || 'TokTickIT API');
-      setLab1Categories(Array.isArray(categoriesData) ? categoriesData : categoriesData.categories || []);
-    } catch (error) {
-      setSystemStatus('Offline');
-      setLab1Categories([]);
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Unable to connect to the backend service. Please ensure the server is running.';
-      setHealthError(`System Status: Offline (${message})`);
-    } finally {
-      setIsLoadingHealth(false);
-    }
-  };
-
-  // If no Development Requester is selected, render Selection screen
-  if (!selectedRequesterId) {
+  if (loading) {
     return (
-      <div>
-        <DevRequesterSelect />
-
-        {/* Hidden / Embedded Lab 1 Test Compatibility Container */}
-        <div className="container py-3 opacity-75">
-          <div className="card shadow-sm border-0">
-            <div className="card-body p-3">
-              <h1 className="h5 mb-2 text-center fw-bold">TokTickIT IT Service Desk</h1>
-              <div className="d-grid mb-2">
-                <button
-                  type="button"
-                  id="check-system-btn"
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={handleCheckSystem}
-                  disabled={isLoadingHealth}
-                >
-                  {isLoadingHealth ? 'Loading...' : 'Check System'}
-                </button>
-              </div>
-
-              {isLoadingHealth && (
-                <div className="text-center my-2 text-secondary" data-testid="loading-indicator">
-                  <p className="mb-0 small">Loading system status and categories...</p>
-                </div>
-              )}
-
-              {healthError && (
-                <div className="alert alert-danger mt-2 p-2 small" role="alert" data-testid="error-alert">
-                  <p className="mb-0">{healthError}</p>
-                </div>
-              )}
-
-              {systemStatus && (
-                <div className="card bg-light border-0 p-2 my-2" data-testid="status-card">
-                  <div className="d-flex justify-content-between align-items-center small">
-                    <span>System Status:</span>
-                    <span
-                      className={`badge ${systemStatus === 'Online' ? 'bg-success' : 'bg-danger'}`}
-                      data-testid="system-status-badge"
-                    >
-                      {systemStatus}
-                    </span>
-                  </div>
-                  {serviceName && systemStatus === 'Online' && (
-                    <div className="mt-1 small">
-                      Service: <span>{serviceName}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {lab1Categories.length > 0 && (
-                <div className="mt-2" data-testid="categories-section">
-                  <h6 className="fw-bold mb-2">Supported Request Categories</h6>
-                  <ul className="list-group list-group-flush" id="categories-list">
-                    {lab1Categories.map((c) => (
-                      <li key={c.id} className="list-group-item py-1 px-2 small">
-                        {c.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-emerald-600 border-t-transparent mb-3"></div>
+          <p className="text-sm font-medium text-slate-600">Initializing TokTickIT session...</p>
         </div>
       </div>
     );
   }
 
+  // Not logged in -> Show Login Form
+  if (!user) {
+    return <LoginForm />;
+  }
+
+  // Must change password -> Show Change Password Modal overlay
+  if (user.mustChangePassword) {
+    return <ChangePasswordModal />;
+  }
+
+  // Handle default tab according to role
+  const effectiveTab =
+    activeTab === 'default'
+      ? user.role === 'REQUESTER'
+        ? 'my-tickets'
+        : user.role === 'STAFF'
+        ? 'staff-queue'
+        : 'user-management'
+      : activeTab;
+
   return (
-    <div className="min-vh-100 d-flex flex-column bg-light">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Navbar
-        activeTab={activeTab}
+        activeTab={effectiveTab}
         setActiveTab={(tab) => {
-          setActiveTab(tab);
           setSelectedTicketId(null);
+          setActiveTab(tab);
         }}
       />
 
-      <main className="flex-grow-1 container py-5">
-        {selectedTicketId ? (
-          <TicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
-        ) : activeTab === 'create-ticket' ? (
-          <CreateTicket
-            onSuccess={(createdTicket) => {
-              setSelectedTicketId(createdTicket.id);
-              setActiveTab('my-tickets');
-            }}
-          />
-        ) : (
+      <main className="flex-grow">
+        {selectedTicketId !== null ? (
+          user.role === 'REQUESTER' ? (
+            <TicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
+          ) : (
+            <StaffTicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
+          )
+        ) : effectiveTab === 'my-tickets' && user.role === 'REQUESTER' ? (
           <MyTickets
-            onSelectTicket={(ticketId) => setSelectedTicketId(ticketId)}
-            onCreateNewTicket={() => {
-              setSelectedTicketId(null);
-              setActiveTab('create-ticket');
-            }}
+            onSelectTicket={(id) => setSelectedTicketId(id)}
+            onCreateNewTicket={() => setActiveTab('create-ticket')}
           />
+        ) : effectiveTab === 'create-ticket' && user.role === 'REQUESTER' ? (
+          <CreateTicket
+            onSuccess={(ticket) => {
+              setSelectedTicketId(ticket.id);
+            }}
+            onCancel={() => setActiveTab('my-tickets')}
+          />
+        ) : effectiveTab === 'staff-queue' && (user.role === 'STAFF' || user.role === 'ADMIN') ? (
+          <StaffTicketQueue onSelectTicket={(id) => setSelectedTicketId(id)} />
+        ) : effectiveTab === 'user-management' && user.role === 'ADMIN' ? (
+          <UserManagement />
+        ) : (
+          <div className="max-w-4xl mx-auto p-12 text-center">
+            <h3 className="text-xl font-bold text-slate-800">Welcome to TokTickIT</h3>
+            <p className="text-sm text-slate-600 mt-2">Use the navigation bar above to manage your tickets and services.</p>
+          </div>
         )}
       </main>
 
-      <footer className="bg-white border-top py-3 text-center text-muted small mt-auto">
-        <div className="container">
-          TokTickIT Service Desk • CPE334 Lab 2 MVP • Zen Green Design System
-        </div>
+      <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        TokTickIT v3.0 &copy; 2026 CPE 334 Software Engineering. Zen Green Design System.
       </footer>
     </div>
   );
-}
+};
 
-function App() {
+export function App() {
   return (
-    <RequesterProvider>
+    <AuthProvider>
       <MainAppContent />
-    </RequesterProvider>
+    </AuthProvider>
   );
 }
 

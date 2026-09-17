@@ -1,16 +1,28 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-import { requireRequester, RequesterRequest } from './middleware/requesterMiddleware';
+import { PrismaClient, Role } from '@prisma/client';
+import authRouter from './routes/auth';
+import staffRouter from './routes/staff';
+import commentsNotesRouter from './routes/comments-notes';
+import adminUsersRouter from './routes/admin-users';
+import { authenticateUser, AuthRequest } from './middleware/authMiddleware';
 import { generateTicketNumber } from './utils/ticketUtils';
+import { upload } from './middleware/uploadMiddleware';
+import path from 'path';
+import fs from 'fs';
 
 const app: Application = express();
 const prisma = new PrismaClient();
 
+const parseId = (idParam: any): number => {
+  const raw = Array.isArray(idParam) ? idParam[0] : String(idParam);
+  return parseInt(raw, 10);
+};
+
 app.use(cors());
 app.use(express.json());
 
-// 1. Health Check
+// 1. Health Check (Public)
 app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
@@ -18,80 +30,65 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// 2. Active Development Requesters (Feature 1)
-app.get('/api/requesters', async (_req: Request, res: Response) => {
-  try {
-    const requesters = await prisma.requester.findMany({
-      where: { isActive: true },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
-      orderBy: { name: 'asc' },
-    });
-
-    res.status(200).json({ requesters });
-  } catch (error) {
-    res.status(500).json({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch development requesters.',
-      },
-    });
-  }
-});
-
-// 3. Active Categories (Issue 2)
+// 2. Reference Data Endpoints (Public / Dev fallback)
 app.get('/api/categories', async (_req: Request, res: Response) => {
   try {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
-      select: {
-        id: true,
-        name: true,
-      },
+      select: { id: true, name: true },
       orderBy: { id: 'asc' },
     });
-
     res.status(200).json(categories);
   } catch (error) {
-    res.status(500).json({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch categories.',
-      },
-    });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch categories.' } });
   }
 });
 
-// 4. Active Related Systems (Issue 2)
 app.get('/api/related-systems', async (_req: Request, res: Response) => {
   try {
     const relatedSystems = await prisma.relatedSystem.findMany({
       where: { isActive: true },
-      select: {
-        id: true,
-        name: true,
-      },
+      select: { id: true, name: true },
       orderBy: { id: 'asc' },
     });
-
     res.status(200).json({ relatedSystems });
   } catch (error) {
-    res.status(500).json({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch related systems.',
-      },
-    });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch related systems.' } });
   }
 });
 
-// 5. Create Ticket (Issue 3)
-app.post('/api/tickets', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+// Active requesters list
+app.get('/api/requesters', async (_req: Request, res: Response) => {
   try {
-    const requesterId = req.requester!.id;
+    const requesters = await prisma.user.findMany({
+      where: { isActive: true, role: Role.REQUESTER },
+      select: { id: true, name: true, email: true },
+      orderBy: { name: 'asc' },
+    });
+    res.status(200).json({ requesters });
+  } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch requesters.' } });
+  }
+});
+
+// 3. Authentication Router
+app.use('/api/auth', authRouter);
+
+// 4. Staff Operations Router
+app.use('/api/staff', staffRouter);
+
+// 5. Comments & Notes Router
+app.use('/api', commentsNotesRouter);
+
+// 6. Admin User Management Router
+app.use('/api/admin', adminUsersRouter);
+
+// 7. Requester Ticket Operations (Authenticated)
+
+// Create Ticket
+app.post('/api/tickets', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const requesterId = req.user!.id;
     const { clientSubmissionId, categoryId, relatedSystemId, summary, requestedPriority, description } = req.body;
 
     // Idempotency check
@@ -175,6 +172,7 @@ app.post('/api/tickets', requireRequester, async (req: RequesterRequest, res: Re
             summary: trimmedSummary,
             description: trimmedDescription,
             requestedPriority,
+            itPriority: requestedPriority,
             currentStatus: 'NEW',
           },
           include: {
@@ -197,25 +195,18 @@ app.post('/api/tickets', requireRequester, async (req: RequesterRequest, res: Re
     res.status(201).json({ ticket });
     return;
   } catch (error) {
-    res.status(500).json({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to create ticket.',
-      },
-    });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to create ticket.' } });
     return;
   }
 });
 
-// 6. My Tickets List & Filtering (Issue 4)
-app.get('/api/tickets', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+// List My Tickets
+app.get('/api/tickets', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const requesterId = req.requester!.id;
+    const requesterId = req.user!.id;
     const { status, categoryId, relatedSystemId, priority, search, sort, page = '1', pageSize = '10' } = req.query;
 
-    const where: any = {
-      requesterId,
-    };
+    const where: any = { requesterId };
 
     if (status && typeof status === 'string' && status.trim() !== '') {
       where.currentStatus = status.trim();
@@ -244,18 +235,14 @@ app.get('/api/tickets', requireRequester, async (req: RequesterRequest, res: Res
       ];
     }
 
-    // Pagination
     const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(pageSize as string, 10) || 10));
     const skip = (pageNum - 1) * limitNum;
 
-    // Sorting
     let orderBy: any = { updatedAt: 'desc' };
     if (sort === 'createdAt_desc') orderBy = { createdAt: 'desc' };
     else if (sort === 'createdAt_asc') orderBy = { createdAt: 'asc' };
     else if (sort === 'updatedAt_asc') orderBy = { updatedAt: 'asc' };
-    else if (sort === 'priority_desc') orderBy = { requestedPriority: 'desc' };
-    else if (sort === 'priority_asc') orderBy = { requestedPriority: 'asc' };
 
     const [total, tickets] = await Promise.all([
       prisma.ticket.count({ where }),
@@ -289,25 +276,16 @@ app.get('/api/tickets', requireRequester, async (req: RequesterRequest, res: Res
     });
     return;
   } catch (error) {
-    res.status(500).json({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch tickets.',
-      },
-    });
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch tickets.' } });
     return;
   }
 });
 
-import { upload } from './middleware/uploadMiddleware';
-import path from 'path';
-import fs from 'fs';
-
-// 7. Ticket Detail View (Issue 5)
-app.get('/api/tickets/:id', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+// Ticket Detail View
+app.get('/api/tickets/:id', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const requesterId = req.requester!.id;
-    const ticketId = parseInt(req.params.id, 10);
+    const user = req.user!;
+    const ticketId = parseId(req.params.id);
 
     if (isNaN(ticketId)) {
       res.status(400).json({ error: { code: 'INVALID_ID', message: 'Ticket ID must be a number.' } });
@@ -320,7 +298,12 @@ app.get('/api/tickets/:id', requireRequester, async (req: RequesterRequest, res:
         category: { select: { id: true, name: true } },
         relatedSystem: { select: { id: true, name: true } },
         requester: { select: { id: true, name: true, email: true } },
+        owner: { select: { id: true, name: true, email: true } },
         attachments: { orderBy: { createdAt: 'asc' } },
+        publicComments: {
+          include: { author: { select: { id: true, name: true, role: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     });
 
@@ -329,8 +312,8 @@ app.get('/api/tickets/:id', requireRequester, async (req: RequesterRequest, res:
       return;
     }
 
-    // Ownership check
-    if (ticket.requesterId !== requesterId) {
+    // Ownership check for Requester
+    if (user.role === Role.REQUESTER && ticket.requesterId !== user.id) {
       res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
       return;
     }
@@ -343,8 +326,8 @@ app.get('/api/tickets/:id', requireRequester, async (req: RequesterRequest, res:
   }
 });
 
-// 8. Upload Attachment (Issue 5)
-app.post('/api/tickets/:id/attachments', requireRequester, (req: RequesterRequest, res: Response): void => {
+// Attachments handling
+app.post('/api/tickets/:id/attachments', authenticateUser, (req: AuthRequest, res: Response): void => {
   upload.single('file')(req, res, async (err: any) => {
     try {
       if (err) {
@@ -359,11 +342,11 @@ app.post('/api/tickets/:id/attachments', requireRequester, (req: RequesterReques
         return;
       }
 
-      const requesterId = req.requester!.id;
-      const ticketId = parseInt(req.params.id, 10);
+      const user = req.user!;
+      const ticketId = parseId(req.params.id);
 
       const ticket = await prisma.ticket.findFirst({ where: { id: ticketId } });
-      if (!ticket || ticket.requesterId !== requesterId) {
+      if (!ticket || (user.role === Role.REQUESTER && ticket.requesterId !== user.id)) {
         if (req.file.path && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
         return;
@@ -401,18 +384,17 @@ app.post('/api/tickets/:id/attachments', requireRequester, (req: RequesterReques
   });
 });
 
-// 9. Download Attachment (Issue 5)
-app.get('/api/attachments/:id/download', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+app.get('/api/attachments/:id/download', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const requesterId = req.requester!.id;
-    const attachmentId = parseInt(req.params.id, 10);
+    const user = req.user!;
+    const attachmentId = parseId(req.params.id);
 
     const attachment = await prisma.attachment.findFirst({
       where: { id: attachmentId },
       include: { ticket: true },
     });
 
-    if (!attachment || attachment.ticket.requesterId !== requesterId) {
+    if (!attachment || (user.role === Role.REQUESTER && attachment.ticket.requesterId !== user.id)) {
       res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Attachment not found.' } });
       return;
     }
@@ -435,11 +417,10 @@ app.get('/api/attachments/:id/download', requireRequester, async (req: Requester
   }
 });
 
-// 10. Soft Remove Attachment (Issue 5)
-app.post('/api/attachments/:id/remove', requireRequester, async (req: RequesterRequest, res: Response): Promise<void> => {
+app.post('/api/attachments/:id/remove', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const requesterId = req.requester!.id;
-    const attachmentId = parseInt(req.params.id, 10);
+    const user = req.user!;
+    const attachmentId = parseId(req.params.id);
     const { removalReason } = req.body;
 
     const attachment = await prisma.attachment.findFirst({
@@ -447,7 +428,7 @@ app.post('/api/attachments/:id/remove', requireRequester, async (req: RequesterR
       include: { ticket: true },
     });
 
-    if (!attachment || attachment.ticket.requesterId !== requesterId) {
+    if (!attachment || (user.role === Role.REQUESTER && attachment.ticket.requesterId !== user.id)) {
       res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Attachment not found.' } });
       return;
     }
@@ -460,10 +441,7 @@ app.post('/api/attachments/:id/remove', requireRequester, async (req: RequesterR
     const trimmedReason = typeof removalReason === 'string' ? removalReason.trim() : '';
     if (trimmedReason.length < 3 || trimmedReason.length > 200) {
       res.status(400).json({
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Removal reason must be between 3 and 200 characters.',
-        },
+        error: { code: 'VALIDATION_ERROR', message: 'Removal reason must be between 3 and 200 characters.' },
       });
       return;
     }
@@ -486,4 +464,3 @@ app.post('/api/attachments/:id/remove', requireRequester, async (req: RequesterR
 });
 
 export default app;
-
