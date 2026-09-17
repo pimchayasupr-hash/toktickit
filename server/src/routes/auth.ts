@@ -106,13 +106,14 @@ router.post('/change-password', authenticateUser, async (req: AuthRequest, res: 
     const userId = req.user!.id;
     const { currentPassword, newPassword } = req.body;
 
-    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!newPassword || typeof newPassword !== 'string' || !passwordRegex.test(newPassword)) {
       res.status(400).json({
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'New password must be at least 8 characters long.',
+          message: 'New password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
           fields: {
-            newPassword: 'Password must be at least 8 characters long.',
+            newPassword: 'Password does not meet complexity requirements.',
           },
         },
       });

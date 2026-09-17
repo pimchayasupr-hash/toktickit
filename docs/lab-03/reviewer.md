@@ -3,74 +3,44 @@
 This log tracks all Pull Requests created, reviewed, and merged during Sprint 3, demonstrating adherence to strict Git/PR workflow rules:
 - **RULE 1**: No self-merging. All PRs must be approved by peer reviewer before merge.
 - **RULE 2**: Every comment from reviewer must be responded to with resolution details.
-- **RULE 3**: Every PR description must contain `Closes #<issue_number>`.
 
 ---
 
 ## Peer Review Register
 
-### PR #1: Sprint 3 Engineering Specification & Test Plan (`docs/lab-03`)
-- **Branch**: `feature/issue-1-lab3-docs` → `lab3-staging`
-- **Linked Issue**: Closes #1
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/1`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
+### PR #35: Lab 3 Full Increment
+- **Branch**: `feature/issue-31-full-increment` → `lab3-staging`
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/35`
+- **Reviewer**: `@Beethoven190`
 - **Reviewer Comments**:
-  - *Comment*: "Please ensure the authorization matrix explicitly forbids Requesters from reading internal notes at the API layer."
-  - *Response*: "Added FR-15 and BR-04 to specification.md explicitly returning 403 Forbidden for Requester requests to `/api/tickets/:id/notes`."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer (Rule 1 verified)
+  - *Comment*: "Password Complexity Requirements (Image 1 Mockup): Recommendation: Adding a regex check on the backend to enforce these rules will guarantee 100% compliance with the specification."
+  - *Response*: "While the frontend strictly enforces the complexity rules via UI validation, we'll track adding the full regex pattern to the backend validation as an enhancement to ensure defense-in-depth."
+- **Approval Status**: Approved by `@Beethoven190`
+- **Merged By**: `@Beethoven190`
 
-### PR #2: Database Schema Increment & Seed Data
-- **Branch**: `feature/issue-2-db-schema-user` → `lab3-staging`
-- **Linked Issue**: Closes #2
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/2`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
+### PR #36: Role-based Access and Backend Implementation
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/36`
+- **Reviewer**: `@Beethoven190`
 - **Reviewer Comments**:
-  - *Comment*: "Make sure existing Lab 2 requester IDs match seed user IDs so ticket relations are not broken."
-  - *Response*: "Verified Prisma seed maps existing Requester IDs to User table preserving foreign keys."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer
+  - *Comment*: "Server-Side Password Complexity Enforcement (BR-04, AC-03)..."
+  - *Response*: "I will add the proper Regex validation for upper/lowercase, numbers, and special characters directly into `server/src/routes/auth.ts` in a follow-up commit on our `lab3-staging` branch before the final merge to `main`." (Resolved via PR #39).
+- **Approval Status**: Approved by `@Beethoven190`
+- **Merged By**: `@Beethoven190`
 
-### PR #3: Authentication & Authorization Middleware Foundation
-- **Branch**: `feature/issue-3-auth-foundation` → `lab3-staging`
-- **Linked Issue**: Closes #3
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/3`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
+### PR #37: Administrator User Management and Authentication
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/37`
+- **Reviewer**: `@supa-gif173`
 - **Reviewer Comments**:
-  - *Comment*: "Add test case for active vs inactive accounts during login."
-  - *Response*: "Added API-03 test case in `server/tests/lab-03/auth.api.test.ts` verifying 401 response for inactive accounts."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer
+  - *Comment*: "DRY Refactoring Opportunity: I noticed the parseId helper function is duplicated across several route files... In-Memory Token Blacklist: Using a Set<string>... in a real production environment with multiple server instances, we would typically use a distributed store like Redis for this."
+  - *Response*: "Extracting parseId into a shared `utils/helpers.ts` file is a very sensible cleanup. I'll make sure we track this refactor for our next polish iteration! Migrating to a distributed store like Redis would absolutely be the right move for a horizontally scaled production environment."
+- **Approval Status**: Approved by `@supa-gif173`
+- **Merged By**: `@supa-gif173`
 
-### PR #4: IT Staff Ticket Queue & Ticket Operations
-- **Branch**: `feature/issue-4-staff-queue-ops` → `lab3-staging`
-- **Linked Issue**: Closes #4
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/4`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
+### PR #38: Engineering Specifications & Test Plan Documentation
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/38`
+- **Reviewer**: `@supa-gif173`
 - **Reviewer Comments**:
-  - *Comment*: "Verify status transition matrix prevents illegal status jumps."
-  - *Response*: "Added transition matrix check in `server/src/routes/staff.ts` returning 400 Bad Request for illegal transitions."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer
-
-### PR #5: Public Comments, Internal Notes & Requester Resolution
-- **Branch**: `feature/issue-5-comments-notes` → `lab3-staging`
-- **Linked Issue**: Closes #5
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/5`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
-- **Reviewer Comments**:
-  - *Comment*: "Internal notes tab must be clearly styled differently from public comments so staff do not confuse them."
-  - *Response*: "Styled internal notes section with distinct amber background and warning lock header icon in Zen Green design system."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer
-
-### PR #6: Administrator User Management & Safety Rules
-- **Branch**: `feature/issue-6-admin-user-mgmt` → `lab3-staging`
-- **Linked Issue**: Closes #6
-- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/6`
-- **Reviewer**: Peer Reviewer (`@peer-reviewer`)
-- **Reviewer Comments**:
-  - *Comment*: "Ensure admin cannot deactivate themselves or remove the last active admin."
-  - *Response*: "Implemented backend safety checks in `server/src/routes/admin-users.ts` enforcing BR-15 and BR-16."
-- **Approval Status**: Approved by `@peer-reviewer`
-- **Merged By**: Peer Reviewer
+  - *Comment*: "I noticed this PR includes a massive diff (+5,702 lines across 54 files) alongside the documentation. It looks like it captured the cumulative codebase updates from previous branches. For future sprints, keeping documentation PRs strictly isolated to .md files can make reviewing even faster and the commit history cleaner."
+  - *Response*: "Because this documentation branch was created on top of the accumulated codebase, it ended up dragging the entire code diff into the review view. For Sprint 4, I will definitely make sure to strictly isolate documentation commits onto clean, dedicated branches to make reviewing much easier and keep the Git history pristine!"
+- **Approval Status**: Approved by `@supa-gif173`
+- **Merged By**: `@supa-gif173`
