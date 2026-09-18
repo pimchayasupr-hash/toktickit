@@ -22,11 +22,13 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
   const [summary, setSummary] = useState<string>('');
   const [requestedPriority, setRequestedPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
   const [description, setDescription] = useState<string>('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // UI / Submission State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReferenceData = async () => {
@@ -56,10 +58,44 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
     fetchReferenceData();
   }, []);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAttachmentError(null);
+    if (!e.target.files) return;
+
+    const files = Array.from(e.target.files);
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setAttachmentError(`Invalid file type: "${file.name}". Permitted types: JPG, PNG, WEBP, PDF.`);
+        return;
+      }
+      if (file.size > MAX_SIZE) {
+        setAttachmentError(`File "${file.name}" exceeds 5 MB size limit.`);
+        return;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 5) {
+      setAttachmentError('You may upload a maximum of 5 attachments per ticket.');
+      return;
+    }
+
+    setSelectedFiles(validFiles);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
     setGeneralError(null);
+    setAttachmentError(null);
 
     // Client validation
     const errors: Record<string, string> = {};
@@ -81,6 +117,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
     const clientSubmissionId = `sub-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     try {
+      // Step 1: Create Ticket
       const res = await fetch(`${API_BASE_URL}/api/tickets`, {
         method: 'POST',
         headers: {
@@ -109,7 +146,40 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
         return;
       }
 
-      onSuccess(data.ticket);
+      const createdTicket: Ticket = data.ticket;
+
+      // Step 2: Upload selected attachments if any
+      let uploadFailureCount = 0;
+      if (selectedFiles.length > 0) {
+        for (const file of selectedFiles) {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          try {
+            const attachRes = await fetch(`${API_BASE_URL}/api/tickets/${createdTicket.id}/attachments`, {
+              method: 'POST',
+              headers: {
+                'X-Development-Requester-Id': String(selectedRequesterId),
+              },
+              body: formData,
+            });
+
+            if (!attachRes.ok) {
+              uploadFailureCount++;
+            }
+          } catch (err) {
+            uploadFailureCount++;
+          }
+        }
+      }
+
+      if (uploadFailureCount > 0) {
+        setAttachmentError(
+          `Ticket ${createdTicket.ticketNumber} was created successfully, but ${uploadFailureCount} attachment(s) failed to upload. You may upload them in Ticket Detail.`
+        );
+      }
+
+      onSuccess(createdTicket);
     } catch (err: any) {
       setGeneralError(err.message || 'Unable to connect to server. Please try again.');
     } finally {
@@ -147,6 +217,12 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
               <div className="alert alert-danger" role="alert">
                 <h6 className="fw-bold mb-1">Submission Failed</h6>
                 <p className="mb-0 small">{generalError}</p>
+              </div>
+            )}
+
+            {attachmentError && (
+              <div className="alert alert-warning" role="alert">
+                <p className="mb-0 small">{attachmentError}</p>
               </div>
             )}
 
@@ -304,6 +380,44 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
                   )}
                   <span className="text-muted extra-small">{description.length}/2000</span>
                 </div>
+              </div>
+
+              {/* Attachments Section */}
+              <div className="mb-4 p-3 border rounded bg-light">
+                <label htmlFor="ticket-attachments" className="form-label fw-semibold">
+                  Attachments (Optional)
+                </label>
+                <input
+                  type="file"
+                  id="ticket-attachments"
+                  className="form-control"
+                  multiple
+                  accept=".jpg,.jpeg,.png,.webp,.pdf"
+                  onChange={handleFileChange}
+                  disabled={isSubmitting}
+                />
+                <div className="form-text small">
+                  Permitted file types: JPG, PNG, WEBP, PDF (Max 5 MB per file, up to 5 attachments).
+                </div>
+
+                {selectedFiles.length > 0 && (
+                  <ul className="list-group mt-2">
+                    {selectedFiles.map((file, idx) => (
+                      <li key={idx} className="list-group-item d-flex justify-content-between align-items-center py-1 px-3 small">
+                        <span>
+                          📄 <strong>{file.name}</strong> ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-link text-danger p-0"
+                          onClick={() => removeFile(idx)}
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* Action Buttons */}
