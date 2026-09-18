@@ -288,20 +288,34 @@ input, select, textarea, button {
   box-shadow: 0 0 0 3px rgba(0, 90, 54, 0.15);
 }
 
-.tkt-input-icon-btn {
+.tkt-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.tkt-input-icon-btn,
+.tkt-password-toggle {
   position: absolute;
   right: 0.75rem;
-  background: none;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
   border: none;
   cursor: pointer;
   color: #64748b;
   padding: 0.25rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+  z-index: 2;
 }
 
-.tkt-input-icon-btn:hover {
+.tkt-input-icon-btn:hover,
+.tkt-password-toggle:hover {
   color: #0f172a;
 }
 
