@@ -128,4 +128,36 @@ describe('Lab 3 - Authentication & Token Revocation API Suite', () => {
     expect(postLogoutRes.status).toBe(401);
     expect(postLogoutRes.body.error.code).toBe('UNAUTHORIZED');
   });
+
+  it('API-05: Password change rejects weak passwords based on complexity regex', async () => {
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'sarah.jenkins@example.com',
+        password: 'Password123!',
+      });
+
+    const token = loginRes.body.token;
+
+    const weakPasswords = [
+      'short1!',
+      'nouppercase1!',
+      'NOLOWERCASE1!',
+      'NoSpecialChar123',
+      'NoNumbersHere!'
+    ];
+
+    for (const weak of weakPasswords) {
+      const changeRes = await request(app)
+        .post('/api/auth/change-password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          currentPassword: 'Password123!',
+          newPassword: weak,
+        });
+
+      expect(changeRes.status).toBe(400);
+      expect(changeRes.body.error.code).toBe('VALIDATION_ERROR');
+    }
+  });
 });

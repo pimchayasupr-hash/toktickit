@@ -44,3 +44,12 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
   - *Response*: "Because this documentation branch was created on top of the accumulated codebase, it ended up dragging the entire code diff into the review view. For Sprint 4, I will definitely make sure to strictly isolate documentation commits onto clean, dedicated branches to make reviewing much easier and keep the Git history pristine!"
 - **Approval Status**: Approved by `@supa-gif173`
 - **Merged By**: `@supa-gif173`
+
+### PR #39: Final Fixes (Password Complexity & Documentation)
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/39`
+- **Reviewer**: `@supa-gif173`
+- **Reviewer Comments**:
+  - *Comment*: "Robust Backend Security: Adding the regex validation directly to server/src/routes/auth.ts (BR-04, AC-03) provides a crucial layer of defense-in-depth. Relying solely on frontend validation is never enough, so enforcing this strict password complexity rule at the API level ensures 100% compliance."
+  - *Response*: "Thank you for the thorough review and the quick approval! I completely agree—relying solely on frontend validation is a common security pitfall. Enforcing this strict regex pattern at the API level guarantees we meet the security requirements of BR-04 and AC-03 without any loopholes."
+- **Approval Status**: Approved by `@supa-gif173`
+- **Merged By**: `@pimchayasupr-hash`
