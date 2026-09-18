@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
 
 :root {
-  /* TikTockIT Zen Green Palette */
+  /* TokTickIT Zen Green Palette */
   --brand-green-primary: #005a36;
   --brand-green-hover: #007a4a;
   --brand-green-dark: #004227;
@@ -62,7 +62,7 @@ input, select, textarea, button {
 }
 
 /* ==========================================================================
-   TikTockIT Custom Header & Navbar
+   TokTickIT Custom Header & Navbar
    ========================================================================== */
 .tkt-navbar {
   background-color: var(--brand-green-primary);

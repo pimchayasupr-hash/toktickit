@@ -53,11 +53,11 @@ export const ChangePasswordModal: React.FC = () => {
   return (
     <div className="tkt-auth-page" style={{ position: 'fixed', inset: 0, zIndex: 50, backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)' }}>
       <div className="tkt-auth-card">
-        {/* TikTockIT Header Bar */}
+        {/* TokTickIT Header Bar */}
         <div className="tkt-auth-header-bar">
           <div className="tkt-brand-icon">⏱️</div>
           <div>
-            <div className="tkt-brand-title">TikTockIT</div>
+            <div className="tkt-brand-title">TokTickIT</div>
           </div>
         </div>
 

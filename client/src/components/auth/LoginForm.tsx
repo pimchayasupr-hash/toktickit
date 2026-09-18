@@ -31,11 +31,11 @@ export const LoginForm: React.FC = () => {
   return (
     <div className="tkt-auth-page">
       <div className="tkt-auth-card">
-        {/* TikTockIT Brand Header Bar */}
+        {/* TokTickIT Brand Header Bar */}
         <div className="tkt-auth-header-bar">
           <div className="tkt-brand-icon">⏱️</div>
           <div>
-            <div className="tkt-brand-title">TikTockIT</div>
+            <div className="tkt-brand-title">TokTickIT</div>
           </div>
         </div>
 

@@ -15,6 +15,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
 
   // Filters & Sorting
   const [search, setSearch] = useState('');
+  const [submittedSearch, setSubmittedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -32,8 +33,52 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   }, []);
 
   useEffect(() => {
+    let ignore = false;
+
+    const fetchQueue = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams();
+        if (submittedSearch) params.append('search', submittedSearch);
+        if (statusFilter) params.append('status', statusFilter);
+        if (priorityFilter) params.append('priority', priorityFilter);
+        if (categoryFilter) params.append('categoryId', categoryFilter);
+        if (ownerFilter) params.append('ownerId', ownerFilter);
+        if (sortOrder) params.append('sort', sortOrder);
+        params.append('page', String(page));
+        params.append('pageSize', '10');
+
+        const res = await fetch(`/api/staff/tickets?${params.toString()}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch ticket queue.');
+        }
+
+        const data = await res.json();
+        if (!ignore) {
+          setTickets(data.tickets || []);
+          setPagination(data.pagination || { page: 1, pageSize: 10, total: 0, totalPages: 1 });
+        }
+      } catch (err: any) {
+        if (!ignore) {
+          setError(err.message || 'An error occurred while loading tickets.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchQueue();
-  }, [page, statusFilter, priorityFilter, categoryFilter, ownerFilter, sortOrder]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [page, statusFilter, priorityFilter, categoryFilter, ownerFilter, sortOrder, submittedSearch, token]);
 
   const fetchReferenceData = async () => {
     try {
@@ -53,44 +98,10 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
     } catch {}
   };
 
-  const fetchQueue = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (statusFilter) params.append('status', statusFilter);
-      if (priorityFilter) params.append('priority', priorityFilter);
-      if (categoryFilter) params.append('categoryId', categoryFilter);
-      if (ownerFilter) params.append('ownerId', ownerFilter);
-      if (sortOrder) params.append('sort', sortOrder);
-      params.append('page', String(page));
-      params.append('pageSize', '10');
-
-      const res = await fetch(`/api/staff/tickets?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch ticket queue.');
-      }
-
-      const data = await res.json();
-      setTickets(data.tickets || []);
-      setPagination(data.pagination || { page: 1, pageSize: 10, total: 0, totalPages: 1 });
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while loading tickets.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setTickets([]);
-    setLoading(true);
     setPage(1);
-    fetchQueue();
+    setSubmittedSearch(search);
   };
 
   const getPriorityBadge = (priority: string) => {

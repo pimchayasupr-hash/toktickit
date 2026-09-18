@@ -30,7 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         <div className="tkt-brand" onClick={() => setActiveTab('default')} title="TokTickIT Home">
           <div className="tkt-brand-icon">⏱️</div>
           <div>
-            <div className="tkt-brand-title">TikTockIT</div>
+            <div className="tkt-brand-title">TokTickIT</div>
             <div className="tkt-brand-sub">IT Support System</div>
           </div>
         </div>
