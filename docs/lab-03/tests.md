@@ -35,6 +35,7 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | **API-16** | API | AC-10, BR-16 | Deactivating last active Admin attempt returns 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-17** | API | AC-17, FR-17 | Admin search users by name/email & filter by role | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-18** | API | AC-18, FR-20 | Admin reset initial password forces password change flag | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-19** | API | AC-03, BR-04 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
 | **UI-01** | UI | AC-01, AC-02 | Login form renders fields, validation errors, and loading state | `client/src/tests/lab-03/Login.test.tsx` | Pass |
 | **UI-02** | UI | AC-02, BR-02 | Mandatory password change form enforces password rules | `client/src/tests/lab-03/ChangePassword.test.tsx` | Pass |
 | **UI-03** | UI | FR-09, FR-10 | Staff Ticket Queue table renders filters, search, and badges | `client/src/tests/lab-03/StaffTicketQueue.test.tsx` | Pass |
@@ -74,6 +75,129 @@ npx playwright test
 ```text
  Test Files  11 passed (11)
       Tests  13 passed (13)
-   Start at  16:30:30
-   Duration  6.80s (transform 2.72s, setup 2.66s, import 4.68s, tests 5.01s, environment 23.63s)
+   Start at  18:36:02
+   Duration  5.21s (transform 1.80s, setup 2.31s, import 2.97s, tests 4.33s, environment 19.14s)
+```
+
+### Playwright End-to-End Test Output
+```text
+Running 9 tests using 4 workers
+
+[1/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[2/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[3/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[4/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+[5/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+[6/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[7/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[8/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+[9/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+  9 passed (20.6s)
+```
+
+---
+
+## 5. Manual Evidence: HTTP 401 & 403 Verification (Live cURL Execution)
+
+As mandated by Lab 3 Specification (Section 7/9) and API Security Matrix guidelines, manual endpoint verification was executed against the running server via cURL. The real terminal outputs, response headers, and HTTP status codes are recorded below:
+
+### 1. Verification of HTTP 401 Unauthorized (Missing Authentication Token)
+
+Attempting to request a protected endpoint without providing an Authorization bearer token:
+
+```bash
+curl -i -s http://localhost:3000/api/staff/tickets
+```
+
+**Live Response Output:**
+```http
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 93
+ETag: W/"5d-ZiGWJit8YnHA2rShoGFufu8IHA4"
+Date: Fri, 18 Sep 2026 11:35:14 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"UNAUTHORIZED","message":"Authentication token is missing. Please log in."}}
+```
+
+---
+
+### 2. Verification of HTTP 403 Forbidden (Requester Accessing IT Staff Queue)
+
+Attempting to access `/api/staff/tickets` using a valid JWT token issued to a `REQUESTER` (`michael.brown@example.com`):
+
+```bash
+curl -i -s http://localhost:3000/api/staff/tickets \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Live Response Output:**
+```http
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 110
+ETag: W/"6e-k0Ju2Dh0A9yFYRXiF9fQch+UPAc"
+Date: Fri, 18 Sep 2026 11:35:14 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"FORBIDDEN","message":"Access denied. Role REQUESTER is not authorized for this operation."}}
+```
+
+---
+
+### 3. Verification of HTTP 403 Forbidden (Requester Accessing Internal Notes)
+
+Attempting to read internal notes `/api/tickets/2/notes` using a `REQUESTER` token:
+
+```bash
+curl -i -s http://localhost:3000/api/tickets/2/notes \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Live Response Output:**
+```http
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 95
+ETag: W/"5f-ibnZJLw0FZPmFFrhIy7frlPO5FI"
+Date: Fri, 18 Sep 2026 11:35:14 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"FORBIDDEN","message":"Requesters are not permitted to view internal notes."}}
+```
+
+---
+
+### 4. Verification of HTTP 403 Forbidden (IT Staff Accessing Admin User Management)
+
+Attempting to access `/api/admin/users` using a valid JWT token issued to an `IT Staff` user (`sarah.staff@toktickit.com`):
+
+```bash
+curl -i -s http://localhost:3000/api/admin/users \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+**Live Response Output:**
+```http
+HTTP/1.1 403 Forbidden
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json; charset=utf-8
+Content-Length: 106
+ETag: W/"6a-sDnquSnGo/BLL+3QUFyX6iKVBmE"
+Date: Fri, 18 Sep 2026 11:35:14 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"error":{"code":"FORBIDDEN","message":"Access denied. Role STAFF is not authorized for this operation."}}
 ```

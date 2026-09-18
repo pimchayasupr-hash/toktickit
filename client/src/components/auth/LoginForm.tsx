@@ -5,6 +5,7 @@ export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -22,69 +23,96 @@ export const LoginForm: React.FC = () => {
     setSubmitting(false);
 
     if (!result.success) {
-      const err = (result as any).error || 'Invalid credentials or inactive account.';
+      const err = (result as any).error || 'Invalid email or password. Please try again.';
       setErrorMessage(err);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-800 mb-3 font-bold text-2xl">
-          ⏱️
+    <div className="tkt-auth-page">
+      <div className="tkt-auth-card">
+        {/* TikTockIT Brand Header Bar */}
+        <div className="tkt-auth-header-bar">
+          <div className="tkt-brand-icon">⏱️</div>
+          <div>
+            <div className="tkt-brand-title">TikTockIT</div>
+          </div>
         </div>
-        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">TokTickIT</h2>
-        <p className="mt-2 text-sm text-slate-600">Sign in to your account to manage IT support tickets</p>
-      </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-md rounded-xl border border-slate-200 sm:px-10">
+        <div className="tkt-auth-body">
+          <h2 className="tkt-auth-title">Sign in to your account</h2>
+          <p className="tkt-auth-subtitle">Manage and track IT support tickets under your account</p>
+
           {errorMessage && (
-            <div role="alert" className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-              <span>⚠️</span>
+            <div role="alert" className="tkt-alert-error">
+              <span style={{ fontSize: '1.1rem' }}>⚠️</span>
               <div>{errorMessage}</div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+          <form onSubmit={handleSubmit}>
+            <div className="tkt-form-group">
+              <label htmlFor="email" className="tkt-label">
                 Email Address
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@toktickit.com"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-sm"
+                className="tkt-input"
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+            <div className="tkt-form-group">
+              <label htmlFor="password" className="tkt-label">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 text-sm"
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="tkt-input"
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="tkt-input-icon-btn"
+                  tabIndex={-1}
+                  title={showPassword ? 'Hide' : 'Show'}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
             </div>
 
-            <div>
+            <div style={{ marginTop: '1.5rem', marginBottom: '1.25rem' }}>
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-[#005a36] hover:bg-[#008751] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-600 disabled:opacity-50 transition-colors"
+                className="tkt-btn-primary"
               >
                 {submitting ? 'Signing in...' : 'Sign In'}
               </button>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <a
+                href="#forgot-password"
+                onClick={(e) => { e.preventDefault(); alert('Please contact your IT administrator to reset your password.'); }}
+                style={{ fontSize: '0.8rem', color: 'var(--brand-green-primary)', textDecoration: 'none', fontWeight: 500 }}
+              >
+                Forgot your password?
+              </a>
             </div>
           </form>
         </div>

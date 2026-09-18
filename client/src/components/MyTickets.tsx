@@ -22,6 +22,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const [selectedSystem, setSelectedSystem] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
   const [sort, setSort] = useState<string>('updatedAt_desc');
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // Pagination State
   const [page, setPage] = useState<number>(1);
@@ -105,178 +106,256 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">Urgent</span>;
       case 'HIGH':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">High</span>;
+        return <span className="tkt-pill tkt-pill-priority-high">High</span>;
       case 'MEDIUM':
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800">Medium</span>;
+        return <span className="tkt-pill tkt-pill-priority-medium">Medium</span>;
       default:
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">Low</span>;
+        return <span className="tkt-pill tkt-pill-priority-low">Low</span>;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'IN_PROGRESS':
+        return <span className="tkt-pill tkt-pill-status-in-progress">In Progress</span>;
+      case 'OPEN':
+      case 'NEW':
+        return <span className="tkt-pill tkt-pill-status-open">Open</span>;
+      case 'WAITING_FOR_REQUESTER':
+      case 'PENDING':
+        return <span className="tkt-pill tkt-pill-status-pending">Pending</span>;
+      case 'RESOLVED':
+        return <span className="tkt-pill tkt-pill-status-resolved">Resolved</span>;
+      default:
+        return <span className="tkt-pill tkt-pill-status-closed">Closed</span>;
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem 1.25rem' }}>
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">My IT Support Tickets</h2>
-          <p className="text-sm text-slate-600">Track and manage support requests submitted under your account.</p>
+          <h2 className="tkt-queue-title">My IT Support Tickets</h2>
+          <p className="tkt-queue-sub">Track and manage support requests submitted under your account.</p>
         </div>
         <button
           onClick={onCreateNewTicket}
-          className="px-4 py-2.5 bg-[#005a36] hover:bg-[#008751] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
+          className="tkt-btn-primary"
+          style={{ width: 'auto', padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}
         >
           <span>➕</span> Create New Ticket
         </button>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-4">
-        <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by ticket number, summary..."
-            className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-          />
-          <button type="submit" className="px-4 py-2 bg-[#005a36] text-white font-medium text-sm rounded-lg hover:bg-[#008751]">
+      {/* Search & Filters Card */}
+      <div className="tkt-search-card">
+        <form onSubmit={handleSearchSubmit} className="tkt-search-row">
+          <div className="tkt-search-input-group">
+            <span className="tkt-search-icon">🔍</span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by ticket number or summary..."
+              className="tkt-search-input"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowFilters(!showFilters)}
+            className="tkt-btn-filters"
+          >
+            <span>🎛️</span> Filters
+          </button>
+          <button
+            type="submit"
+            className="tkt-btn-primary"
+            style={{ width: 'auto', padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}
+          >
             Search
           </button>
         </form>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-100 text-xs">
-          <div>
-            <label className="block font-medium text-slate-500 mb-1">Category</label>
-            <select
-              value={selectedCategory}
-              onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
-              className="w-full p-2 border border-slate-300 rounded-lg"
-            >
-              <option value="">All Categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
+        {showFilters && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+            <div>
+              <label className="tkt-label" style={{ fontSize: '0.75rem' }}>Category</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
+                className="tkt-input"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
+              >
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label className="block font-medium text-slate-500 mb-1">Related System</label>
-            <select
-              value={selectedSystem}
-              onChange={(e) => { setSelectedSystem(e.target.value); setPage(1); }}
-              className="w-full p-2 border border-slate-300 rounded-lg"
-            >
-              <option value="">All Systems</option>
-              {relatedSystems.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
-              ))}
-            </select>
-          </div>
+            <div>
+              <label className="tkt-label" style={{ fontSize: '0.75rem' }}>Related System</label>
+              <select
+                value={selectedSystem}
+                onChange={(e) => { setSelectedSystem(e.target.value); setPage(1); }}
+                className="tkt-input"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
+              >
+                <option value="">All Systems</option>
+                {relatedSystems.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label className="block font-medium text-slate-500 mb-1">Priority</label>
-            <select
-              value={selectedPriority}
-              onChange={(e) => { setSelectedPriority(e.target.value); setPage(1); }}
-              className="w-full p-2 border border-slate-300 rounded-lg"
-            >
-              <option value="">All Priorities</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
-          </div>
+            <div>
+              <label className="tkt-label" style={{ fontSize: '0.75rem' }}>Priority</label>
+              <select
+                value={selectedPriority}
+                onChange={(e) => { setSelectedPriority(e.target.value); setPage(1); }}
+                className="tkt-input"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
+              >
+                <option value="">All Priorities</option>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block font-medium text-slate-500 mb-1">Sort</label>
-            <select
-              value={sort}
-              onChange={(e) => { setSort(e.target.value); setPage(1); }}
-              className="w-full p-2 border border-slate-300 rounded-lg"
-            >
-              <option value="updatedAt_desc">Last Updated (Newest)</option>
-              <option value="createdAt_desc">Created Date (Newest)</option>
-              <option value="createdAt_asc">Created Date (Oldest)</option>
-            </select>
+            <div>
+              <label className="tkt-label" style={{ fontSize: '0.75rem' }}>Sort By</label>
+              <select
+                value={sort}
+                onChange={(e) => { setSort(e.target.value); setPage(1); }}
+                className="tkt-input"
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
+              >
+                <option value="updatedAt_desc">Last Updated (Newest)</option>
+                <option value="createdAt_desc">Created Date (Newest)</option>
+                <option value="createdAt_asc">Created Date (Oldest)</option>
+              </select>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Tickets List */}
-      {error && <div role="alert" className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">{error}</div>}
+      {/* Subtitle Count */}
+      <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.75rem', fontWeight: 500 }}>
+        Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
+        {Math.min(page * 10, totalTickets)} of {totalTickets} tickets
+      </div>
+
+      {/* Content Area */}
+      {error && (
+        <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1.25rem' }}>
+          <span>⚠️</span>
+          <div>{error}</div>
+        </div>
+      )}
 
       {isLoading ? (
-        <div className="bg-white p-12 text-center rounded-xl shadow-sm border border-slate-200">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
-          <p className="mt-3 text-sm text-slate-500">Loading your tickets...</p>
+        <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading tickets...</p>
         </div>
       ) : tickets.length === 0 ? (
-        <div className="bg-white p-12 text-center rounded-xl shadow-sm border border-slate-200 space-y-3">
-          <span className="text-4xl">🎫</span>
-          <h3 className="font-bold text-slate-900 text-base">No Tickets Found</h3>
-          <p className="text-sm text-slate-500">You have not submitted any tickets matching your search/filter criteria.</p>
-          <button
-            onClick={onCreateNewTicket}
-            className="px-4 py-2 bg-[#005a36] text-white font-semibold text-xs rounded-lg shadow-sm"
-          >
-            Create Your First Ticket
-          </button>
+        <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <span style={{ fontSize: '2.5rem' }}>📭</span>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.5rem 0 0.25rem 0', color: '#0f172a' }}>No Tickets Found</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>You have not submitted any support tickets matching these criteria.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="divide-y divide-slate-200">
-            {tickets.map((t) => (
-              <div key={t.id} className="p-4 sm:p-5 hover:bg-slate-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1.5 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-emerald-800 text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+        <div className="tkt-table-container">
+          <table className="tkt-table">
+            <thead>
+              <tr>
+                <th>Ticket No. <span className="sort-arrow">⇅</span></th>
+                <th>Created Date <span className="sort-arrow">⇅</span></th>
+                <th>Summary</th>
+                <th>Category <span className="sort-arrow">⇅</span></th>
+                <th>Req. Priority</th>
+                <th>IT Priority</th>
+                <th>Status <span className="sort-arrow">⇅</span></th>
+                <th>Owner <span className="sort-arrow">⇅</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    <span
+                      onClick={() => onSelectTicket(t.id)}
+                      className="tkt-ticket-link"
+                    >
                       {t.ticketNumber}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                      {t.currentStatus}
-                    </span>
-                    {getPriorityBadge(t.requestedPriority)}
-                  </div>
-                  <h3 className="font-bold text-slate-900 text-base">{t.summary}</h3>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                    <span>Category: <strong className="text-slate-700">{t.category.name}</strong></span>
-                    <span>System: <strong className="text-slate-700">{t.relatedSystem.name}</strong></span>
-                    <span>Created: {new Date(t.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onSelectTicket(t.id)}
-                  className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-[#005a36] font-semibold text-xs rounded-lg border border-emerald-300 transition-colors"
-                >
-                  View Details →
-                </button>
-              </div>
-            ))}
-          </div>
+                  </td>
+                  <td style={{ whiteSpace: 'nowrap', color: '#64748b', fontSize: '0.8rem' }}>
+                    {formatDate(t.createdAt)}
+                  </td>
+                  <td style={{ fontWeight: 600, color: '#0f172a', maxWidth: '300px' }}>
+                    {t.summary}
+                  </td>
+                  <td style={{ color: '#475569' }}>
+                    {t.category?.name || 'General'}
+                  </td>
+                  <td>{getPriorityBadge(t.requestedPriority)}</td>
+                  <td>{getPriorityBadge(t.itPriority || t.requestedPriority)}</td>
+                  <td>{getStatusBadge(t.currentStatus)}</td>
+                  <td style={{ color: '#475569', fontSize: '0.8rem' }}>
+                    {t.owner ? t.owner.name : <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-t border-slate-200 text-xs">
-            <span className="text-slate-600">Page {page} of {totalPages} ({totalTickets} tickets)</span>
-            <div className="flex gap-2">
+          {totalPages > 1 && (
+            <div className="tkt-pagination">
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
-                className="px-3 py-1.5 border border-slate-300 rounded text-slate-700 disabled:opacity-40"
+                className="tkt-page-btn"
               >
-                Previous
+                &lt; Previous
               </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`tkt-page-btn ${p === page ? 'active' : ''}`}
+                >
+                  {p}
+                </button>
+              ))}
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
-                className="px-3 py-1.5 border border-slate-300 rounded text-slate-700 disabled:opacity-40"
+                className="tkt-page-btn"
               >
-                Next
+                Next &gt;
               </button>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

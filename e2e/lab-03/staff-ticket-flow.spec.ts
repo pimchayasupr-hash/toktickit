@@ -23,6 +23,6 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     // Post internal note
     await page.fill('textarea[placeholder*="internal note"]', 'Playwright E2E Internal Note verification.');
     await page.click('button:has-text("Add Internal Note")');
-    await expect(page.locator('p').filter({ hasText: 'Playwright E2E Internal Note verification.' })).toBeVisible();
+    await expect(page.locator('p').filter({ hasText: 'Playwright E2E Internal Note verification.' }).first()).toBeVisible();
   });
 });

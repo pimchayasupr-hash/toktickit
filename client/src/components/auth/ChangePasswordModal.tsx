@@ -6,8 +6,20 @@ export const ChangePasswordModal: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const hasMinLength = newPassword.length >= 8;
+  const hasUpper = /[A-Z]/.test(newPassword);
+  const hasLower = /[a-z]/.test(newPassword);
+  const hasDigit = /[0-9]/.test(newPassword);
+  const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+  const matchesConfirm = Boolean(newPassword && newPassword === confirmPassword);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +27,11 @@ export const ChangePasswordModal: React.FC = () => {
 
     if (newPassword.length < 8) {
       setErrorMessage('New password must be at least 8 characters long.');
+      return;
+    }
+
+    if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
+      setErrorMessage('Password must include upper and lower case letters, a number, and a special character.');
       return;
     }
 
@@ -34,84 +51,127 @@ export const ChangePasswordModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md p-6">
-        <div className="text-center mb-5">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 text-amber-800 mb-3 font-bold text-xl">
-            🔒
+    <div className="tkt-auth-page" style={{ position: 'fixed', inset: 0, zIndex: 50, backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)' }}>
+      <div className="tkt-auth-card">
+        {/* TikTockIT Header Bar */}
+        <div className="tkt-auth-header-bar">
+          <div className="tkt-brand-icon">⏱️</div>
+          <div>
+            <div className="tkt-brand-title">TikTockIT</div>
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Change Your Password</h3>
-          <p className="text-xs text-amber-700 font-medium mt-1 bg-amber-50 p-2 rounded border border-amber-200">
-            Notice: You must change your initial password before continuing into the application.
-          </p>
         </div>
 
-        {errorMessage && (
-          <div role="alert" className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-lg text-sm">
-            {errorMessage}
-          </div>
-        )}
+        <div className="tkt-auth-body">
+          <h2 className="tkt-auth-title">Change Your Password</h2>
+          <p className="tkt-auth-subtitle" style={{ color: '#b45309', backgroundColor: '#fffbeb', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid #fde68a', fontSize: '0.8rem' }}>
+            Notice: You must change your initial credentials before continuing.
+          </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Current (Temporary) Password
-            </label>
-            <input
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-            />
-          </div>
+          {errorMessage && (
+            <div role="alert" className="tkt-alert-error">
+              <span>⚠️</span>
+              <div>{errorMessage}</div>
+            </div>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              New Password
-            </label>
-            <input
-              type="password"
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="tkt-form-group">
+              <label className="tkt-label">Current (temporary) password</label>
+              <div className="tkt-input-wrapper">
+                <input
+                  type={showCurrent ? 'text' : 'password'}
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="tkt-input"
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  className="tkt-input-icon-btn"
+                  tabIndex={-1}
+                >
+                  {showCurrent ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none"
-            />
-          </div>
+            <div className="tkt-form-group">
+              <label className="tkt-label">New password</label>
+              <div className="tkt-input-wrapper">
+                <input
+                  type={showNew ? 'text' : 'password'}
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="tkt-input"
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="tkt-input-icon-btn"
+                  tabIndex={-1}
+                >
+                  {showNew ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
 
-          <div className="bg-slate-50 p-3 rounded-lg text-xs text-slate-600 space-y-1 border border-slate-200">
-            <p className="font-semibold text-slate-700 mb-1">Password Rules:</p>
-            <p className={newPassword.length >= 8 ? 'text-emerald-700 font-medium' : ''}>
-              ✓ Minimum 8 characters long
-            </p>
-            <p className={newPassword && newPassword === confirmPassword ? 'text-emerald-700 font-medium' : ''}>
-              ✓ Confirm password matches
-            </p>
-          </div>
+            <div className="tkt-form-group">
+              <label className="tkt-label">Confirm new password</label>
+              <div className="tkt-input-wrapper">
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="tkt-input"
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="tkt-input-icon-btn"
+                  tabIndex={-1}
+                >
+                  {showConfirm ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-2.5 px-4 bg-[#005a36] hover:bg-[#008751] text-white font-semibold rounded-lg shadow text-sm transition-colors disabled:opacity-50"
-          >
-            {submitting ? 'Updating Password...' : 'Save New Password & Continue'}
-          </button>
-        </form>
+            {/* Password Rules Checklist Box */}
+            <div className="tkt-rules-box">
+              <div className="tkt-rules-heading">Password rules: (Minimum 8 characters long)</div>
+              <div className="tkt-rule-item" style={{ color: hasMinLength ? '#15803d' : '#64748b' }}>
+                <span>{hasMinLength ? '✓' : '○'}</span> Be at least 8 characters
+              </div>
+              <div className="tkt-rule-item" style={{ color: (hasUpper && hasLower) ? '#15803d' : '#64748b' }}>
+                <span>{hasUpper && hasLower ? '✓' : '○'}</span> Include upper and lower case letters
+              </div>
+              <div className="tkt-rule-item" style={{ color: (hasDigit && hasSpecial) ? '#15803d' : '#64748b' }}>
+                <span>{hasDigit && hasSpecial ? '✓' : '○'}</span> Include a number and a special character
+              </div>
+              {newPassword && (
+                <div className="tkt-rule-item" style={{ color: matchesConfirm ? '#15803d' : '#dc2626' }}>
+                  <span>{matchesConfirm ? '✓' : '○'}</span> Passwords match
+                </div>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="tkt-btn-primary"
+            >
+              Save New Password &amp; Continue
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [staffUsers, setStaffUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<'comments' | 'notes' | 'attachments' | 'actions'>('comments');
 
   // Action feedback
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -128,12 +129,10 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         },
         body: JSON.stringify({ status: newStatus }),
       });
-
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error?.message || 'Failed to update status.');
+        throw new Error(data.error?.message || 'Invalid status transition.');
       }
-
       setActionMessage(`Ticket status updated to ${newStatus}.`);
       fetchTicketDetail();
     } catch (err: any) {
@@ -143,182 +142,242 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
-        <p className="mt-3 text-sm text-slate-500">Loading ticket detail...</p>
+      <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }}>
+        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket detail...</p>
       </div>
     );
   }
 
   if (error || !ticket) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <button onClick={onBack} className="mb-4 text-xs font-semibold text-emerald-800 hover:underline">
+      <div style={{ maxWidth: '1080px', margin: '2rem auto', padding: '0 1rem' }}>
+        <button onClick={onBack} className="tkt-btn-back" style={{ marginBottom: '1rem' }}>
           ← Back to Queue
         </button>
-        <div role="alert" className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">
-          {error || 'Ticket not found.'}
+        <div role="alert" className="tkt-alert-error">
+          <span>⚠️</span>
+          <div>{error || 'Ticket not found.'}</div>
         </div>
       </div>
     );
   }
 
   const allowedStatuses = PERMITTED_TRANSITIONS[ticket.currentStatus] || [];
+  const publicComments = ticket.publicComments || [];
+  const internalNotes = ticket.internalNotes || [];
+  const activeAttachments = ticket.attachments?.filter((a) => !a.isRemoved) || [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Back button */}
-      <button onClick={onBack} className="text-xs font-semibold text-[#005a36] hover:text-[#008751] flex items-center gap-1">
-        ← Back to Ticket Queue
-      </button>
+    <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '1.5rem 1.25rem' }}>
+      {/* Breadcrumb Header */}
+      <div className="tkt-breadcrumb-bar">
+        <div className="tkt-breadcrumb-text">
+          My Queue &gt; <span>Ticket Detail</span>
+        </div>
+        <button onClick={onBack} className="tkt-btn-back">
+          ← Back to Queue
+        </button>
+      </div>
 
-      {/* Header Banner */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      {actionMessage && (
+        <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.65rem 1rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '1rem' }}>
+          {actionMessage}
+        </div>
+      )}
+
+      {/* Main Ticket Card Grid */}
+      <div className="tkt-detail-card">
+        {/* Row 1: Ticket No, Category, Related System */}
+        <div className="tkt-grid-3">
           <div>
-            <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
-              {ticket.ticketNumber}
-            </span>
-            <h2 className="text-xl font-bold text-slate-900 mt-2">{ticket.summary}</h2>
+            <label className="tkt-label">Ticket No.</label>
+            <input
+              type="text"
+              readOnly
+              value={ticket.ticketNumber}
+              className="tkt-input"
+              style={{ backgroundColor: '#f8fafc', color: '#005a36', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
+            />
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Status Change */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">Status:</span>
-              <select
-                value={ticket.currentStatus}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                className="p-1.5 border border-slate-300 rounded-lg text-xs font-semibold bg-slate-50 focus:ring-2 focus:ring-emerald-600"
-              >
-                <option value={ticket.currentStatus}>{ticket.currentStatus}</option>
-                {allowedStatuses.map((s) => (
-                  <option key={s} value={s}>→ {s}</option>
-                ))}
-              </select>
-            </div>
 
-            {/* IT Priority */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">IT Priority:</span>
-              <select
-                value={ticket.itPriority || ticket.requestedPriority}
-                onChange={(e) => handlePriorityChange(e.target.value)}
-                className="p-1.5 border border-slate-300 rounded-lg text-xs font-semibold bg-slate-50 focus:ring-2 focus:ring-emerald-600"
-              >
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
-              </select>
-            </div>
+          <div>
+            <label className="tkt-label">Category</label>
+            <input
+              type="text"
+              readOnly
+              value={ticket.category?.name || 'General'}
+              className="tkt-input"
+              style={{ backgroundColor: '#f8fafc' }}
+            />
+          </div>
+
+          <div>
+            <label className="tkt-label">Related System</label>
+            <input
+              type="text"
+              readOnly
+              value={ticket.relatedSystem?.name || 'Corporate Laptop'}
+              className="tkt-input"
+              style={{ backgroundColor: '#f8fafc' }}
+            />
           </div>
         </div>
 
-        {/* Claim / Reassign Controls */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-700">Ticket Owner:</span>
-            {ticket.owner ? (
-              <span className="font-bold text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
-                👤 {ticket.owner.name}
-              </span>
-            ) : (
-              <span className="italic text-slate-400">Unassigned</span>
-            )}
+        {/* Row 2: Requester, Requested Priority, Current Status */}
+        <div className="tkt-grid-3">
+          <div>
+            <label className="tkt-label">Requester</label>
+            <input
+              type="text"
+              readOnly
+              value={ticket.requester?.name || 'Requester'}
+              className="tkt-input"
+              style={{ backgroundColor: '#f8fafc' }}
+            />
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {(!ticket.owner || ticket.owner.id !== loggedInUser?.id) && (
-              <button
-                onClick={handleClaim}
-                className="px-3 py-1.5 bg-[#005a36] hover:bg-[#008751] text-white font-semibold rounded-lg shadow-sm"
-              >
-                Claim Ownership
-              </button>
-            )}
+          <div>
+            <label className="tkt-label">Requested Priority</label>
+            <div style={{ paddingTop: '0.35rem' }}>
+              <span className={`tkt-pill ${ticket.requestedPriority === 'HIGH' || ticket.requestedPriority === 'URGENT' ? 'tkt-pill-priority-high' : ticket.requestedPriority === 'MEDIUM' ? 'tkt-pill-priority-medium' : 'tkt-pill-priority-low'}`}>
+                {ticket.requestedPriority}
+              </span>
+            </div>
+          </div>
 
+          <div>
+            <label className="tkt-label">Current Status</label>
             <select
-              onChange={(e) => handleAssign(e.target.value)}
-              value={ticket.ownerId ? String(ticket.ownerId) : ''}
-              className="p-1.5 border border-slate-300 rounded-lg text-xs bg-white"
+              value={ticket.currentStatus}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="tkt-input"
+              style={{ fontWeight: 600, color: '#166534', backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }}
             >
-              <option value="">Reassign Owner...</option>
-              {staffUsers.map((u) => (
-                <option key={u.id} value={u.id}>{u.name}</option>
+              <option value={ticket.currentStatus}>{ticket.currentStatus}</option>
+              {allowedStatuses.map((s) => (
+                <option key={s} value={s}>→ {s}</option>
               ))}
             </select>
           </div>
         </div>
 
-        {actionMessage && (
-          <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-2 rounded-lg text-xs font-medium">
-            ✅ {actionMessage}
-          </div>
-        )}
-      </div>
-
-      {/* Ticket Details & Attachments Grid */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-        <h3 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">Ticket Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        {/* Row 3: Ticket Owner, IT Priority */}
+        <div className="tkt-grid-2">
           <div>
-            <span className="text-slate-400 block font-medium">Requester</span>
-            <span className="font-semibold text-slate-800">{ticket.requester.name} ({ticket.requester.email})</span>
-          </div>
-          <div>
-            <span className="text-slate-400 block font-medium">Category</span>
-            <span className="font-semibold text-slate-800">{ticket.category.name}</span>
-          </div>
-          <div>
-            <span className="text-slate-400 block font-medium">Related System</span>
-            <span className="font-semibold text-slate-800">{ticket.relatedSystem.name}</span>
-          </div>
-        </div>
-
-        <div>
-          <span className="text-xs text-slate-400 block font-medium mb-1">Description</span>
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm text-slate-800 whitespace-pre-wrap">
-            {ticket.description}
-          </div>
-        </div>
-
-        {ticket.attachments && ticket.attachments.length > 0 && (
-          <div>
-            <span className="text-xs text-slate-400 block font-medium mb-2">Attachments ({ticket.attachments.length})</span>
-            <div className="space-y-2">
-              {ticket.attachments.map((att) => (
-                <div key={att.id} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-                  <span className="font-medium text-slate-700">📎 {att.originalFilename} ({(att.sizeBytes / 1024).toFixed(1)} KB)</span>
-                  {att.isRemoved ? (
-                    <span className="text-red-600 italic">Removed: {att.removalReason}</span>
-                  ) : (
-                    <a
-                      href={`/api/attachments/${att.id}/download`}
-                      download
-                      className="text-emerald-700 font-semibold hover:underline"
-                    >
-                      Download
-                    </a>
-                  )}
-                </div>
-              ))}
+            <label className="tkt-label">Ticket Owner</label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <select
+                onChange={(e) => handleAssign(e.target.value)}
+                value={ticket.ownerId ? String(ticket.ownerId) : ''}
+                className="tkt-input"
+                style={{ flex: 1 }}
+              >
+                <option value="">{ticket.owner ? `${ticket.owner.name} (IT Support)` : 'Unassigned'}</option>
+                {staffUsers.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name} (IT Support)</option>
+                ))}
+              </select>
+              {(!ticket.owner || ticket.owner.id !== loggedInUser?.id) && (
+                <button
+                  onClick={handleClaim}
+                  className="tkt-btn-primary"
+                  style={{ width: 'auto', padding: '0.5rem 0.9rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                >
+                  Claim
+                </button>
+              )}
             </div>
           </div>
-        )}
+
+          <div>
+            <label className="tkt-label">IT Priority</label>
+            <select
+              value={ticket.itPriority || ticket.requestedPriority}
+              onChange={(e) => handlePriorityChange(e.target.value)}
+              className="tkt-input"
+              style={{ fontWeight: 600 }}
+            >
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+              <option value="URGENT">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Row 4: Summary */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label className="tkt-label">Summary</label>
+          <h2 style={{ margin: '0.25rem 0 0 0', fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>
+            {ticket.summary}
+          </h2>
+        </div>
+
+        {/* Row 5: Description */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label className="tkt-label">Description</label>
+          <textarea
+            readOnly
+            rows={3}
+            value={ticket.description}
+            className="tkt-input"
+            style={{ resize: 'none' }}
+          />
+        </div>
+
+        {/* Row 6: Resolution Summary */}
+        <div>
+          <label className="tkt-label">Resolution Summary</label>
+          <textarea
+            rows={2}
+            placeholder="Add resolution summary (visible to requester)..."
+            value={ticket.resolutionSummary || ''}
+            onChange={async (e) => {
+              const val = e.target.value;
+              setTicket({ ...ticket, resolutionSummary: val });
+            }}
+            className="tkt-input"
+            style={{ resize: 'none' }}
+          />
+        </div>
       </div>
 
-      {/* Communications Grid: Public Comments & Internal Notes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PublicCommentsSection
-          ticketId={ticket.id}
-          comments={ticket.publicComments || []}
-          onCommentAdded={fetchTicketDetail}
-        />
-        <InternalNotesSection
-          ticketId={ticket.id}
-          notes={ticket.internalNotes || []}
-          onNoteAdded={fetchTicketDetail}
-        />
+      {/* Communications Grid: Public Comments & Private Internal Notes Side-by-Side */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+        <div className="tkt-detail-card" style={{ margin: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '1.2rem' }}>💬</span>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+              Public Comments ({publicComments.length})
+            </h3>
+            <span className="tkt-pill tkt-pill-status-in-progress" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
+              Visible to Requester
+            </span>
+          </div>
+          <PublicCommentsSection
+            ticketId={ticket.id}
+            comments={publicComments}
+            onCommentAdded={fetchTicketDetail}
+          />
+        </div>
+
+        <div className="tkt-detail-card" style={{ margin: 0, backgroundColor: '#fffdfa', borderColor: '#fde68a' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #fde68a', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '1.2rem' }}>🔒</span>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#92400e' }}>
+              Private Internal Notes ({internalNotes.length})
+            </h3>
+            <span className="tkt-pill tkt-pill-status-pending" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
+              IT Staff & Admins Only
+            </span>
+          </div>
+          <InternalNotesSection
+            ticketId={ticket.id}
+            notes={internalNotes}
+            onNoteAdded={fetchTicketDetail}
+          />
+        </div>
       </div>
     </div>
   );
