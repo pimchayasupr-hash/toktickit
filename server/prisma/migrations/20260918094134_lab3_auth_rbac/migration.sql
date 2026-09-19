@@ -1,23 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Requester` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('REQUESTER', 'STAFF', 'ADMIN');
-
--- DropForeignKey
-ALTER TABLE "Attachment" DROP CONSTRAINT "Attachment_ticketId_fkey";
-
--- DropForeignKey
-ALTER TABLE "Ticket" DROP CONSTRAINT "Ticket_requesterId_fkey";
-
--- AlterTable
-ALTER TABLE "Ticket" ADD COLUMN     "ownerId" INTEGER;
-
--- DropTable
-DROP TABLE "Requester";
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -33,6 +15,33 @@ CREATE TABLE "User" (
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
+
+-- Migrate existing records from Requester into User table (preserving primary key ID and data)
+INSERT INTO "User" ("id", "name", "email", "passwordHash", "role", "mustChangePassword", "isActive", "createdAt", "updatedAt")
+SELECT 
+  "id", 
+  "name", 
+  "email", 
+  '$2b$10$.vKPqI0Tl6WawqjbBBPydeDEMdWepjRl0/TlpA0xPD7Tx7iIkDpKK', 
+  'REQUESTER'::"Role", 
+  true, 
+  "isActive", 
+  "createdAt", 
+  "updatedAt"
+FROM "Requester"
+ON CONFLICT ("id") DO NOTHING;
+
+-- Resynchronize the User serial sequence
+SELECT setval(pg_get_serial_sequence('"User"', 'id'), coalesce(max("id"), 1), max("id") IS NOT NULL) FROM "User";
+
+-- Drop foreign key constraint on Ticket to old Requester table
+ALTER TABLE "Ticket" DROP CONSTRAINT IF EXISTS "Ticket_requesterId_fkey";
+
+-- Drop old Requester table after migration
+DROP TABLE IF EXISTS "Requester";
+
+-- AlterTable
+ALTER TABLE "Ticket" ADD COLUMN IF NOT EXISTS "ownerId" INTEGER;
 
 -- CreateTable
 CREATE TABLE "PublicComment" (
@@ -89,7 +98,8 @@ ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_requesterId_fkey" FOREIGN KEY ("requ
 -- AddForeignKey
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- AddForeignKey
+-- Drop old Attachment constraint if needed and recreate with CASCADE
+ALTER TABLE "Attachment" DROP CONSTRAINT IF EXISTS "Attachment_ticketId_fkey";
 ALTER TABLE "Attachment" ADD CONSTRAINT "Attachment_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey

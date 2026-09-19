@@ -321,19 +321,6 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           />
         </div>
 
-        {/* Row 6: Resolution Summary */}
-        <div style={{ marginBottom: '1rem' }}>
-          <label className="tkt-label">Resolution Summary</label>
-          <textarea
-            readOnly
-            rows={2}
-            placeholder="Add resolution summary (visible to requester)..."
-            value={ticket.resolutionSummary || ''}
-            className="tkt-input"
-            style={{ resize: 'none', backgroundColor: '#f8fafc' }}
-          />
-        </div>
-
         {/* Action Button: Problem Appears Resolved */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
           <div>
@@ -422,10 +409,10 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                           rel="noreferrer"
                           style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
                         >
-                          📎 {a.originalFileName}
+                          📎 {a.originalFilename}
                         </a>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
-                          ({(a.fileSize / 1024).toFixed(1)} KB)
+                          ({(a.sizeBytes / 1024).toFixed(1)} KB)
                         </span>
                       </div>
                       <button
@@ -449,7 +436,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div className="tkt-auth-card" style={{ padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Confirm Attachment Removal</h3>
             <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>
-              Are you sure you want to remove <strong>{removingAttachment.originalFileName}</strong>? A reason is required.
+              Are you sure you want to remove <strong>{removingAttachment.originalFilename}</strong>? A reason is required.
             </p>
 
             {removalError && <div className="tkt-alert-error" style={{ marginBottom: '0.75rem' }}>{removalError}</div>}

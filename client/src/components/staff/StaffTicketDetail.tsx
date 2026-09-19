@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Ticket, User } from '../../types';
+import type { Ticket, User, Attachment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { PublicCommentsSection } from '../comments/PublicCommentsSection';
 import { InternalNotesSection } from '../comments/InternalNotesSection';
@@ -26,10 +26,21 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [staffUsers, setStaffUsers] = useState<User[]>([]);
-  const [activeTab, setActiveTab] = useState<'comments' | 'notes' | 'attachments' | 'actions'>('comments');
 
   // Action feedback
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  // File Upload State
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+
+  // Soft Removal Modal State
+  const [removingAttachment, setRemovingAttachment] = useState<Attachment | null>(null);
+  const [removalReason, setRemovalReason] = useState<string>('');
+  const [isRemoving, setIsRemoving] = useState<boolean>(false);
+  const [removalError, setRemovalError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTicketDetail();
@@ -137,6 +148,87 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       fetchTicketDetail();
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile) return;
+
+    setUploadError(null);
+    setUploadSuccess(null);
+
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+    const fileExt = '.' + (selectedFile.name.split('.').pop() || '').toLowerCase();
+
+    if (!ALLOWED_TYPES.includes(selectedFile.type.toLowerCase()) && !ALLOWED_EXTS.includes(fileExt)) {
+      setUploadError(`Invalid file type "${selectedFile.name}". Allowed formats are JPG, PNG, WEBP, and PDF.`);
+      return;
+    }
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setUploadError(`File "${selectedFile.name}" exceeds the 5 MB size limit (${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB).`);
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}/attachments`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to upload attachment.');
+
+      setUploadSuccess(`Attachment "${selectedFile.name}" uploaded successfully.`);
+      setSelectedFile(null);
+      fetchTicketDetail();
+    } catch (err: any) {
+      setUploadError(err.message || 'Upload failed.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSoftRemove = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!removingAttachment) return;
+
+    const trimmedReason = removalReason.trim();
+    if (!trimmedReason) {
+      setRemovalError('Removal reason is required.');
+      return;
+    }
+
+    setIsRemoving(true);
+    setRemovalError(null);
+
+    try {
+      const res = await fetch(`/api/attachments/${removingAttachment.id}/remove`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ removalReason: trimmedReason }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to remove attachment.');
+
+      setRemovingAttachment(null);
+      setRemovalReason('');
+      fetchTicketDetail();
+    } catch (err: any) {
+      setRemovalError(err.message || 'Removal failed.');
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -315,7 +407,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </div>
 
         {/* Row 5: Description */}
-        <div style={{ marginBottom: '1rem' }}>
+        <div>
           <label className="tkt-label">Description</label>
           <textarea
             readOnly
@@ -325,21 +417,69 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             style={{ resize: 'none' }}
           />
         </div>
+      </div>
 
-        {/* Row 6: Resolution Summary */}
-        <div>
-          <label className="tkt-label">Resolution Summary</label>
-          <textarea
-            rows={2}
-            placeholder="Add resolution summary (visible to requester)..."
-            value={ticket.resolutionSummary || ''}
-            onChange={async (e) => {
-              const val = e.target.value;
-              setTicket({ ...ticket, resolutionSummary: val });
-            }}
+      {/* Attachments Section for Staff */}
+      <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+          <span style={{ fontSize: '1.2rem' }}>📎</span>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+            Attachments ({activeAttachments.length})
+          </h3>
+        </div>
+
+        {uploadError && <div className="tkt-alert-error" style={{ marginBottom: '0.75rem' }}>{uploadError}</div>}
+        {uploadSuccess && (
+          <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }}>
+            {uploadSuccess}
+          </div>
+        )}
+
+        <form onSubmit={handleUploadSubmit} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <input
+            type="file"
+            onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
             className="tkt-input"
-            style={{ resize: 'none' }}
+            style={{ flex: 1 }}
           />
+          <button
+            type="submit"
+            disabled={!selectedFile || isUploading}
+            className="tkt-btn-primary"
+            style={{ width: 'auto', padding: '0.65rem 1.25rem' }}
+          >
+            {isUploading ? 'Uploading...' : 'Upload File'}
+          </button>
+        </form>
+
+        <div style={{ display: 'grid', gap: '0.5rem' }}>
+          {activeAttachments.length === 0 ? (
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>No active attachments.</p>
+          ) : (
+            activeAttachments.map((a) => (
+              <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                <div>
+                  <a
+                    href={`/api/attachments/${a.id}/download`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+                  >
+                    📎 {a.originalFilename}
+                  </a>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
+                    ({(a.sizeBytes / 1024).toFixed(1)} KB)
+                  </span>
+                </div>
+                <button
+                  onClick={() => setRemovingAttachment(a)}
+                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
+                >
+                  Remove
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -379,6 +519,52 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           />
         </div>
       </div>
+
+      {/* Attachment Soft Removal Modal for Staff */}
+      {removingAttachment && (
+        <div className="tkt-auth-page" style={{ position: 'fixed', inset: 0, zIndex: 50, backgroundColor: 'rgba(15, 23, 42, 0.65)' }}>
+          <div className="tkt-auth-card" style={{ padding: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem' }}>Confirm Attachment Removal</h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '1rem' }}>
+              Are you sure you want to remove <strong>{removingAttachment.originalFilename}</strong>? A reason is required.
+            </p>
+
+            {removalError && <div className="tkt-alert-error" style={{ marginBottom: '0.75rem' }}>{removalError}</div>}
+
+            <form onSubmit={handleSoftRemove}>
+              <div className="tkt-form-group">
+                <label className="tkt-label">Removal Reason</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={removalReason}
+                  onChange={(e) => setRemovalReason(e.target.value)}
+                  placeholder="Provide reason for removing this file..."
+                  className="tkt-input"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => { setRemovingAttachment(null); setRemovalReason(''); }}
+                  className="tkt-btn-filters"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isRemoving}
+                  className="tkt-btn-primary"
+                  style={{ width: 'auto', backgroundColor: '#dc2626' }}
+                >
+                  {isRemoving ? 'Removing...' : 'Confirm Remove'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
