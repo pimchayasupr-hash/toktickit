@@ -2,9 +2,9 @@
 
 > **Document Status**: Complete & Final (ผ่านการทดสอบ 100% ครบทุกชั้น และตรวจสอบหลักฐานภาพถ่ายครบถ้วน)  
 > **Repository**: `pimchayasupr-hash/toktickit`  
-> **Branch**: `lab3-staging` (Commit `4110ea3`)  
+> **Branch**: `lab3-staging` (Commit `85fe06f`)  
 > **PR #40 Status**: APPROVED & MERGED (Merged on 2026-09-19T08:47:52Z by `@supa-gif173`)  
-> **Final PR (lab3-staging → main) Status**: Ready to open (รอดำเนินการเปิดตามขั้นตอนเมื่อสรุปรายงานสมบูรณ์)
+> **Final PR (lab3-staging → main) Status**: Opened as [PR #41](https://github.com/pimchayasupr-hash/toktickit/pull/41) (Requested Reviewers: `@supa-gif173`, `@MiMikoChAn913`)
 
 ---
 
