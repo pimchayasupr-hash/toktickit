@@ -285,7 +285,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             <input
               type="text"
               readOnly
-              value={ticket.owner ? `${ticket.owner.name} (IT Support)` : 'Unassigned'}
+              value={ticket.owner ? ticket.owner.name : 'Unassigned'}
               className="tkt-input"
               style={{ backgroundColor: '#f8fafc' }}
             />

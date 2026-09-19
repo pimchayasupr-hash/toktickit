@@ -365,9 +365,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                 className="tkt-input"
                 style={{ flex: 1 }}
               >
-                <option value="">{ticket.owner ? `${ticket.owner.name} (IT Support)` : 'Unassigned'}</option>
+                <option value="">{ticket.owner ? ticket.owner.name : 'Unassigned'}</option>
                 {staffUsers.map((u) => (
-                  <option key={u.id} value={u.id}>{u.name} (IT Support)</option>
+                  <option key={u.id} value={u.id}>{u.name}</option>
                 ))}
               </select>
               {(!ticket.owner || ticket.owner.id !== loggedInUser?.id) && (

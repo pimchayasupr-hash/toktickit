@@ -388,14 +388,16 @@ Approving and merging now. Excellent work on the Zen Green UI overhaul!
 ## 4. Known Limitations & Out-of-Scope Considerations
 
 ### 4.1 Known Limitations & Mitigation Strategies
-1. **Default Password ของ Migrated Users ทุกคนเหมือนกัน (Uniform Initial Credentials)**:
-   - **ข้อจำกัด**: บัญชีผู้ใช้งานที่ได้รับการ Migrate มาจากฐานข้อมูล Lab 2 และบัญชีเริ่มต้นทั้งหมดที่ถูกสร้างขึ้นโดย Administrator ได้รับการกำหนดรหัสผ่านเริ่มต้นเป็นค่าเดียวกัน (`Password123!`)
-   - **กลไกการบรรเทาความเสี่ยง (Mitigation)**: ระบบควบคุมความเสี่ยงด้านความปลอดภัยนี้อย่างเข้มงวดตามกฎ **BR-02** โดยกำหนดให้บัญชีเหล่านี้มีสถานะ `mustChangePassword = true` เสมอ เมื่อผู้ใช้งานล็อกอินเข้าสู่ระบบครั้งแรก ตัว Client จะแสดงผล `ChangePasswordModal` บังคับให้ผู้ใช้ต้องเปลี่ยนรหัสผ่านใหม่ที่ผ่านเกณฑ์ความซับซ้อน (BR-04) ทันที โดยไม่สามารถกดข้าม ปิดหน้าต่าง หรือเรียกใช้งาน API อื่นๆ ได้จนกว่าจะเปลี่ยนรหัสผ่านสำเร็จ
-2. **In-Memory Token Revocation Blacklist**:
+1. **In-Memory Token Revocation Blacklist**:
    - **ข้อจำกัด**: การเพิกถอน Token เมื่อผู้ใช้ออกจากระบบ (`/api/auth/logout`) อาศัยหน่วยความจำภายใน Process (`Set<string>`) ของ Node.js/Express
    - **การขยายผลในอนาคต**: สำหรับสภาพแวดล้อมปัจจุบัน (Single-Instance Staging & Local Grading) ทำงานได้อย่างถูกต้อง 100% แต่หากขยายระบบไปสู่ Production ที่มีหลายเซิร์ฟเวอร์ (Horizontally Scaled Multi-Instance) จำเป็นต้องย้าย Blacklist ไปยัง Distributed Cache เช่น Redis พร้อมตั้งเวลา TTL ตามอายุของ JWT
-3. **Sequential E2E Test Execution (`workers: 1`)**:
+2. **Sequential E2E Test Execution (`workers: 1`)**:
    - **ข้อจำกัด**: ในการทดสอบ Playwright E2E จำเป็นต้องกำหนดค่า `workers: 1` และ `fullyParallel: false` เนื่องจากแบบทดสอบทำกับฐานข้อมูล PostgreSQL ก้อนจริงตัวเดียวพร้อมกัน การรันพร้อมกันแบบขนานจะทำให้เกิด Race Condition บนบัญชี Seed ที่ใช้ทดสอบสิทธิ์ (เช่น Sarah Jenkins ถูกเปลี่ยนรหัสผ่านขณะที่เทสอีกตัวกำลังล็อกอิน)
+3. **Database Migration Safety Verified (Zero Data Loss on Requesters & Attachments)**:
+   - **ข้อจำกัดและการตรวจสอบ**: การย้ายโครงสร้างตารางจาก `Requester` ใน Lab 2 มาสู่โมเดล `User` แบบรวมศูนย์ (Unified User with Roles) ใน Lab 3 มีความเสี่ยงต่อการสูญหายของข้อมูล ทีมงานได้ออกแบบสคริปต์ Migration ให้คงข้อมูล Requester เดิมและ Ticket Attachments ทั้งหมดไว้ 100% พร้อมทดสอบ Migration Upgrade ซ้ำแล้วยืนยันว่าไม่มีข้อมูลสูญหาย
+4. **Default Password ของ Migrated Users ทุกคนเหมือนกัน (Uniform Initial Credentials)**:
+   - **ข้อจำกัดและ Behavior Change**: บัญชีผู้ใช้งานที่ได้รับการ Migrate มาจากฐานข้อมูล Lab 2 และบัญชีเริ่มต้นทั้งหมดที่ถูกสร้างขึ้นโดย Administrator ได้รับการกำหนดรหัสผ่านเริ่มต้นเป็นค่าเดียวกัน (`Password123!`) ซึ่งเป็นพฤติกรรมของระบบที่ต้องตระหนัก
+   - **กลไกการบรรเทาความเสี่ยง (Mitigation)**: ระบบควบคุมความเสี่ยงด้านความปลอดภัยนี้อย่างเข้มงวดตามกฎ **BR-02** โดยกำหนดให้บัญชีเหล่านี้มีสถานะ `mustChangePassword = true` เสมอ เมื่อผู้ใช้งานล็อกอินเข้าสู่ระบบครั้งแรก ตัว Client จะแสดงผล `ChangePasswordModal` บังคับให้ผู้ใช้ต้องเปลี่ยนรหัสผ่านใหม่ที่ผ่านเกณฑ์ความซับซ้อน (BR-04) ทันที โดยไม่สามารถกดข้าม ปิดหน้าต่าง หรือเรียกใช้งาน API อื่นๆ ได้จนกว่าจะเปลี่ยนรหัสผ่านสำเร็จ
 
 ### 4.2 ขอบเขตอื่นที่อยู่นอกเหนือข้อกำหนดของ Lab 3 (Out-of-Scope & Non-Goals)
 1. **Self-Service Registration & Email-Based Password Recovery**:
