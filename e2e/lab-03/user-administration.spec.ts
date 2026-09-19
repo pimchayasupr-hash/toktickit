@@ -26,6 +26,6 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
     // Search created user
     await page.fill('input[placeholder*="Search users"]', uniqueEmail);
     await page.click('button:has-text("Search")');
-    await expect(page.getByText('E2E New Staff')).toBeVisible();
+    await expect(page.getByText('E2E New Staff').first()).toBeVisible();
   });
 });

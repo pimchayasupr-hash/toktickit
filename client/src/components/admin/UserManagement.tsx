@@ -195,7 +195,7 @@ export const UserManagement: React.FC = () => {
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3">
         <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
           <input
-            type="text"
+            type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search users by name or email..."

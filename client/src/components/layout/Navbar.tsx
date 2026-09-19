@@ -12,102 +12,94 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   if (!user) return null;
 
   const roleLabel =
-    user.role === 'ADMIN' ? 'Administrator' : user.role === 'STAFF' ? 'IT Staff' : 'Requester';
+    user.role === 'ADMIN' ? 'Administrator' : user.role === 'STAFF' ? 'IT Support' : 'Requester';
 
-  const roleBadgeStyle =
-    user.role === 'ADMIN'
-      ? 'bg-purple-100 text-purple-800 border-purple-200'
-      : user.role === 'STAFF'
-      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-      : 'bg-blue-100 text-blue-800 border-blue-200';
+  const userInitials = user.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'U';
 
   return (
-    <header className="bg-[#005a36] text-white shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Title */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('default')}>
-            <span className="text-2xl">⏱️</span>
-            <div>
-              <h1 className="font-extrabold text-xl tracking-tight leading-none text-white">TokTickIT</h1>
-              <span className="text-[10px] text-emerald-200 font-medium tracking-wide uppercase">IT Support System</span>
-            </div>
+    <header className="tkt-navbar">
+      <div className="tkt-nav-container">
+        {/* Brand Logo & Title */}
+        <div className="tkt-brand" onClick={() => setActiveTab('default')} title="TokTickIT Home">
+          <div className="tkt-brand-icon">⏱️</div>
+          <div>
+            <div className="tkt-brand-title">TokTickIT</div>
+            <div className="tkt-brand-sub">IT Support System</div>
           </div>
+        </div>
 
-          {/* Navigation Links based on Role */}
-          <nav className="hidden md:flex space-x-2">
-            {user.role === 'REQUESTER' && (
-              <>
-                <button
-                  onClick={() => setActiveTab('my-tickets')}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'my-tickets' || activeTab === 'default'
-                      ? 'bg-emerald-800 text-white shadow-inner'
-                      : 'text-emerald-100 hover:bg-[#008751]'
-                  }`}
-                >
-                  My Tickets
-                </button>
-                <button
-                  onClick={() => setActiveTab('create-ticket')}
-                  className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'create-ticket'
-                      ? 'bg-emerald-800 text-white shadow-inner'
-                      : 'text-emerald-100 hover:bg-[#008751]'
-                  }`}
-                >
-                  + Create Ticket
-                </button>
-              </>
-            )}
-
-            {(user.role === 'STAFF' || user.role === 'ADMIN') && (
+        {/* Navigation Tabs */}
+        <nav className="tkt-nav-menu">
+          {user.role === 'REQUESTER' && (
+            <>
               <button
-                onClick={() => setActiveTab('staff-queue')}
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'staff-queue' || activeTab === 'default'
-                    ? 'bg-emerald-800 text-white shadow-inner'
-                    : 'text-emerald-100 hover:bg-[#008751]'
+                onClick={() => setActiveTab('my-tickets')}
+                className={`tkt-nav-tab ${
+                  activeTab === 'my-tickets' || activeTab === 'default' ? 'active' : ''
                 }`}
               >
-                📋 Shared Queue
+                <span>📄</span> My Queue
               </button>
-            )}
-
-            {user.role === 'ADMIN' && (
               <button
-                onClick={() => setActiveTab('user-management')}
-                className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'user-management'
-                    ? 'bg-emerald-800 text-white shadow-inner'
-                    : 'text-emerald-100 hover:bg-[#008751]'
-                }`}
+                onClick={() => setActiveTab('create-ticket')}
+                className={`tkt-nav-tab ${activeTab === 'create-ticket' ? 'active' : ''}`}
               >
-                👥 User Management
+                <span>➕</span> Create Ticket
               </button>
-            )}
-          </nav>
+            </>
+          )}
 
-          {/* Authenticated User Profile & Logout */}
-          <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex items-center space-x-2 text-right">
-              <div>
-                <div className="text-sm font-semibold text-white leading-tight">{user.name}</div>
-                <div className="text-xs text-emerald-200">{user.email}</div>
-              </div>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${roleBadgeStyle}`}>
+          {(user.role === 'STAFF' || user.role === 'ADMIN') && (
+            <button
+              onClick={() => setActiveTab('staff-queue')}
+              className={`tkt-nav-tab ${
+                activeTab === 'staff-queue' || activeTab === 'default' ? 'active' : ''
+              }`}
+            >
+              <span>📄</span> My Queue
+            </button>
+          )}
+
+          {user.role === 'ADMIN' && (
+            <button
+              onClick={() => setActiveTab('user-management')}
+              className={`tkt-nav-tab ${activeTab === 'user-management' ? 'active' : ''}`}
+            >
+              <span>👥</span> User Management
+            </button>
+          )}
+        </nav>
+
+        {/* Authenticated User Profile & Logout */}
+        <div className="tkt-nav-profile">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div className="tkt-avatar-circle" title={user.name}>
+              {userInitials}
+            </div>
+            <div className="tkt-user-text" style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#ffffff', lineHeight: 1.1 }}>
+                {user.name}
+              </span>
+              <span style={{ fontSize: '0.7rem', color: '#a7f3d0' }}>
                 {roleLabel}
               </span>
             </div>
-
-            <button
-              onClick={logout}
-              title="Sign Out"
-              className="px-3 py-1.5 text-xs font-semibold bg-emerald-900/80 hover:bg-red-700 text-white rounded-lg border border-emerald-700 transition-colors shadow-sm"
-            >
-              Logout 🚪
-            </button>
           </div>
+
+          <button
+            onClick={logout}
+            title="Sign Out"
+            className="tkt-btn-logout"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </header>

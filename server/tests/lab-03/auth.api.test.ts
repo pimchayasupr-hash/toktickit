@@ -129,7 +129,7 @@ describe('Lab 3 - Authentication & Token Revocation API Suite', () => {
     expect(postLogoutRes.body.error.code).toBe('UNAUTHORIZED');
   });
 
-  it('API-05: Password change rejects weak passwords based on complexity regex', async () => {
+  it('API-19: Password change rejects weak passwords based on complexity regex (BR-04)', async () => {
     const loginRes = await request(app)
       .post('/api/auth/login')
       .send({

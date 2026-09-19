@@ -174,8 +174,7 @@ The stakeholder requires replacing the temporary development requester dropdown 
 - [x] Shared IT Staff Queue with search, filters, sorting, and pagination implemented with Zen Green styling.
 - [x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.
 - [x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.
-- [x] Automated test suite (API, UI component, Playwright E2E) passing with 100% success on `main`.
-- [ ] Screenshots captured and stored in `artifacts/lab-03/screenshots/` (Pending capture).
+- [x] Screenshots captured and stored in `artifacts/lab-03/screenshots/` (Desktop & responsive mobile).
 - [ ] GitHub Issues, PR description `Closes #X`, reviewer comments & approval, and reviewer merge executed on GitHub.
 
 ---
