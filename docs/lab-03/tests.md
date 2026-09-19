@@ -201,3 +201,129 @@ Keep-Alive: timeout=5
 
 {"error":{"code":"FORBIDDEN","message":"Access denied. Role STAFF is not authorized for this operation."}}
 ```
+
+---
+
+## 6. Peer Review Verification Evidence (Data Migration, Client Build & E2E)
+
+Following peer review feedback on PR #40 regarding database migration data preservation, attachment typing, and badge accuracy, the following verification suite was executed:
+
+### 1. Lab 2 Populated Database Migration Upgrade Test
+
+A clean isolated PostgreSQL schema was provisioned, populated with simulated Lab 2 production records (Categories, Systems, Requesters 1-3, Tickets 1-3, Attachments 1-2), and upgraded using `20260918094134_lab3_auth_rbac/migration.sql`.
+
+**Execution Output:**
+```text
+1. Setting up clean test schema in postgres...
+2. Applying Lab 1 and Lab 2 migrations...
+3. Populating simulated Lab 2 data (Categories, Systems, Requesters, Tickets, Attachments)...
+4. Applying Lab 3 migration...
+5. Verifying data integrity post-migration...
+Migrated Users count: 3
+Users: [
+  { id: 1, name: 'Alice Requester', email: 'alice@example.com', role: 'REQUESTER', mustChangePassword: true, isActive: true },
+  { id: 2, name: 'Bob Requester', email: 'bob@example.com', role: 'REQUESTER', mustChangePassword: true, isActive: true },
+  { id: 3, name: 'Charlie Inactive', email: 'charlie@example.com', role: 'REQUESTER', mustChangePassword: true, isActive: false }
+]
+Migrated Tickets count: 3
+Tickets: [
+  { id: 1, ticketNumber: 'TXT-2026-000001', requesterId: 1, summary: 'Alice Ticket 1' },
+  { id: 2, ticketNumber: 'TXT-2026-000002', requesterId: 2, summary: 'Bob Ticket 2' },
+  { id: 3, ticketNumber: 'TXT-2026-000003', requesterId: 3, summary: 'Charlie Ticket 3' }
+]
+Migrated Attachments count: 2
+Attachments: [
+  { id: 1, ticketId: 1, originalFilename: 'error_screenshot.png' },
+  { id: 2, ticketId: 2, originalFilename: 'spec.pdf' }
+]
+New User autoincrement ID: 4
+>>> SUCCESS: Migration verification test PASSED 100%! <<<
+```
+
+- **Verification Result**:
+  - Legacy `Requester` records were copied to `User` without loss.
+  - Primary key IDs and foreign key links from `Ticket.requesterId` were preserved.
+  - `User_id_seq` was resynchronized so subsequent user creation autoincrements correctly without collisions.
+  - Default initial password hash (`$2b$10$...` for `Password123!`) was provisioned with `mustChangePassword = true` (enforcing BR-02/BR-04).
+
+---
+
+### 2. Client Production TypeScript Build (`tsc -b && vite build`)
+
+To verify type safety after aligning `Attachment` property names (`originalFilename`, `sizeBytes`) and removing the unsupported `resolutionSummary` editor:
+
+```bash
+cd client && npm run build
+```
+
+**Build Output:**
+```text
+> client@0.0.0 build
+> tsc -b && vite build
+
+vite v8.2.1 building client environment for production...
+transforming (28) src/index.css✓ 29 modules transformed.
+rendering chunks (1)...computing gzip size...
+dist/index.html                   0.45 kB │ gzip:  0.29 kB
+dist/assets/index-D0Hd3QwP.css  246.11 kB │ gzip: 34.74 kB
+dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
+
+✓ built in 369ms
+```
+
+---
+
+### 3. Server Vitest API Suite (Post-Fix)
+
+```bash
+npm --prefix server test -- --run
+```
+
+**Output:**
+```text
+ Test Files  18 passed (18)
+      Tests  56 passed (56)
+   Duration  4.53s
+```
+
+---
+
+### 4. Client Vitest Component Suite (Post-Fix)
+
+```bash
+npm --prefix client test -- --run
+```
+
+**Output:**
+```text
+ Test Files  11 passed (11)
+      Tests  13 passed (13)
+   Duration  6.93s
+```
+
+---
+
+### 5. Playwright End-to-End Suite (Post-Fix)
+
+```bash
+npx playwright test e2e/lab-03/
+```
+
+> **Note on Test Execution Configuration**: `playwright.config.ts` was configured with `workers: 1` and `fullyParallel: false` because E2E tests interact with a single, stateful PostgreSQL database instance. Concurrent workers attempting simultaneous mutations (e.g. mandatory password changes and user creation) on shared seed accounts caused cross-test race conditions and resource contention. Sequential worker execution guarantees strict state isolation against the persistent test database.
+
+**Output:**
+```text
+Running 9 tests using 1 worker
+
+[1/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[2/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[3/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+[4/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[5/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[6/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+[7/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
+[8/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[9/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
+  9 passed (41.0s)
+```
+
