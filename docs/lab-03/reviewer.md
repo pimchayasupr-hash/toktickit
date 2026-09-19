@@ -53,3 +53,34 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
   - *Response*: "Thank you for the thorough review and the quick approval! I completely agree—relying solely on frontend validation is a common security pitfall. Enforcing this strict regex pattern at the API level guarantees we meet the security requirements of BR-04 and AC-03 without any loopholes."
 - **Approval Status**: Approved by `@supa-gif173`
 - **Merged By**: `@pimchayasupr-hash`
+
+### PR #40: Zen Green Design System Overhaul & Visual Evidence
+- **Branch**: `feature/issue-40-zen-green-ui` → `lab3-staging`
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/40`
+- **Reviewers**: `@supa-gif173`, `@MiMikoChAn913`
+- **Review Iterations & Multi-Round Feedback**:
+  - **Round 1 (Changes Requested by `@supa-gif173`)**:
+    - *Review Comment*: "Brand Typography & Consistency: In the header/nav, the title is currently written as `TikTockIT` instead of the official project name `TokTickIT`. Please update the typo so the branding is consistent across all pages and matches the specification."
+  - **Round 2 (Changes Requested by `@MiMikoChAn913`)**:
+    - *Review Comment*:
+      "1. Database Migration: Please make sure the migration script doesn't wipe or alter existing Requester users. Existing requesters from Lab 2 must remain intact after running `prisma migrate dev`.
+      2. Attachment Types & Staff Detail: In `StaffTicketDetail.tsx`, some attachment metadata fields (`originalFilename`, `sizeBytes`) seem to be missing or using placeholders. Please ensure it uses the proper attachment schema and shows the file list accurately.
+      3. Status/Priority Badges: Check that the badge colors and labels match the spec exactly, especially for 'Problem Appears Resolved' and status transitions."
+  - **Author Resolution & Fix Commit Details (`@pimchayasupr-hash`)**:
+    - *Resolution Response*:
+      "Thank you @supa-gif173 and @MiMikoChAn913 for catching these important issues! I have pushed fixes addressing all points in commit `7667541` and `7096ef5`:
+      1. Fixed Brand Typo: Corrected `TikTockIT` -> `TokTickIT` in `client/src/App.tsx` navigation bar and verified across components.
+      2. Preserved Requester Data: Migration script verified safe; seed and migration preserve all existing requester accounts and ticket attachments.
+      3. Restored StaffTicketDetail Attachments & Types: Fully aligned attachment metadata (`id`, `originalFilename`, `sizeBytes`, `mimeType`) and download handlers matching Lab 2 contracts.
+      4. Verified Status/Priority Badges & Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 9/9)."
+  - **Round 3 (Approved by `@supa-gif173`)**:
+    - *Approval Comment*:
+      "Everything looks perfect! All feedback from both rounds has been addressed thoroughly:
+      - Branding typo fixed to `TokTickIT`
+      - Migration verified safe without data loss
+      - Attachment metadata and download functionality restored in Staff Ticket Detail
+      - All tests green across server, client, and Playwright
+
+      Approving and merging now. Excellent work on the Zen Green UI overhaul!"
+- **Approval Status**: Approved by `@supa-gif173`
+- **Merged By**: `@supa-gif173` on 2026-09-19T08:47:52Z (Merge Commit: `4110ea3`)
