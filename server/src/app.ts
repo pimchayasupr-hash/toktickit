@@ -5,7 +5,7 @@ import authRouter from './routes/auth';
 import staffRouter from './routes/staff';
 import commentsNotesRouter from './routes/comments-notes';
 import adminUsersRouter from './routes/admin-users';
-import { authenticateUser, AuthRequest } from './middleware/authMiddleware';
+import { authenticateUser, requirePasswordChangeCheck, AuthRequest } from './middleware/authMiddleware';
 import { generateTicketNumber } from './utils/ticketUtils';
 import { upload } from './middleware/uploadMiddleware';
 import path from 'path';
@@ -86,7 +86,7 @@ app.use('/api/admin', adminUsersRouter);
 // 7. Requester Ticket Operations (Authenticated)
 
 // Create Ticket
-app.post('/api/tickets', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+app.post('/api/tickets', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const requesterId = req.user!.id;
     const { clientSubmissionId, categoryId, relatedSystemId, summary, requestedPriority, description } = req.body;
@@ -201,7 +201,7 @@ app.post('/api/tickets', authenticateUser, async (req: AuthRequest, res: Respons
 });
 
 // List My Tickets
-app.get('/api/tickets', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+app.get('/api/tickets', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const requesterId = req.user!.id;
     const { status, categoryId, relatedSystemId, priority, search, sort, page = '1', pageSize = '10' } = req.query;
@@ -282,7 +282,7 @@ app.get('/api/tickets', authenticateUser, async (req: AuthRequest, res: Response
 });
 
 // Ticket Detail View
-app.get('/api/tickets/:id', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+app.get('/api/tickets/:id', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
     const ticketId = parseId(req.params.id);
@@ -327,7 +327,7 @@ app.get('/api/tickets/:id', authenticateUser, async (req: AuthRequest, res: Resp
 });
 
 // Attachments handling
-app.post('/api/tickets/:id/attachments', authenticateUser, (req: AuthRequest, res: Response): void => {
+app.post('/api/tickets/:id/attachments', authenticateUser, requirePasswordChangeCheck, (req: AuthRequest, res: Response): void => {
   upload.single('file')(req, res, async (err: any) => {
     try {
       if (err) {
@@ -384,7 +384,7 @@ app.post('/api/tickets/:id/attachments', authenticateUser, (req: AuthRequest, re
   });
 });
 
-app.get('/api/attachments/:id/download', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+app.get('/api/attachments/:id/download', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
     const attachmentId = parseId(req.params.id);
@@ -417,7 +417,7 @@ app.get('/api/attachments/:id/download', authenticateUser, async (req: AuthReque
   }
 });
 
-app.post('/api/attachments/:id/remove', authenticateUser, async (req: AuthRequest, res: Response): Promise<void> => {
+app.post('/api/attachments/:id/remove', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const user = req.user!;
     const attachmentId = parseId(req.params.id);

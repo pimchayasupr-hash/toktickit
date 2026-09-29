@@ -38,4 +38,45 @@ describe('Lab 3 - IT Staff Ticket Queue API Suite', () => {
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.tickets)).toBe(true);
   });
+
+  it('API-24 (Regression): Staff Queue filters by search AND priority simultaneously without overwriting OR conditions', async () => {
+    const token = await getStaffToken();
+
+    // 1. Fetch all tickets with search=battery only
+    const searchOnlyRes = await request(app)
+      .get('/api/staff/tickets?search=battery')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(searchOnlyRes.status).toBe(200);
+    const searchOnlyTickets = searchOnlyRes.body.tickets;
+    expect(searchOnlyTickets.length).toBeGreaterThan(0);
+
+    // 2. Query with search=battery AND priority=URGENT
+    const combinedUrgentRes = await request(app)
+      .get('/api/staff/tickets?search=battery&priority=URGENT')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(combinedUrgentRes.status).toBe(200);
+    const combinedUrgentTickets = combinedUrgentRes.body.tickets;
+
+    // Every ticket in combinedUrgentTickets must match search AND priority URGENT
+    for (const t of combinedUrgentTickets) {
+      const matchesSearch = t.summary.toLowerCase().includes('battery') ||
+                            t.description.toLowerCase().includes('battery') ||
+                            t.ticketNumber.toLowerCase().includes('battery');
+      expect(matchesSearch).toBe(true);
+
+      const matchesPriority = t.itPriority === 'URGENT' || t.requestedPriority === 'URGENT';
+      expect(matchesPriority).toBe(true);
+    }
+
+    // 3. Query with search=battery AND a priority that does not match
+    const nonMatchingPriorityRes = await request(app)
+      .get('/api/staff/tickets?search=battery&priority=NONEXISTENT_PRIORITY')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(nonMatchingPriorityRes.status).toBe(200);
+    expect(nonMatchingPriorityRes.body.tickets.length).toBe(0);
+  });
 });
+

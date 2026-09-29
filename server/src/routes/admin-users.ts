@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient, Role } from '@prisma/client';
-import { authenticateUser, requireRole, AuthRequest } from '../middleware/authMiddleware';
+import { authenticateUser, requireRole, requirePasswordChangeCheck, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -11,8 +11,9 @@ const parseId = (idParam: any): number => {
   return parseInt(raw, 10);
 };
 
-// Enforce authentication & ADMIN role ONLY
+// Enforce authentication, password change check & ADMIN role ONLY
 router.use(authenticateUser);
+router.use(requirePasswordChangeCheck);
 router.use(requireRole(Role.ADMIN));
 
 // 1. GET /api/admin/users (List users with search & role filter)

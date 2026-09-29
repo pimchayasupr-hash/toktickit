@@ -106,6 +106,20 @@ router.post('/change-password', authenticateUser, async (req: AuthRequest, res: 
     const userId = req.user!.id;
     const { currentPassword, newPassword } = req.body;
 
+    // Validate currentPassword immediately upfront
+    if (currentPassword === undefined || typeof currentPassword !== 'string' || currentPassword.trim() === '') {
+      res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Current password is required.',
+          fields: {
+            currentPassword: 'Current password is required.',
+          },
+        },
+      });
+      return;
+    }
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     if (!newPassword || typeof newPassword !== 'string' || !passwordRegex.test(newPassword)) {
       res.status(400).json({
@@ -126,19 +140,17 @@ router.post('/change-password', authenticateUser, async (req: AuthRequest, res: 
       return;
     }
 
-    // Check current password if provided
-    if (currentPassword && typeof currentPassword === 'string') {
-      const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
-      if (!isMatch) {
-        res.status(400).json({
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Current password is incorrect.',
-            fields: { currentPassword: 'Current password is incorrect.' },
-          },
-        });
-        return;
-      }
+    // Verify current password matches existing hash
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isMatch) {
+      res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Current password is incorrect.',
+          fields: { currentPassword: 'Current password is incorrect.' },
+        },
+      });
+      return;
     }
 
     const newPasswordHash = await bcrypt.hash(newPassword, 10);

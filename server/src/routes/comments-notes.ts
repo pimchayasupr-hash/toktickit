@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { PrismaClient, Role } from '@prisma/client';
-import { authenticateUser, AuthRequest } from '../middleware/authMiddleware';
+import { authenticateUser, requirePasswordChangeCheck, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -11,6 +11,7 @@ const parseId = (idParam: any): number => {
 };
 
 router.use(authenticateUser);
+router.use(requirePasswordChangeCheck);
 
 // --- Public Comments ---
 

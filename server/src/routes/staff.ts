@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
 import { PrismaClient, Role } from '@prisma/client';
-import { authenticateUser, requireRole, AuthRequest } from '../middleware/authMiddleware';
+import { authenticateUser, requireRole, requirePasswordChangeCheck, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -10,8 +10,9 @@ const parseId = (idParam: any): number => {
   return parseInt(raw, 10);
 };
 
-// Apply auth + role checks to all staff routes
+// Apply auth, password change check, and role checks to all staff routes
 router.use(authenticateUser);
+router.use(requirePasswordChangeCheck);
 router.use(requireRole(Role.STAFF, Role.ADMIN));
 
 // 1. GET /api/staff/tickets (IT Staff Ticket Queue)
@@ -19,46 +20,52 @@ router.get('/tickets', async (req: AuthRequest, res: Response): Promise<void> =>
   try {
     const { status, categoryId, relatedSystemId, priority, ownerId, search, sort, page = '1', pageSize = '10' } = req.query;
 
-    const where: any = {};
+    const andConditions: any[] = [];
 
     if (status && typeof status === 'string' && status.trim() !== '') {
-      where.currentStatus = status.trim();
+      andConditions.push({ currentStatus: status.trim() });
     }
 
     if (categoryId) {
       const parsedCat = parseInt(categoryId as string, 10);
-      if (!isNaN(parsedCat)) where.categoryId = parsedCat;
+      if (!isNaN(parsedCat)) andConditions.push({ categoryId: parsedCat });
     }
 
     if (relatedSystemId) {
       const parsedSys = parseInt(relatedSystemId as string, 10);
-      if (!isNaN(parsedSys)) where.relatedSystemId = parsedSys;
+      if (!isNaN(parsedSys)) andConditions.push({ relatedSystemId: parsedSys });
     }
 
     if (priority && typeof priority === 'string' && priority.trim() !== '') {
-      where.OR = [
-        { itPriority: priority.trim() },
-        { requestedPriority: priority.trim() },
-      ];
+      andConditions.push({
+        OR: [
+          { itPriority: priority.trim() },
+          { requestedPriority: priority.trim() },
+        ],
+      });
     }
 
     if (ownerId && typeof ownerId === 'string') {
       if (ownerId.trim() === 'unassigned') {
-        where.ownerId = null;
+        andConditions.push({ ownerId: null });
       } else {
         const parsedOwner = parseInt(ownerId.trim(), 10);
-        if (!isNaN(parsedOwner)) where.ownerId = parsedOwner;
+        if (!isNaN(parsedOwner)) andConditions.push({ ownerId: parsedOwner });
       }
     }
 
     if (search && typeof search === 'string' && search.trim() !== '') {
       const query = search.trim();
-      where.OR = [
-        { ticketNumber: { contains: query, mode: 'insensitive' } },
-        { summary: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } },
-      ];
+      andConditions.push({
+        OR: [
+          { ticketNumber: { contains: query, mode: 'insensitive' } },
+          { summary: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } },
+        ],
+      });
     }
+
+    const where: any = andConditions.length > 0 ? { AND: andConditions } : {};
 
     // Pagination
     const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
@@ -287,6 +294,39 @@ router.patch('/tickets/:id/status', async (req: AuthRequest, res: Response): Pro
     return;
   } catch (error) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update status.' } });
+    return;
+  }
+});
+
+// 5. GET /api/staff/assignees (List active STAFF and ADMIN users for assignment/reassignment)
+router.get('/assignees', async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const assignees = await prisma.user.findMany({
+      where: {
+        isActive: true,
+        role: { in: [Role.STAFF, Role.ADMIN] },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    res.status(200).json({
+      assignees,
+      users: assignees,
+    });
+    return;
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to fetch assignees.',
+      },
+    });
     return;
   }
 });

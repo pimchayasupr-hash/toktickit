@@ -66,12 +66,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   const fetchStaffUsers = async () => {
     try {
-      const res = await fetch('/api/admin/users?role=STAFF', {
+      const res = await fetch('/api/staff/assignees', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
-        setStaffUsers(data.users || []);
+        setStaffUsers(data.assignees || data.users || []);
       }
     } catch {}
   };

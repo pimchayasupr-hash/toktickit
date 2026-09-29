@@ -88,12 +88,12 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
         setCategories(Array.isArray(catData) ? catData : catData.categories || []);
       }
 
-      const usersRes = await fetch('/api/admin/users?role=STAFF', {
+      const usersRes = await fetch('/api/staff/assignees', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (usersRes.ok) {
         const userData = await usersRes.json();
-        setStaffUsers(userData.users || []);
+        setStaffUsers(userData.assignees || userData.users || []);
       }
     } catch {}
   };

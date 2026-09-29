@@ -165,8 +165,10 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Category *</label>
+              <label htmlFor="ticket-category" className="block text-sm font-semibold text-slate-700 mb-1">Category *</label>
               <select
+                id="ticket-category"
+                name="categoryId"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 className={`w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none ${
@@ -182,8 +184,10 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1">Related System *</label>
+              <label htmlFor="ticket-system" className="block text-sm font-semibold text-slate-700 mb-1">Related System *</label>
               <select
+                id="ticket-system"
+                name="relatedSystemId"
                 value={relatedSystemId}
                 onChange={(e) => setRelatedSystemId(e.target.value)}
                 className={`w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 focus:outline-none ${
@@ -202,6 +206,8 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Ticket Summary *</label>
             <input
+              id="ticket-summary"
+              name="summary"
               type="text"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
@@ -235,6 +241,8 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Detailed Description *</label>
             <textarea
+              id="ticket-description"
+              name="description"
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}

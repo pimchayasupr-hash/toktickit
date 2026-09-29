@@ -69,4 +69,46 @@ describe('Lab 3 - IT Staff Ticket Detail & Operations API Suite', () => {
       expect(res.body.error.code).toBe('INVALID_TRANSITION');
     }
   });
+
+  it('API-23 (Regression): STAFF login fetches /api/staff/assignees successfully and reassigns ticket for real', async () => {
+    const token = await getStaffToken();
+
+    // 1. Call new assignees endpoint
+    const assigneesRes = await request(app)
+      .get('/api/staff/assignees')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(assigneesRes.status).toBe(200);
+    expect(assigneesRes.body).toHaveProperty('assignees');
+    const assignees = assigneesRes.body.assignees;
+    expect(Array.isArray(assignees)).toBe(true);
+    expect(assignees.length).toBeGreaterThan(0);
+
+    // Verify all returned users have role STAFF or ADMIN and isActive
+    for (const user of assignees) {
+      expect(['STAFF', 'ADMIN']).toContain(user.role);
+    }
+
+    // 2. Pick a target assignee that is not the current user
+    const targetAssignee = assignees.find((u: any) => u.email === 'sarah.staff@toktickit.com') || assignees[0];
+
+    // 3. Get a ticket from queue
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${token}`);
+
+    const ticket = queueRes.body.tickets[0];
+    expect(ticket).toBeDefined();
+
+    // 4. Reassign ticket to targetAssignee
+    const reassignRes = await request(app)
+      .patch(`/api/staff/tickets/${ticket.id}/assign`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ownerId: targetAssignee.id });
+
+    expect(reassignRes.status).toBe(200);
+    expect(reassignRes.body.ticket.ownerId).toBe(targetAssignee.id);
+    expect(reassignRes.body.ticket.owner.id).toBe(targetAssignee.id);
+  });
 });
+

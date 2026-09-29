@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
+import { PrismaClient } from '@prisma/client';
 import app from '../../src/app';
+
+const prisma = new PrismaClient();
 
 describe('Lab 3 - Authentication & Token Revocation API Suite', () => {
   it('API-01: Valid user login returns auth token & user profile', async () => {
@@ -159,5 +162,112 @@ describe('Lab 3 - Authentication & Token Revocation API Suite', () => {
       expect(changeRes.status).toBe(400);
       expect(changeRes.body.error.code).toBe('VALIDATION_ERROR');
     }
+  });
+
+  it('API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout', async () => {
+    // 1. Set test user mustChangePassword = true in DB
+    await prisma.user.update({
+      where: { email: 'sarah.jenkins@example.com' },
+      data: { mustChangePassword: true },
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'sarah.jenkins@example.com',
+      password: 'Password123!',
+    });
+
+    const token = loginRes.body.token;
+    expect(loginRes.body.user.mustChangePassword).toBe(true);
+
+    // 2. Calling protected endpoints -> 403 MUST_CHANGE_PASSWORD
+    const protectedTicketRes = await request(app)
+      .get('/api/tickets')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(protectedTicketRes.status).toBe(403);
+    expect(protectedTicketRes.body.error.code).toBe('MUST_CHANGE_PASSWORD');
+
+    const protectedStaffRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(protectedStaffRes.status).toBe(403);
+    expect(protectedStaffRes.body.error.code).toBe('MUST_CHANGE_PASSWORD');
+
+    // 3. Calling allowed flow endpoints -> succeeds
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(meRes.status).toBe(200);
+    expect(meRes.body.user.mustChangePassword).toBe(true);
+
+    // 4. Change password with correct credentials -> succeeds
+    const changeRes = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        currentPassword: 'Password123!',
+        newPassword: 'SecurePassword2026!',
+      });
+
+    expect(changeRes.status).toBe(200);
+    expect(changeRes.body.mustChangePassword).toBe(false);
+
+    // Restore password back to default
+    await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        currentPassword: 'SecurePassword2026!',
+        newPassword: 'Password123!',
+      });
+
+    await prisma.user.update({
+      where: { email: 'sarah.jenkins@example.com' },
+      data: { mustChangePassword: false },
+    });
+  });
+
+  it('API-22 (Regression): POST /api/auth/change-password rejects missing, empty, or incorrect currentPassword', async () => {
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'sarah.jenkins@example.com',
+      password: 'Password123!',
+    });
+    const token = loginRes.body.token;
+
+    // 1. undefined currentPassword
+    const resUndefined = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        newPassword: 'ValidNewPassword123!',
+      });
+    expect(resUndefined.status).toBe(400);
+    expect(resUndefined.body.error.code).toBe('VALIDATION_ERROR');
+    expect(resUndefined.body.error.fields.currentPassword).toBeDefined();
+
+    // 2. empty string currentPassword
+    const resEmpty = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        currentPassword: '   ',
+        newPassword: 'ValidNewPassword123!',
+      });
+    expect(resEmpty.status).toBe(400);
+    expect(resEmpty.body.error.code).toBe('VALIDATION_ERROR');
+
+    // 3. wrong currentPassword
+    const resWrong = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        currentPassword: 'WrongPassword999!',
+        newPassword: 'ValidNewPassword123!',
+      });
+    expect(resWrong.status).toBe(400);
+    expect(resWrong.body.error.code).toBe('VALIDATION_ERROR');
+    expect(resWrong.body.error.message).toContain('Current password is incorrect');
   });
 });
