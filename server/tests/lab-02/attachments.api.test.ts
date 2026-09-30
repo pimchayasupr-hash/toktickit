@@ -1,9 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import app from '../../src/app';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../../src/middleware/authMiddleware';
 
 describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   const requesterId = 1;
+  const token1 = jwt.sign({ userId: 1 }, JWT_SECRET);
+  const token2 = jwt.sign({ userId: 2 }, JWT_SECRET);
   let createdTicketId: number;
   let createdAttachmentId: number;
 
@@ -11,7 +15,7 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
     const clientSubmissionId = `sub-issue5-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const res = await request(app)
       .post('/api/tickets')
-      .set('X-Development-Requester-Id', String(requesterId))
+      .set('Authorization', `Bearer ${token1}`)
       .send({
         clientSubmissionId,
         categoryId: 1,
@@ -28,7 +32,7 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   it('GET /api/tickets/:id retrieves owned ticket detail', async () => {
     const res = await request(app)
       .get(`/api/tickets/${createdTicketId}`)
-      .set('X-Development-Requester-Id', String(requesterId));
+      .set('Authorization', `Bearer ${token1}`);
 
     expect(res.status).toBe(200);
     expect(res.body.ticket).toBeDefined();
@@ -38,7 +42,7 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   it('GET /api/tickets/:id rejects access when owned by different requester (404/Safe Error)', async () => {
     const res = await request(app)
       .get(`/api/tickets/${createdTicketId}`)
-      .set('X-Development-Requester-Id', '2'); // Michael Brown
+      .set('Authorization', `Bearer ${token2}`); // Michael Brown
 
     expect([404, 403]).toContain(res.status);
     expect(res.body.error).toBeDefined();
@@ -47,7 +51,7 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   it('POST /api/tickets/:id/attachments uploads valid attachment (PDF)', async () => {
     const res = await request(app)
       .post(`/api/tickets/${createdTicketId}/attachments`)
-      .set('X-Development-Requester-Id', String(requesterId))
+      .set('Authorization', `Bearer ${token1}`)
       .attach('file', Buffer.from('%PDF-1.4 test content'), 'test-doc.pdf');
 
     expect(res.status).toBe(201);
@@ -59,7 +63,7 @@ describe('Issue 5: Ticket Detail and Attachment Lifecycle API Tests', () => {
   it('POST /api/attachments/:id/remove soft removes attachment with reason', async () => {
     const res = await request(app)
       .post(`/api/attachments/${createdAttachmentId}/remove`)
-      .set('X-Development-Requester-Id', String(requesterId))
+      .set('Authorization', `Bearer ${token1}`)
       .send({
         removalReason: 'File uploaded by mistake and contains old information.',
       });
