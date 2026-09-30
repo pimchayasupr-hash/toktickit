@@ -84,3 +84,41 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
       Approving and merging now. Excellent work on the Zen Green UI overhaul!"
 - **Approval Status**: Approved by `@supa-gif173`
 - **Merged By**: `@supa-gif173` on 2026-09-19T08:47:52Z (Merge Commit: `4110ea3`)
+
+### PR #41: Lab 3 Final Increment (Staging to Main Release)
+- **Branch**: `lab3-staging` → `main`
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/41`
+- **Reviewers**: `@MiMikoChAn913`, `@supa-gif173`
+- **Review Iterations & Multi-Round Feedback**:
+  - **Round 1 (Changes Requested by `@MiMikoChAn913` on 2026-09-19T11:12:39Z)**:
+    - *Review Comment*:
+      "Thanks for putting the Lab 3 integration together. I found four issues to address before merging into main:
+      1. `requirePasswordChangeCheck` is defined but never applied to the application routes. Users with `mustChangePassword = true` can still access protected features through direct API requests. Please enforce this server-side while allowing the authentication endpoints needed to complete the password change.
+      2. `/api/auth/change-password` skips current-password verification when `currentPassword` is omitted, empty, or not a string. Please require and verify it before updating the password.
+      3. Both Staff screens fetch assignees from `/api/admin/users?role=STAFF`, which returns 403 for STAFF users. Please provide a Staff-accessible assignee endpoint returning active STAFF and ADMIN users, while keeping user-management endpoints restricted to ADMIN.
+      4. In the staff queue, the search condition overwrites the priority condition in `where.OR`. Please combine the two filter groups with AND so both remain effective.
+      Please add regression coverage for these cases, including reassignment while logged in as STAFF, and rerun the relevant tests."
+  - **Author Resolution & Fix Commit Details (`@pimchayasupr-hash` in Commit [`ee630ab`](https://github.com/pimchayasupr-hash/toktickit/commit/ee630ab842a8a11f2b0fadfdee373c3d0811694f))**:
+    - *Resolution Response*:
+      "Thank you @MiMikoChAn913 and @supa-gif173 for catching these critical security and operational issues! I have addressed all four points and added full regression test coverage in commit `ee630ab`:
+      1. **Password Change Enforcement (Security)**: Applied `requirePasswordChangeCheck` middleware across all protected routes (`/api/tickets`, `/api/attachments`, `/api/staff/*`, `/api/admin/users`, `/api/interactions/*`). Kept `/api/auth/change-password`, `/api/auth/me`, and `/api/auth/logout` accessible for onboarding password updates.
+      2. **Current Password Verification (Security)**: Added validation on `POST /api/auth/change-password` requiring `currentPassword` and verified via `bcrypt.compare` against `user.passwordHash`.
+      3. **Staff Assignee Endpoint & Permissions**: Implemented dedicated `GET /api/staff/assignees` endpoint returning active `STAFF` and `ADMIN` users for ticket assignment. Updated `StaffTicketQueue` and `StaffTicketDetail` components. Kept `/api/admin/users` restricted to `ADMIN` only.
+      4. **Staff Queue Filter Logic**: Refactored query builder using `AND` conditions to combine `search` and `priority` filters properly without overwriting `where.OR`.
+      - Added regression test suite (`API-21` to `API-24`): All 60 server tests and 13 client tests passing (100% Green)."
+  - **Round 2 (Re-review & Approval on Commit [`ee630ab`](https://github.com/pimchayasupr-hash/toktickit/commit/ee630ab842a8a11f2b0fadfdee373c3d0811694f))**:
+    - *Approval by `@MiMikoChAn913` (2026-09-29T16:47:35Z)*:
+      "Re-reviewed the actual fixes in commit ee630ab. The four previously reported issues are now addressed, and regression coverage has been added. Approved and ready to merge."
+    - *Approval by `@supa-gif173` (2026-09-30T06:01:20Z)*:
+      "Thank you for quickly turning around these fixes and providing such a clear summary of the changes!
+      While I focused primarily on the frontend code in this diff, your implementation of the ChangePasswordModal is excellent. The real-time password rule validation (checking for minimum length, uppercase/lowercase, digits, and special characters) paired with immediate visual feedback is a fantastic UX improvement. It perfectly complements the strict security rules you've enforced on the backend.
+      Based on your summary of the backend changes:
+      - Implementing the requirePasswordChangeCheck middleware while explicitly whitelisting the auth endpoints is the correct architectural approach to securely enforcing the mandatory password change flow.
+      - Securing the /api/auth/change-password route with upfront validation and bcrypt.compare completely resolves the credential update vulnerability.
+      - Creating the dedicated /api/staff/assignees endpoint is a clean solution that unblocks the IT Staff workflow without compromising the strictly enforced admin RBAC boundaries.
+      - Using AND conditions for the queue filters prevents the logic conflicts effectively.
+      With a 100% green test suite (including the new API-21 to API-24 regression tests) across both the Server and Client sides, I am fully confident in this integration. Outstanding work! The Lab 3 increment is highly secure and beautifully structured. Approved and ready to merge into main!"
+- **Approval Status**: Approved by `@MiMikoChAn913` and `@supa-gif173`
+- **Merged By**: `@supa-gif173` on 2026-09-30T07:33:49Z (14:33:49 GMT+7)
+- **Merge Commit**: [`b5494cb`](https://github.com/pimchayasupr-hash/toktickit/commit/b5494cbb5c5f08641e5f2a925f09fd10a7103969)
+

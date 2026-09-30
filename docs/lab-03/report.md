@@ -1,10 +1,10 @@
 # Lab 3 Engineering Report: TokTickIT Users, Roles, IT Staff Ticketing, and Admin Screens
 
-> **Document Status**: Complete & Final (ผ่านการทดสอบ 100% ครบทุกชั้น และตรวจสอบหลักฐานภาพถ่ายครบถ้วน)  
+> **Document Status**: Complete & Final (ผ่านการทดสอบ 100% ครบทุกชั้น ผสานโค้ดเข้าสู่ main สำเร็จ และตรวจสอบหลักฐานภาพถ่ายครบถ้วน)  
 > **Repository**: `pimchayasupr-hash/toktickit`  
-> **Branch**: `lab3-staging` (Commit `85fe06f`)  
+> **Branch**: `main` (Merge Commit `b5494cb`, Head `ee630ab`)  
 > **PR #40 Status**: APPROVED & MERGED (Merged on 2026-09-19T08:47:52Z by `@supa-gif173`)  
-> **Final PR (lab3-staging → main) Status**: Opened as [PR #41](https://github.com/pimchayasupr-hash/toktickit/pull/41) (Requested Reviewers: `@supa-gif173`, `@MiMikoChAn913`)
+> **Final PR (lab3-staging → main) Status**: APPROVED & MERGED as [PR #41](https://github.com/pimchayasupr-hash/toktickit/pull/41) (Merged on 2026-09-30T07:33:49Z / 14:33:49 GMT+7 by `@supa-gif173`, Re-reviewed & Approved on commit `ee630ab` by `@MiMikoChAn913` & `@supa-gif173`)
 
 ---
 
@@ -38,6 +38,20 @@ Lab 3 พัฒนาต่อยอดจาก Lab 2 MVP (Requester-Facing IT 
 | **Database & ORM** | PostgreSQL & Prisma ORM | `prisma ^6.19.3`, `@prisma/client ^6.19.3` | `server/package.json` |
 | **Backend Testing** | Vitest & Supertest | `vitest ^4.1.10`, `supertest ^7.2.2` | `server/package.json` |
 | **End-to-End Testing** | Playwright | `@playwright/test ^1.50.1` (Chromium, Firefox, WebKit) | `package.json` |
+
+### 1.3 Git Workflow, Branching Strategy & Release Cadence
+
+ทีมงานใช้กระบวนการพัฒนาและควบคุมเวอร์ชันตามข้อกำหนดวิศวกรรมซอฟต์แวร์อย่างเคร่งครัด:
+1. **Branching Strategy (Feature → Staging → Main)**:
+   - แต่ละ User Story / Task ถูกแยกพัฒนาบน Feature Branch เฉพาะกิจ (`feature/*`)
+   - รวมฟีเจอร์เข้าสู่ Integration Branch กลาง (`lab3-staging`) ผ่าน Pull Request เพื่อรัน Automated Test Suites (Vitest + Playwright) ร่วมกัน
+   - ปล่อยโค้ดขึ้น Production Release Branch (`main`) ผ่าน **PR #41** เมื่อผ่านเกณฑ์ครบทุกข้อ
+2. **Peer Review Rules Enforcement**:
+   - **RULE 1 (No Self-Merging)**: ห้ามผู้พัฒนา Merge Pull Request ของตนเองเด็ดขาด ทุก PR ต้องได้รับการ Review และ Approved จาก Reviewer ก่อนเสมอ
+   - **RULE 2 (Comprehensive Response)**: ทุกคอมเมนต์/ข้อเสนอแนะจาก Reviewer ต้องได้รับการชี้แจง ตอบกลับ และแก้ไขอย่างเป็นลายลักษณ์อักษร
+3. **Release Milestone Summary**:
+   - **Staging Consolidation**: PR #35 ถึง PR #40 ผสานฟีเจอร์ Authentication, RBAC, IT Staff Queue, Admin Management, และ Zen Green UI System เข้าสู่ `lab3-staging` (Merge Commit `4110ea3`)
+   - **Final Production Merge (PR #41)**: เปิด PR #41 (`lab3-staging` → `main`) ผ่านการ Review 2 รอบ (รอบแรกตรวจพบ 4 จุดบกพร่องด้าน Security/Filter $\rightarrow$ แก้ไขใน commit [`ee630ab`](https://github.com/pimchayasupr-hash/toktickit/commit/ee630ab842a8a11f2b0fadfdee373c3d0811694f) พร้อมเพิ่ม Regression Tests `API-21` ถึง `API-24` $\rightarrow$ ได้รับ Approved จาก `@MiMikoChAn913` และ `@supa-gif173` $\rightarrow$ ผสานโค้ดเข้าสู่ `main` สำเร็จเมื่อวันที่ **2026-09-30T07:33:49Z (14:33:49 น. ตามเวลาไทย)** โดย **`@supa-gif173`** ผ่าน Merge Commit [`b5494cb`](https://github.com/pimchayasupr-hash/toktickit/commit/b5494cbb5c5f08641e5f2a925f09fd10a7103969))
 
 ---
 
@@ -74,9 +88,9 @@ Lab 3 พัฒนาต่อยอดจาก Lab 2 MVP (Requester-Facing IT 
 
 ---
 
-## 3. Peer Review Summary (PR #35 – #40)
+## 3. Peer Review Summary (PR #35 – #41)
 
-> **หมายเหตุ**: สรุป PR #35 ถึง #40 ที่ได้รับการอนุมัติ (Approved) และผสานโค้ด (Merged) บน GitHub เรียบร้อยแล้ว ข้อมูลทั้งหมดถูกดึงและตรวจสอบยืนยันโดยตรงจาก GitHub REST API (`https://api.github.com/repos/pimchayasupr-hash/toktickit/pulls/`) โดยคงข้อความรีวิวและข้อความตอบกลับแบบ Verbatim ครบทุกรอบการรีวิว (รวมทั้งรอบ Request Changes ทั้ง 2 รอบของ PR #40)
+> **หมายเหตุ**: สรุป PR #35 ถึง #41 ที่ได้รับการอนุมัติ (Approved) และผสานโค้ด (Merged) บน GitHub เรียบร้อยแล้ว ข้อมูลทั้งหมดถูกดึงและตรวจสอบยืนยันโดยตรงจาก GitHub REST API (`https://api.github.com/repos/pimchayasupr-hash/toktickit/pulls/`) โดยคงข้อความรีวิวและข้อความตอบกลับแบบ Verbatim ครบทุกรอบการรีวิว (รวมทั้งรอบ Request Changes ทั้ง 2 รอบของ PR #40 และการ Re-review บนโค้ดจริงในรอบ PR #41 ก่อนผสานเข้าสู่ `main`)
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -382,6 +396,107 @@ Everything looks perfect! All feedback from both rounds has been addressed thoro
 
 Approving and merging now. Excellent work on the Zen Green UI overhaul!
 ```
+
+```
++----------------------------------------------------------------------------------------------------+
+| PR #41: release: Lab 3 Final Increment — Users, Roles, IT Staff Ticketing, and Admin Screens       |
+| Status: CLOSED (Merged into main)                                                                  |
++----------------------------------------------------------------------------------------------------+
+| PR Link:     https://github.com/pimchayasupr-hash/toktickit/pull/41                                |
+| Base/Head:   main ← lab3-staging                                                                   |
+| Reviewers:   @MiMikoChAn913, @supa-gif173                                                          |
+| Review State: APPROVED (Re-reviewed and Approved on Commit ee630ab)                                 |
+| Merged Date: 2026-09-30T07:33:49Z (14:33:49 GMT+7)                                                |
+| Merged By:   @supa-gif173                                                                          |
+| Merge Commit: b5494cbb5c5f08641e5f2a925f09fd10a7103969                                            |
++----------------------------------------------------------------------------------------------------+
+```
+
+#### Multi-Round Peer Review Log (PR #41):
+
+##### Round 1: Reviewer Feedback & Changes Requested (2026-09-19T11:12:39Z โดย @MiMikoChAn913):
+```markdown
+Thanks for putting the Lab 3 integration together. I found four issues to address before merging into main:
+
+1. `requirePasswordChangeCheck` is defined but never applied to the application routes. Users with `mustChangePassword = true` can still access protected features through direct API requests. Please enforce this server-side while allowing the authentication endpoints needed to complete the password change.
+
+2. `/api/auth/change-password` skips current-password verification when `currentPassword` is omitted, empty, or not a string. Please require and verify it before updating the password.
+
+3. Both Staff screens fetch assignees from `/api/admin/users?role=STAFF`, which returns 403 for STAFF users. Please provide a Staff-accessible assignee endpoint returning active STAFF and ADMIN users, while keeping user-management endpoints restricted to ADMIN.
+
+4. In the staff queue, the search condition overwrites the priority condition in `where.OR`. Please combine the two filter groups with AND so both remain effective.
+
+Please add regression coverage for these cases, including reassignment while logged in as STAFF, and rerun the relevant tests.
+```
+
+##### Author Response & Resolution Commit (Commit [`ee630ab`](https://github.com/pimchayasupr-hash/toktickit/commit/ee630ab842a8a11f2b0fadfdee373c3d0811694f) โดย @pimchayasupr-hash):
+```markdown
+@MiMikoChAn913 Thank you so much for the thorough review and for catching these critical security and operational issues! 
+I have addressed all four points and added full regression test coverage:
+
+### Summary of Fixes:
+
+1. **Password Change Enforcement (Security)**:
+   - Applied `requirePasswordChangeCheck` middleware across all protected routes (`/api/tickets`, `/api/attachments`, `/api/staff/*`, `/api/admin/users`, `/api/interactions/*`).
+   - Kept `/api/auth/change-password`, `/api/auth/me`, and `/api/auth/logout` accessible so users with `mustChangePassword = true` can complete the password change flow without being locked out.
+
+2. **Current Password Verification (Security)**:
+   - Added upfront validation on `POST /api/auth/change-password` to immediately reject missing, empty, or non-string `currentPassword` with `400 Bad Request`.
+   - Added verification using `bcrypt.compare(currentPassword, user.passwordHash)` before allowing the password update.
+
+3. **Staff Assignee Endpoint & Permission Scope**:
+   - Implemented a dedicated `GET /api/staff/assignees` endpoint returning active `STAFF` and `ADMIN` users for ticket assignment.
+   - Updated both `StaffTicketQueue` and `StaffTicketDetail` components to consume this new endpoint instead of `/api/admin/users`.
+   - Kept `/api/admin/users` strictly restricted to `ADMIN` only.
+
+4. **Staff Queue Filter Logic**:
+   - Refactored the query builder in `server/src/routes/staff.ts` using `AND` conditions to combine `search` and `priority` filters properly without overwriting `where.OR`.
+
+---
+
+### Regression Tests & Verification:
+- **API-21**: Verified users with `mustChangePassword = true` are blocked on protected endpoints (e.g. `GET /api/tickets`) but can access `/api/auth/change-password`, `/api/auth/me`, and `/api/auth/logout`.
+- **API-22**: Verified `POST /api/auth/change-password` rejects missing, empty, or incorrect `currentPassword`.
+- **API-23**: Verified a `STAFF` user can authenticate, retrieve `/api/staff/assignees`, and successfully reassign a ticket in the database.
+- **API-24**: Verified staff queue filtering by both `search` and `priority` simultaneously returns records matching both criteria (`AND`).
+
+### Test Suite Results:
+- **Server Vitest**: 60/60 tests passed (18 files)
+- **Client Vitest**: 13/13 tests passed (11 files)
+- **Playwright E2E**: 12/12 tests passed across Chromium, Firefox, and WebKit
+- **Client Build**: Clean production build (0 errors)
+
+All fixes are in place and verified 100% green. Ready for your final re-review!
+```
+
+##### Round 2: Final Re-Review & Official Approvals on Commit [`ee630ab`](https://github.com/pimchayasupr-hash/toktickit/commit/ee630ab842a8a11f2b0fadfdee373c3d0811694f):
+
+1. **Re-Review Approval by `@MiMikoChAn913` (2026-09-29T16:47:35Z / 23:47:35 GMT+7)**:
+```markdown
+Re-reviewed the actual fixes in commit ee630ab. The four previously reported issues are now addressed, and regression coverage has been added. Approved and ready to merge.
+```
+
+2. **Re-Review Approval by `@supa-gif173` (2026-09-30T06:01:20Z / 13:01:20 GMT+7)**:
+```markdown
+Thank you for quickly turning around these fixes and providing such a clear summary of the changes!
+
+While I focused primarily on the frontend code in this diff, your implementation of the ChangePasswordModal is excellent. The real-time password rule validation (checking for minimum length, uppercase/lowercase, digits, and special characters) paired with immediate visual feedback is a fantastic UX improvement. It perfectly complements the strict security rules you've enforced on the backend.
+
+Based on your summary of the backend changes:
+- Implementing the requirePasswordChangeCheck middleware while explicitly whitelisting the auth endpoints is the correct architectural approach to securely enforcing the mandatory password change flow.
+- Securing the /api/auth/change-password route with upfront validation and bcrypt.compare completely resolves the credential update vulnerability.
+- Creating the dedicated /api/staff/assignees endpoint is a clean solution that unblocks the IT Staff workflow without compromising the strictly enforced admin RBAC boundaries.
+- Using AND conditions for the queue filters prevents the logic conflicts effectively.
+
+With a 100% green test suite (including the new API-21 to API-24 regression tests) across both the Server and Client sides, I am fully confident in this integration.
+
+Outstanding work! The Lab 3 increment is highly secure and beautifully structured. Approved and ready to merge into main!
+```
+
+##### Merge Execution & Production Integration:
+- **Merged by**: `@supa-gif173` on 2026-09-30T07:33:49Z (14:33:49 GMT+7)
+- **Merge Commit**: [`b5494cb`](https://github.com/pimchayasupr-hash/toktickit/commit/b5494cbb5c5f08641e5f2a925f09fd10a7103969)
+- **Target**: `main` branch (Production Release)
 
 ---
 
