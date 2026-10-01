@@ -36,6 +36,17 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | **API-17** | API | AC-17, FR-17 | Admin search users by name/email & filter by role | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-18** | API | AC-18, FR-20 | Admin reset initial password forces password change flag | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-19** | API | AC-03, BR-04 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-20** | API | AC-13, BR-04 | Protected endpoint with `mustChangePassword=true` blocks all operations except /auth/me, /change-password, /logout | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-21** | API | AC-03, BR-01 | Inactive account blocks login even with correct password | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-22** | API | AC-02, BR-02 | Password change rejects empty, missing, or incorrect `currentPassword` | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **UT-01** | Unit | BR-02 | Password validator rejects passwords < 8 chars | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-02** | Unit | BR-02 | Password validator enforces uppercase, lowercase, digit, special char requirements | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-03** | Unit | BR-11 | Comment validator rejects empty/whitespace-only strings | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-04** | Unit | BR-11 | Comment validator enforces min=1, max=2000 char boundaries | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-05** | Unit | BR-10 | Status transition matrix allows all valid transitions from NEW, IN_PROGRESS | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-06** | Unit | BR-10 | Status transition matrix blocks all invalid transitions; CANCELLED is terminal | `server/tests/lab-03/unit.test.ts` | Pass |
+| **MT-01** | Migration | BR-05 | Lab 2 DB populated with legacy Requesters/Tickets/Attachments survives Lab 3 migration with zero data loss | `server/tests/lab-03/migration-regression.test.ts` | Pass |
+| **MT-02** | Migration | BR-05 | Seed idempotency: re-running `prisma db seed` does not duplicate records or throw constraint violations | `server/tests/lab-03/seed-idempotency.test.ts` | Pass |
 | **UI-01** | UI | AC-01, AC-02 | Login form renders fields, validation errors, and loading state | `client/src/tests/lab-03/Login.test.tsx` | Pass |
 | **UI-02** | UI | AC-02, BR-02 | Mandatory password change form enforces password rules | `client/src/tests/lab-03/ChangePassword.test.tsx` | Pass |
 | **UI-03** | UI | FR-09, FR-10 | Staff Ticket Queue table renders filters, search, and badges | `client/src/tests/lab-03/StaffTicketQueue.test.tsx` | Pass |
@@ -45,6 +56,16 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | **E2E-01** | E2E | AC-01, AC-02 | E2E complete authentication, initial password change & logout | `e2e/lab-03/authentication.spec.ts` | Pass |
 | **E2E-02** | E2E | AC-05..AC-08 | E2E IT Staff queue search, ticket detail claim, status & notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
 | **E2E-03** | E2E | AC-09, AC-10 | E2E Administrator user creation, search, edit & safety checks | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-04** | E2E | AC-13, BR-04 | E2E Logout revokes session; direct URL access redirects to login; unauthenticated API returns 401 | `e2e/lab-03/authentication.spec.ts` | Pass |
+| **E2E-05** | E2E | AC-07, BR-10 | E2E Staff claims ticket and performs status transition sequence | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
+| **E2E-06** | E2E | AC-02, BR-02 | E2E New user first login triggers mandatory password change modal | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-07** | E2E | AC-10, BR-15, BR-16 | E2E Admin safety rules block self-deactivation and last-admin demotion | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-08** | E2E | §10, Handout | Zero horizontal overflow on Login screen at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-09** | E2E | §10, Handout | Zero horizontal overflow on IT Staff Queue at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-10** | E2E | §10, Handout | Zero horizontal overflow on Staff Detail & Admin User Management at all viewports | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-11** | E2E | §10, AC-19 | Zen Green primary button (`#005a36`) background & white text verified by computed styles | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-12** | E2E | §10, AC-19 | Keyboard Escape key closes admin modal (accessibility) | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-13** | E2E | §10, AC-19 | Axe-core accessibility scan: zero critical violations on Login and Staff Queue pages | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
 
 ---
 
@@ -63,36 +84,55 @@ npx playwright test
 
 ## 4. Final Sprint 3 Test Execution Logs
 
+> All commands executed against the live application (`npm --prefix server run dev` + `npm run dev`) on the `fix/lab3-review-fixes` branch.
+
 ### Server Test Output
 ```text
- Test Files  18 passed (18)
-      Tests  56 passed (56)
-   Start at  16:27:19
-   Duration  6.64s (transform 1.80s, setup 0ms, import 16.84s, tests 20.89s, environment 3ms)
+ Test Files  21 passed (21)
+      Tests  90 passed (90)
+   Start at  13:24:28
+   Duration  2.29s (transform 511ms, setup 0ms, import 3.76s, tests 8.77s, environment 1ms)
 ```
 
 ### Client Test Output
 ```text
  Test Files  11 passed (11)
-      Tests  13 passed (13)
-   Start at  18:36:02
-   Duration  5.21s (transform 1.80s, setup 2.31s, import 2.97s, tests 4.33s, environment 19.14s)
+      Tests  28 passed (28)
+   Start at  13:24:47
+   Duration  2.60s (transform 1.25s, setup 1.26s, import 1.89s, tests 3.45s, environment 8.04s)
 ```
 
-### Playwright End-to-End Test Output
+### Playwright End-to-End Test Output (Chromium)
 ```text
-Running 9 tests using 4 workers
+Running 27 tests using 1 worker
 
-[1/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
-[2/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
-[3/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
-[4/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
-[5/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
-[6/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
-[7/9] …hange › E2E-01: Login, mandatory initial password change, and logout flow
-[8/9] …t Flow › E2E-03: Admin login, create user, search, and safety rules check
-[9/9] …Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
-  9 passed (20.6s)
+[1/27]  … Authentication & Mandatory Password Change › E2E-01: Login, mandatory initial password change, and logout flow
+[2/27]  … Authentication & Mandatory Password Change › E2E-04: Logout blocks direct URL access and unauthenticated API calls
+[3/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on Login screen at Mobile 375px
+[4/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on Login screen at Mobile 390px
+[5/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on Login screen at Tablet 820px
+[6/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on Login screen at Desktop 1440px
+[7/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Queue at Mobile 375px
+[8/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Queue at Mobile 390px
+[9/27]  … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Queue at Tablet 820px
+[10/27] … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Queue at Desktop 1440px
+[11/27] … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Ticket Detail at Mobile 375px
+[12/27] … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Ticket Detail at Mobile 390px
+[13/27] … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Ticket Detail at Tablet 820px
+[14/27] … Responsive & Accessibility Suite › Zero horizontal overflow on IT Staff Ticket Detail at Desktop 1440px
+[15/27] … Responsive & Accessibility Suite › Zero horizontal overflow on Admin User Management at Mobile 375px
+[16/27] … Responsive & Accessibility Suite › Zero horizontal overflow on Admin User Management at Mobile 390px
+[17/27] … Responsive & Accessibility Suite › Zero horizontal overflow on Admin User Management at Tablet 820px
+[18/27] … Responsive & Accessibility Suite › Zero horizontal overflow on Admin User Management at Desktop 1440px
+[19/27] … Responsive & Accessibility Suite › Primary Zen Green button visibility and styling
+[20/27] … Responsive & Accessibility Suite › Keyboard Escape key closes admin modals
+[21/27] … Responsive & Accessibility Suite › Accessibility check via axe-core on Login and Queue
+[22/27] … IT Staff Ticket Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
+[23/27] … IT Staff Ticket Flow › E2E-05: Staff ticket detail - reassign & complete workflow
+[24/27] … Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check
+[25/27] … Administrator User Management Flow › E2E-06: New user first login enforces mandatory password change flow
+[26/27] … Administrator User Management Flow › E2E-07: Admin safety rules block self-deactivation and last admin demotion
+  27 passed (45.2s)
 ```
 
 ---
@@ -391,9 +431,9 @@ Running 9 tests using 1 worker
 ```
 
 ### 5. Final Quality Summary
-- **Client TypeScript / Vite Build**: PASS (0 errors, 824ms)
-- **Backend API Tests**: 56 / 56 PASS (100%)
-- **Frontend Component Tests**: 13 / 13 PASS (100%)
-- **End-to-End Multi-Browser Tests**: 9 / 9 PASS (100%)
-- **Grand Total Automated Tests**: **78 / 78 PASS (100% Green)**
+- **Client TypeScript / Vite Build**: PASS (0 errors)
+- **Backend API Tests (Server Vitest)**: 90 / 90 PASS in 21 test files (100%)
+- **Frontend Component Tests (Client Vitest)**: 28 / 28 PASS in 11 test files (100%)
+- **End-to-End Playwright Tests (Chromium)**: 27 / 27 PASS (100%)
+- **Grand Total Automated Tests**: **145 / 145 PASS (100% Green)**
 

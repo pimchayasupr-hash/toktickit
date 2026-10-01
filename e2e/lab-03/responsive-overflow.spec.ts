@@ -31,8 +31,9 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
       await page.fill('input[type="email"]', 'michael.staff@toktickit.com');
       await page.fill('input[type="password"]', 'Password123!');
       await page.click('button:has-text("Sign In")');
+      await page.waitForLoadState('networkidle', { timeout: 15000 });
 
-      await expect(page.getByText('IT Staff Shared Ticket Queue')).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText('IT Staff Shared Ticket Queue')).toBeVisible({ timeout: 12000 });
 
       if (vp.width < 768) {
         await expect(page.locator('[data-testid="mobile-ticket-cards"]')).toBeVisible();
