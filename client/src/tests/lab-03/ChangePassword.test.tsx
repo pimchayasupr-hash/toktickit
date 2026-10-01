@@ -13,6 +13,6 @@ describe('Lab 3 UI - ChangePassword Component', () => {
 
     expect(screen.getByText(/Change Your Password/i)).toBeDefined();
     expect(screen.getByText(/Minimum 8 characters long/i)).toBeDefined();
-    expect(screen.getByRole('button', { name: /Save New Password & Continue/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Update Password & Continue/i })).toBeDefined();
   });
 });

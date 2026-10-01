@@ -107,7 +107,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return <span className="tkt-pill tkt-pill-priority-high">Urgent</span>;
+        return <span className="tkt-pill tkt-pill-priority-urgent">Urgent</span>;
       case 'HIGH':
         return <span className="tkt-pill tkt-pill-priority-high">High</span>;
       case 'MEDIUM':
@@ -120,21 +120,21 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'NEW':
-        return <span className="tkt-pill tkt-pill-status-open">New</span>;
+        return <span className="tkt-pill tkt-pill-status-new">New</span>;
       case 'OPEN':
         return <span className="tkt-pill tkt-pill-status-open">Open</span>;
       case 'IN_PROGRESS':
         return <span className="tkt-pill tkt-pill-status-in-progress">In Progress</span>;
       case 'WAITING_FOR_REQUESTER':
-        return <span className="tkt-pill tkt-pill-status-pending">Waiting for Requester</span>;
+        return <span className="tkt-pill tkt-pill-status-waiting">Waiting for Requester</span>;
       case 'PENDING':
         return <span className="tkt-pill tkt-pill-status-pending">Pending</span>;
       case 'RESOLVED':
         return <span className="tkt-pill tkt-pill-status-resolved">Resolved</span>;
       case 'REOPENED':
-        return <span className="tkt-pill tkt-pill-status-in-progress">Reopened</span>;
+        return <span className="tkt-pill tkt-pill-status-reopened">Reopened</span>;
       case 'CANCELLED':
-        return <span className="tkt-pill tkt-pill-status-closed">Cancelled</span>;
+        return <span className="tkt-pill tkt-pill-status-cancelled">Cancelled</span>;
       case 'CLOSED':
         return <span className="tkt-pill tkt-pill-status-closed">Closed</span>;
       default:
@@ -304,60 +304,108 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
           <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Try resetting your filters or search terms.</p>
         </div>
       ) : (
-        <div className="tkt-table-container">
-          <table className="tkt-table">
-            <thead>
-              <tr>
-                <th>Ticket No. <span className="sort-arrow">⇅</span></th>
-                <th>Created Date <span className="sort-arrow">⇅</span></th>
-                <th>Summary</th>
-                <th>Category <span className="sort-arrow">⇅</span></th>
-                <th>Req. Priority</th>
-                <th>IT Priority</th>
-                <th>Status <span className="sort-arrow">⇅</span></th>
-                <th>Owner <span className="sort-arrow">⇅</span></th>
-                <th style={{ textAlign: 'right' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((t) => (
-                <tr key={t.id}>
-                  <td>
-                    <span
-                      onClick={() => onSelectTicket(t.id)}
-                      className="tkt-ticket-link"
-                    >
-                      {t.ticketNumber}
+        <>
+          {/* Mobile View: Stacked Card List (< 768px) */}
+          <div className="tkt-card-list tkt-mobile-only" data-testid="mobile-ticket-cards">
+            {tickets.map((t) => (
+              <div key={t.id} className="tkt-queue-card">
+                <div className="tkt-queue-card-header">
+                  <span
+                    onClick={() => onSelectTicket(t.id)}
+                    className="tkt-ticket-link"
+                    style={{ fontSize: '0.95rem' }}
+                  >
+                    {t.ticketNumber}
+                  </span>
+                  <div>{getStatusBadge(t.currentStatus)}</div>
+                </div>
+                <div className="tkt-queue-card-title">{t.summary}</div>
+                <div className="tkt-queue-card-meta">
+                  <div className="tkt-queue-card-meta-item">
+                    <span className="tkt-queue-card-meta-label">Category</span>
+                    <span style={{ color: '#334155' }}>{t.category?.name || 'General'}</span>
+                  </div>
+                  <div className="tkt-queue-card-meta-item">
+                    <span className="tkt-queue-card-meta-label">Owner</span>
+                    <span style={{ color: '#334155' }}>
+                      {t.owner ? t.owner.name : <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>}
                     </span>
-                  </td>
-                  <td style={{ whiteSpace: 'nowrap', color: '#64748b', fontSize: '0.8rem' }}>
-                    {formatDate(t.createdAt)}
-                  </td>
-                  <td style={{ fontWeight: 600, color: '#0f172a', maxWidth: '300px' }}>
-                    {t.summary}
-                  </td>
-                  <td style={{ color: '#475569' }}>
-                    {t.category?.name || 'General'}
-                  </td>
-                  <td>{getPriorityBadge(t.requestedPriority)}</td>
-                  <td>{getPriorityBadge(t.itPriority || t.requestedPriority)}</td>
-                  <td>{getStatusBadge(t.currentStatus)}</td>
-                  <td style={{ color: '#475569', fontSize: '0.8rem' }}>
-                    {t.owner ? t.owner.name : <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>}
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <button
-                      onClick={() => onSelectTicket(t.id)}
-                      className="tkt-btn-filters"
-                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', backgroundColor: '#eaf6ef', color: '#005a36', borderColor: '#bbf7d0' }}
-                    >
-                      Open Detail
-                    </button>
-                  </td>
+                  </div>
+                  <div className="tkt-queue-card-meta-item">
+                    <span className="tkt-queue-card-meta-label">Req. Priority</span>
+                    <div>{getPriorityBadge(t.requestedPriority)}</div>
+                  </div>
+                  <div className="tkt-queue-card-meta-item">
+                    <span className="tkt-queue-card-meta-label">IT Priority</span>
+                    <div>{getPriorityBadge(t.itPriority || t.requestedPriority)}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onSelectTicket(t.id)}
+                  className="tkt-queue-card-btn"
+                >
+                  Open Detail
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop & Tablet Table (>= 768px) */}
+          <div className="tkt-table-container tkt-desktop-tablet">
+            <table className="tkt-table">
+              <thead>
+                <tr>
+                  <th>Ticket No. <span className="sort-arrow">⇅</span></th>
+                  <th className="tkt-desktop-only">Created Date <span className="sort-arrow">⇅</span></th>
+                  <th>Summary</th>
+                  <th className="tkt-desktop-only">Category <span className="sort-arrow">⇅</span></th>
+                  <th>Req. Priority</th>
+                  <th>IT Priority</th>
+                  <th>Status <span className="sort-arrow">⇅</span></th>
+                  <th>Owner <span className="sort-arrow">⇅</span></th>
+                  <th style={{ textAlign: 'right' }}>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tickets.map((t) => (
+                  <tr key={t.id}>
+                    <td>
+                      <span
+                        onClick={() => onSelectTicket(t.id)}
+                        className="tkt-ticket-link"
+                      >
+                        {t.ticketNumber}
+                      </span>
+                    </td>
+                    <td className="tkt-desktop-only" style={{ whiteSpace: 'nowrap', color: '#64748b', fontSize: '0.8rem' }}>
+                      {formatDate(t.createdAt)}
+                    </td>
+                    <td style={{ fontWeight: 600, color: '#0f172a', maxWidth: '300px' }}>
+                      {t.summary}
+                    </td>
+                    <td className="tkt-desktop-only" style={{ color: '#475569' }}>
+                      {t.category?.name || 'General'}
+                    </td>
+                    <td>{getPriorityBadge(t.requestedPriority)}</td>
+                    <td>{getPriorityBadge(t.itPriority || t.requestedPriority)}</td>
+                    <td>{getStatusBadge(t.currentStatus)}</td>
+                    <td style={{ color: '#475569', fontSize: '0.8rem' }}>
+                      {t.owner ? t.owner.name : <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        onClick={() => onSelectTicket(t.id)}
+                        className="tkt-btn-filters"
+                        style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', backgroundColor: '#eaf6ef', color: '#005a36', borderColor: '#bbf7d0', minHeight: '36px' }}
+                      >
+                        Open Detail
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
@@ -387,7 +435,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
               </button>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

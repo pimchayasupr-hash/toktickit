@@ -33,7 +33,7 @@ router.post('/login', async (req: AuthRequest, res: Response): Promise<void> => 
       where: { email: trimmedEmail },
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
       res.status(401).json({
         error: {
           code: 'INVALID_CREDENTIALS',
@@ -54,10 +54,20 @@ router.post('/login', async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
+    if (!user.isActive) {
+      res.status(401).json({
+        error: {
+          code: 'ACCOUNT_DEACTIVATED',
+          message: 'Your account has been deactivated. Please contact an administrator.',
+        },
+      });
+      return;
+    }
+
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '8h' }
     );
 
     res.status(200).json({

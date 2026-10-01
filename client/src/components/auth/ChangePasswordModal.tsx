@@ -204,7 +204,7 @@ export const ChangePasswordModal: React.FC = () => {
               disabled={submitting}
               className="tkt-btn-primary"
             >
-              Save New Password &amp; Continue
+              Update Password &amp; Continue
             </button>
           </form>
         </div>

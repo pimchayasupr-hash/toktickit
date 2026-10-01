@@ -106,7 +106,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return <span className="tkt-pill tkt-pill-priority-high">Urgent</span>;
+        return <span className="tkt-pill tkt-pill-priority-urgent">Urgent</span>;
       case 'HIGH':
         return <span className="tkt-pill tkt-pill-priority-high">High</span>;
       case 'MEDIUM':
@@ -119,21 +119,21 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'NEW':
-        return <span className="tkt-pill tkt-pill-status-open">New</span>;
+        return <span className="tkt-pill tkt-pill-status-new">New</span>;
       case 'OPEN':
         return <span className="tkt-pill tkt-pill-status-open">Open</span>;
       case 'IN_PROGRESS':
         return <span className="tkt-pill tkt-pill-status-in-progress">In Progress</span>;
       case 'WAITING_FOR_REQUESTER':
-        return <span className="tkt-pill tkt-pill-status-pending">Waiting for Requester</span>;
+        return <span className="tkt-pill tkt-pill-status-waiting">Waiting for Requester</span>;
       case 'PENDING':
         return <span className="tkt-pill tkt-pill-status-pending">Pending</span>;
       case 'RESOLVED':
         return <span className="tkt-pill tkt-pill-status-resolved">Resolved</span>;
       case 'REOPENED':
-        return <span className="tkt-pill tkt-pill-status-in-progress">Reopened</span>;
+        return <span className="tkt-pill tkt-pill-status-reopened">Reopened</span>;
       case 'CANCELLED':
-        return <span className="tkt-pill tkt-pill-status-closed">Cancelled</span>;
+        return <span className="tkt-pill tkt-pill-status-cancelled">Cancelled</span>;
       case 'CLOSED':
         return <span className="tkt-pill tkt-pill-status-closed">Closed</span>;
       default:

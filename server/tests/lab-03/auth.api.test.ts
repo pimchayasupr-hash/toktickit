@@ -36,16 +36,33 @@ describe('Lab 3 - Authentication & Token Revocation API Suite', () => {
     expect(res.body.error.code).toBe('INVALID_CREDENTIALS');
   });
 
-  it('API-03: Inactive account login attempt returns 401 Unauthorized', async () => {
-    const res = await request(app)
+  it('API-03: Inactive account login response flow (FR-01, BR-01, AC-03)', async () => {
+    // Case 1: Inactive account with wrong password returns generic INVALID_CREDENTIALS
+    const wrongPassRes = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'alex.turner@example.com',
+        password: 'WrongPassword123!',
+      });
+
+    expect(wrongPassRes.status).toBe(401);
+    expect(wrongPassRes.body.error.code).toBe('INVALID_CREDENTIALS');
+    expect(wrongPassRes.body.error.message).toBe('Invalid email or password.');
+
+    // Case 2: Inactive account with correct password returns ACCOUNT_DEACTIVATED
+    const correctPassRes = await request(app)
       .post('/api/auth/login')
       .send({
         email: 'alex.turner@example.com',
         password: 'Password123!',
       });
 
-    expect(res.status).toBe(401);
-    expect(res.body.error.code).toBe('INVALID_CREDENTIALS');
+    expect(correctPassRes.status).toBe(401);
+    expect(correctPassRes.body.error.code).toBe('ACCOUNT_DEACTIVATED');
+    expect(correctPassRes.body.error.message).toContain('Your account has been deactivated');
+
+    // Case 3: Response structure equality
+    expect(Object.keys(wrongPassRes.body.error)).toEqual(Object.keys(correctPassRes.body.error));
   });
 
   it('API-04: Mandatory password change updates password and clears flag', async () => {

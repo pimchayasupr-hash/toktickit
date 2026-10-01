@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                   activeTab === 'my-tickets' || activeTab === 'default' ? 'active' : ''
                 }`}
               >
-                <span>📄</span> My Queue
+                <span>📄</span> My Tickets
               </button>
               <button
                 onClick={() => setActiveTab('create-ticket')}
@@ -56,21 +56,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             </>
           )}
 
-          {(user.role === 'STAFF' || user.role === 'ADMIN') && (
+          {user.role === 'STAFF' && (
             <button
               onClick={() => setActiveTab('staff-queue')}
               className={`tkt-nav-tab ${
                 activeTab === 'staff-queue' || activeTab === 'default' ? 'active' : ''
               }`}
             >
-              <span>📄</span> My Queue
+              <span>📄</span> Ticket Queue
             </button>
           )}
 
           {user.role === 'ADMIN' && (
             <button
               onClick={() => setActiveTab('user-management')}
-              className={`tkt-nav-tab ${activeTab === 'user-management' ? 'active' : ''}`}
+              className={`tkt-nav-tab ${
+                activeTab === 'user-management' || activeTab === 'default' ? 'active' : ''
+              }`}
             >
               <span>👥</span> User Management
             </button>

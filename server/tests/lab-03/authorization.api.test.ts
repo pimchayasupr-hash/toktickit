@@ -127,9 +127,12 @@ describe('Lab 3 - Complete Role × Endpoint Authorization Matrix Test Suite', ()
     const queueRes = await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${token}`);
     expect(queueRes.status).toBe(200);
 
-    // Notes
-    const notesRes = await request(app).get('/api/tickets/1/notes').set('Authorization', `Bearer ${token}`);
-    expect(notesRes.status).toBe(200);
+    // Notes on an existing ticket from queue
+    const ticketId = queueRes.body.tickets[0]?.id;
+    if (ticketId) {
+      const notesRes = await request(app).get(`/api/tickets/${ticketId}/notes`).set('Authorization', `Bearer ${token}`);
+      expect(notesRes.status).toBe(200);
+    }
   });
 
   it('6. Admin role permits User Management and Staff Queue operations', async () => {

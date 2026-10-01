@@ -5,6 +5,63 @@ import { PublicCommentsSection } from './comments/PublicCommentsSection';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
+const STATUS_LABELS: Record<string, string> = {
+  NEW: 'New',
+  OPEN: 'Open',
+  IN_PROGRESS: 'In Progress',
+  WAITING_FOR_REQUESTER: 'Waiting for Requester',
+  PENDING: 'Pending',
+  RESOLVED: 'Resolved',
+  CANCELLED: 'Cancelled',
+  CLOSED: 'Closed',
+  REOPENED: 'Reopened',
+};
+
+const getStatusBadgeClass = (status: string) => {
+  switch (status) {
+    case 'NEW':
+      return 'tkt-pill-status-new';
+    case 'OPEN':
+      return 'tkt-pill-status-open';
+    case 'IN_PROGRESS':
+      return 'tkt-pill-status-in-progress';
+    case 'WAITING_FOR_REQUESTER':
+      return 'tkt-pill-status-waiting';
+    case 'PENDING':
+      return 'tkt-pill-status-pending';
+    case 'RESOLVED':
+      return 'tkt-pill-status-resolved';
+    case 'CANCELLED':
+      return 'tkt-pill-status-cancelled';
+    case 'CLOSED':
+      return 'tkt-pill-status-closed';
+    case 'REOPENED':
+      return 'tkt-pill-status-reopened';
+    default:
+      return 'tkt-pill-status-closed';
+  }
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  URGENT: 'Urgent',
+};
+
+const getPriorityBadgeClass = (priority?: string) => {
+  switch (priority) {
+    case 'URGENT':
+      return 'tkt-pill-priority-urgent';
+    case 'HIGH':
+      return 'tkt-pill-priority-high';
+    case 'MEDIUM':
+      return 'tkt-pill-priority-medium';
+    default:
+      return 'tkt-pill-priority-low';
+  }
+};
+
 interface TicketDetailProps {
   ticketId: number;
   onBack: () => void;
@@ -183,7 +240,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
     return (
       <div style={{ maxWidth: '1080px', margin: '2rem auto', padding: '0 1rem' }}>
         <button onClick={onBack} className="tkt-btn-back" style={{ marginBottom: '1rem' }}>
-          ← Back to Queue
+          ← Back to My Tickets
         </button>
         <div role="alert" className="tkt-alert-error" data-testid="ticket-detail-error">
           <span>⚠️</span>
@@ -201,10 +258,10 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
       {/* Breadcrumb Header */}
       <div className="tkt-breadcrumb-bar">
         <div className="tkt-breadcrumb-text">
-          My Queue &gt; <span>Ticket Detail</span>
+          My Tickets &gt; <span>Ticket Detail</span>
         </div>
         <button onClick={onBack} className="tkt-btn-back">
-          ← Back to Queue
+          ← Back to My Tickets
         </button>
       </div>
 
@@ -262,8 +319,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">Requested Priority</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className={`tkt-pill ${ticket.requestedPriority === 'HIGH' || ticket.requestedPriority === 'URGENT' ? 'tkt-pill-priority-high' : ticket.requestedPriority === 'MEDIUM' ? 'tkt-pill-priority-medium' : 'tkt-pill-priority-low'}`}>
-                {ticket.requestedPriority}
+              <span className={`tkt-pill ${getPriorityBadgeClass(ticket.requestedPriority)}`}>
+                {PRIORITY_LABELS[ticket.requestedPriority] || ticket.requestedPriority}
               </span>
             </div>
           </div>
@@ -271,8 +328,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">Current Status</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className="tkt-pill tkt-pill-status-in-progress">
-                {ticket.currentStatus}
+              <span className={`tkt-pill ${getStatusBadgeClass(ticket.currentStatus)}`}>
+                {STATUS_LABELS[ticket.currentStatus] || ticket.currentStatus}
               </span>
             </div>
           </div>
@@ -294,8 +351,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">IT Priority</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className={`tkt-pill ${ticket.itPriority === 'HIGH' || ticket.itPriority === 'URGENT' ? 'tkt-pill-priority-high' : 'tkt-pill-priority-medium'}`}>
-                {ticket.itPriority || ticket.requestedPriority}
+              <span className={`tkt-pill ${getPriorityBadgeClass(ticket.itPriority || ticket.requestedPriority)}`}>
+                {PRIORITY_LABELS[ticket.itPriority || ticket.requestedPriority] || ticket.itPriority || ticket.requestedPriority}
               </span>
             </div>
           </div>
@@ -404,7 +461,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                     <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                       <div>
                         <a
-                          href={`/api/attachments/${a.id}/download`}
+                          href={`/api/attachments/${a.id}/download${token ? `?token=${token}` : ''}`}
                           target="_blank"
                           rel="noreferrer"
                           style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}

@@ -543,6 +543,13 @@ input, select, textarea, button {
   white-space: nowrap;
 }
 
+.tkt-pill-priority-urgent {
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+  border: 1px solid #fca5a5;
+}
+
 .tkt-pill-priority-high {
   background-color: var(--badge-high-bg);
   color: var(--badge-high-text);
@@ -558,14 +565,26 @@ input, select, textarea, button {
   color: var(--badge-low-text);
 }
 
-.tkt-pill-status-in-progress {
-  background-color: var(--badge-status-progress-bg);
-  color: var(--badge-status-progress-text);
+.tkt-pill-status-new {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
 }
 
 .tkt-pill-status-open {
   background-color: var(--badge-status-open-bg);
   color: var(--badge-status-open-text);
+}
+
+.tkt-pill-status-in-progress {
+  background-color: var(--badge-status-progress-bg);
+  color: var(--badge-status-progress-text);
+}
+
+.tkt-pill-status-waiting {
+  background-color: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
 }
 
 .tkt-pill-status-pending {
@@ -581,6 +600,215 @@ input, select, textarea, button {
 .tkt-pill-status-closed {
   background-color: var(--badge-status-closed-bg);
   color: var(--badge-status-closed-text);
+}
+
+.tkt-pill-status-cancelled {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.tkt-pill-status-reopened {
+  background-color: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+/* Primary Action Button (Zen Green) */
+.tkt-btn-action-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  background-color: var(--brand-green-primary) !important;
+  border: 1px solid var(--brand-green-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 90, 54, 0.2);
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.tkt-btn-action-primary:hover:not(:disabled) {
+  background-color: var(--brand-green-hover) !important;
+  border-color: var(--brand-green-hover);
+  box-shadow: 0 3px 6px rgba(0, 90, 54, 0.3);
+}
+
+.tkt-btn-action-primary:focus-visible {
+  outline: 2px solid var(--brand-green-accent);
+  outline-offset: 2px;
+}
+
+.tkt-btn-action-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Viewport Display Helpers */
+.tkt-mobile-only {
+  display: none !important;
+}
+
+.tkt-desktop-tablet {
+  display: block;
+}
+
+.tkt-desktop-only {
+  display: table-cell;
+}
+
+@media (max-width: 767px) {
+  .tkt-mobile-only {
+    display: flex !important;
+  }
+  .tkt-desktop-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tkt-desktop-only {
+    display: none !important;
+  }
+}
+
+/* Mobile Stacked Card Layouts (Queue & Admin) */
+.tkt-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  width: 100%;
+}
+
+.tkt-queue-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tkt-queue-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tkt-queue-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.tkt-queue-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #edf2f7;
+}
+
+.tkt-queue-card-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tkt-queue-card-meta-label {
+  font-size: 0.675rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.tkt-queue-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #005a36;
+  background-color: #eaf6ef;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.tkt-queue-card-btn:hover {
+  background-color: #dcfce7;
+  border-color: #86efac;
+}
+
+.tkt-user-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tkt-user-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tkt-user-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.tkt-user-card-btn {
+  flex: 1;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #334155;
+  transition: all 0.15s ease;
+}
+
+.tkt-user-card-btn:hover {
+  background-color: #f1f5f9;
 }
 
 /* Pagination */

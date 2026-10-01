@@ -15,10 +15,10 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     // Search for ticket
     await page.fill('input[placeholder*="Search"]', 'battery');
     await page.click('button:has-text("Search")');
-    await expect(page.getByText('Laptop battery drains quickly')).toBeVisible();
+    await expect(page.locator('.tkt-table').getByText('Laptop battery drains quickly')).toBeVisible();
 
     // Open detail
-    await page.click('button:has-text("Open Detail")');
+    await page.locator('.tkt-table tr').filter({ hasText: 'Laptop battery drains quickly' }).getByRole('button', { name: 'Open Detail' }).click();
     await expect(page.getByRole('heading', { name: 'Laptop battery drains quickly' })).toBeVisible();
 
     // Post internal note
