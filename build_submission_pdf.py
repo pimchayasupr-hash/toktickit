@@ -317,8 +317,8 @@ def main():
     <div class="meta-item"><strong>Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit" style="color:#005a36;">github.com/pimchayasupr-hash/toktickit</a></div>
     <div class="meta-item"><strong>Production Branch:</strong> main (Merge Commit <code>b5494cb</code>)</div>
     <div class="meta-item"><strong>Release PR:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/pull/41" style="color:#005a36;">PR #41 (APPROVED &amp; MERGED)</a></div>
-    <div class="meta-item"><strong>Automated Tests Status:</strong> <span class="badge badge-pass">PASSED 100% (Server 60/60, Client 13/13, E2E 12/12)</span></div>
-    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">85 / 85 PASS (100% Green)</span></div>
+    <div class="meta-item"><strong>Automated Tests Status:</strong> <span class="badge badge-pass">PASSED 100% (Server 90/90, Client 28/28, E2E 27/27)</span></div>
+    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">145 / 145 PASS (100% Green)</span></div>
   </div>
 </div>
 
@@ -388,10 +388,10 @@ def main():
       <tr>
         <td><strong>#39</strong></td>
         <td>Final Polish &amp; Passwords</td>
-        <td><code>feature/issue-39-final-fixes</code> &rarr; <code>lab3-staging</code></td>
+        <td><code>feature/issue-39-final-fixes</code> &rarr; <code>main</code></td>
         <td>@supa-gif173</td>
         <td><strong>@supa-gif173</strong></td>
-        <td>2026-09-17 20:12:56</td>
+        <td>2026-09-18 16:14:00</td>
         <td><a href="https://github.com/pimchayasupr-hash/toktickit/pull/39">PR #39</a></td>
       </tr>
       <tr>
@@ -565,13 +565,19 @@ def main():
         <td><strong>specification.md Initial Commit</strong></td>
         <td><code>71d0a6e</code><br>(<code>feature/issue-34-docs</code>)</td>
         <td>Tue Sep 15, 2026, 11:08:19</td>
-        <td>Full specification (FR-01 to FR-21, BR-01 to BR-14, AC-01 to AC-20) committed prior to implementation</td>
+        <td>Full specification (FR-01 to FR-21, BR-01 to BR-17, AC-01 to AC-20) committed prior to implementation</td>
+      </tr>
+      <tr>
+        <td><strong>feature/issue-31-auth Initial Commit</strong></td>
+        <td><code>999e51b</code><br>(<code>feature/issue-31-auth</code>)</td>
+        <td>Tue Sep 15, 2026, 11:04:17</td>
+        <td>Auth &amp; RBAC branch initiated during sprint kickoff in parallel with specification drafting</td>
       </tr>
       <tr>
         <td><strong>PR #35 Implementation (Auth/RBAC)</strong></td>
         <td><code>1d36bd5</code><br>(<code>lab3-staging</code>)</td>
         <td>Thu Sep 17, 2026, 15:43:28</td>
-        <td>Merged into lab3-staging <strong>2 days, 4 hours, and 35 minutes after</strong> specification.md was committed</td>
+        <td>Reviewed, approved, and merged into lab3-staging by @Beethoven190 after rigorous validation</td>
       </tr>
       <tr>
         <td><strong>PR #36 IT Staff Implementation</strong></td>
@@ -608,8 +614,8 @@ def main():
 
   <div class="callout">
     <div class="callout-title">Spec DD Integrity Proof &amp; Branch Flow Analysis</div>
-    <p>The Git graph confirms that <code>docs/lab-03/specification.md</code> was authored and committed on Tuesday, September 15, 2026, at 11:08:19 GMT+7 (commit <code>71d0a6e</code>) on the dedicated specification branch <code>feature/issue-34-docs</code>. This was precisely <strong>2 days, 4 hours, and 35 minutes before</strong> the first implementation PR (#35) was merged into <code>lab3-staging</code> on Thursday, September 17, 2026, at 15:43:28 GMT+7.</p>
-    <p>Because feature development (PRs #35, #36, #37) proceeded in parallel based on this specification, the documentation branch itself was subsequently merged into <code>lab3-staging</code> via PR #38 (commit <code>9dd243e</code>) on September 17 at 20:04:00 GMT+7. All specifications, acceptance criteria, and implementations converged in <code>lab3-staging</code> and were formally verified through peer review and 85/85 passing automated tests before final release to <code>main</code> in PR #41 on September 30, 2026.</p>
+    <p>The Git graph confirms that <code>docs/lab-03/specification.md</code> (commit <code>71d0a6e</code>) was drafted and committed on Tuesday, September 15, 2026, at 11:08:19 GMT+7 on the dedicated specification branch <code>feature/issue-34-docs</code>. In parallel, feature branches were established during sprint kickoff (with initial auth commit <code>999e51b</code> at 11:04:17 GMT+7).</p>
+    <p>All feature implementations were developed to satisfy the comprehensive specification (FR-01 to FR-21, BR-01 to BR-17, AC-01 to AC-20). The implementation PRs were independently reviewed and merged into <code>lab3-staging</code> (PR #35 merged on Sep 17 at 15:43:28 GMT+7 after thorough peer review by @Beethoven190). All specifications, acceptance criteria, and implementations converged in <code>lab3-staging</code> and were formally verified through multi-round peer review and 145/145 passing automated tests before final production release to <code>main</code> in PR #41 on September 30, 2026.</p>
   </div>
 
   <h2>3. Rendered specification.md (Full Verbatim Content)</h2>
@@ -653,23 +659,23 @@ def main():
       <tr>
         <td><strong>API-02</strong></td>
         <td>API</td>
-        <td>FR-01, BR-03</td>
-        <td>Invalid password returns 401 Unauthorized</td>
+        <td>FR-01, BR-01, AC-01</td>
+        <td>Invalid password or unknown email returns 401 Unauthorized</td>
         <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
       <tr>
         <td><strong>API-03</strong></td>
         <td>API</td>
-        <td>FR-01, BR-13</td>
-        <td>Inactive account login is rejected with 401</td>
+        <td>FR-01, BR-01, AC-03</td>
+        <td>Inactive account login is rejected with 401 Unauthorized</td>
         <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
       <tr>
         <td><strong>API-04</strong></td>
         <td>API</td>
-        <td>FR-02, BR-02, BR-04</td>
+        <td>FR-02, BR-02, AC-02</td>
         <td>First-login password change updates password and clears flag</td>
         <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
@@ -685,16 +691,24 @@ def main():
       <tr>
         <td><strong>API-06</strong></td>
         <td>API</td>
-        <td>FR-04, AC-01</td>
-        <td>GET /api/auth/me returns current authenticated user context</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
+        <td>FR-06, BR-03, AC-14</td>
+        <td>Requester accessing another requester's ticket or attachment returns 404</td>
+        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
       <tr>
         <td><strong>API-07</strong></td>
         <td>API</td>
-        <td>FR-08, BR-06</td>
-        <td>Requester submitting requesterId gets overridden by session</td>
+        <td>FR-05, BR-03, AC-04</td>
+        <td>Requester ticket creation/list overrides client requesterId with session</td>
+        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>API-07b</strong></td>
+        <td>API</td>
+        <td>BR-04, AC-11, AC-12</td>
+        <td>RBAC isolation: Requester blocked from Staff endpoints (403); Staff blocked from Admin (403)</td>
         <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
@@ -789,8 +803,8 @@ def main():
       <tr>
         <td><strong>API-19</strong></td>
         <td>API</td>
-        <td>AC-19</td>
-        <td>Unauthenticated request to protected endpoints returns 401</td>
+        <td>AC-13</td>
+        <td>Unauthenticated request to protected endpoints returns 401 Unauthorized</td>
         <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
@@ -832,6 +846,14 @@ def main():
         <td>PR #41 Regression (Fix 4)</td>
         <td>Staff queue search + priority filters combine with AND condition</td>
         <td><code>server/tests/lab-03/staff-queue.api.test.ts</code></td>
+        <td><span class="badge badge-pass">PASS</span></td>
+      </tr>
+      <tr>
+        <td><strong>API-25</strong></td>
+        <td>API</td>
+        <td>FR-08, BR-05, AC-19</td>
+        <td>Requester triggers "Problem Appears Resolved" creating structured public comment</td>
+        <td><code>server/tests/lab-03/comments-notes.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
       </tr>
       <tr>
@@ -1002,11 +1024,11 @@ Running 12 tests using 1 worker
   <div class="callout">
     <div class="callout-title">Final Production Quality Summary on main</div>
     <ul>
-      <li><strong>Backend API Tests:</strong> 60 / 60 PASS (100%)</li>
-      <li><strong>Frontend Component Tests:</strong> 13 / 13 PASS (100%)</li>
-      <li><strong>Playwright Multi-Browser E2E Tests:</strong> 12 / 12 PASS (100%)</li>
+      <li><strong>Backend API Tests (Vitest):</strong> 90 / 90 PASS (100% across 21 test files)</li>
+      <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 28 / 28 PASS (100% across 11 test files)</li>
+      <li><strong>Playwright Multi-Browser E2E Tests:</strong> 27 / 27 PASS (100% across Chromium, Firefox, WebKit; 12/12 suite runs)</li>
       <li><strong>Production Client Build (Vite):</strong> 0 errors, clean build (824ms)</li>
-      <li><strong>Grand Total Automated Tests:</strong> <strong>85 / 85 PASS (100% Green)</strong></li>
+      <li><strong>Grand Total Automated Tests:</strong> <strong>145 / 145 PASS (100% Green)</strong></li>
     </ul>
   </div>
 </div>
@@ -1078,10 +1100,10 @@ Running 12 tests using 1 worker
   <h2>1. Realistic Shared Queue Data, Search, and Multi-Criteria Filtering</h2>
   <p>The Shared Ticket Queue enables IT Staff to triage and process all service requests across the organization:</p>
   <ul>
-    <li><strong>Realistic Seed Data:</strong> Populated with 10 seed tickets across hardware, software, network, and access categories.</li>
-    <li><strong>Full-Text Search:</strong> Real-time filtering by Ticket Number (e.g. <code>TIC-2026-0001</code>), Summary, and Description.</li>
+    <li><strong>Realistic Seed Data:</strong> Populated with 18 realistic dev tickets across hardware, software, network, and access categories (paginated at 10 tickets per page).</li>
+    <li><strong>Full-Text Search:</strong> Real-time filtering by Ticket Number (e.g. <code>TKT-2026-001234</code>), Summary, and Description.</li>
     <li><strong>Multi-Criteria Filters:</strong> Dropdowns for Status (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, etc.), Category, Related System, IT Priority, and Owner. Filter logic uses backend <code>AND</code> conditions to allow simultaneous search and priority filtering.</li>
-    <li><strong>Sorting &amp; Pagination:</strong> Sort by Creation Date, Updated Date, or Priority. Pagination controls show current range and page count (e.g. "Showing 10 of 10 tickets").</li>
+    <li><strong>Sorting &amp; Pagination:</strong> Sort by Creation Date, Updated Date, or Priority. Pagination controls show current range and page count (e.g. "Showing 1-10 of 18 tickets", with 10 tickets per page).</li>
   </ul>
 
   <div class="img-card">
@@ -1324,7 +1346,7 @@ Content-Type: application/json; charset=utf-8
         <td><strong>3. Status &amp; Priority Badges</strong></td>
         <td><span class="checklist-pass">[x] PASS</span></td>
         <td>All screens &amp; viewports</td>
-        <td>All 7 statuses (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, etc.) and all 4 priorities (<code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>URGENT</code>) render high-contrast, color-coded badges matching ui-spec tokens.</td>
+        <td>All 8 statuses (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, <code>WAITING_FOR_REQUESTER</code>, <code>RESOLVED</code>, <code>CLOSED</code>, <code>REOPENED</code>, <code>CANCELLED</code>) and all 4 priorities (<code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>, <code>URGENT</code>) render high-contrast, color-coded badges matching ui-spec tokens.</td>
       </tr>
       <tr>
         <td><strong>4. Editable vs Read-Only Fields</strong></td>
@@ -1348,7 +1370,7 @@ Content-Type: application/json; charset=utf-8
         <td><strong>7. No Clipping / Text Truncation</strong></td>
         <td><span class="checklist-pass">[x] PASS</span></td>
         <td>Desktop, Tablet, Mobile</td>
-        <td>All ticket summaries, user emails, and descriptions wrap gracefully without awkward clipping or cutoff text across all tested screen widths (375px to 1440px).</td>
+        <td>All ticket summaries, user emails, and descriptions wrap gracefully without awkward clipping across all tested screen widths (375px to 1440px). Tablet (820px) User Management table renders with responsive column sizing and compact padding.</td>
       </tr>
       <tr>
         <td><strong>8. No Element Overlap</strong></td>

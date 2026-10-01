@@ -537,6 +537,13 @@ input, select, textarea, button {
   background-color: #f8fafc;
 }
 
+@media (max-width: 900px) {
+  .tkt-table th, .tkt-table td {
+    padding: 0.6rem 0.65rem;
+    font-size: 0.8rem;
+  }
+}
+
 .tkt-ticket-link {
   color: var(--brand-green-primary);
   font-weight: 600;

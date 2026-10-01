@@ -155,7 +155,7 @@ All 145 tests pass on `main` and `lab3-staging` branches.
 
 ## Ticket ID Format
 
-Tickets are identified as `TIC-YYYY-NNNN` (e.g. `TIC-2026-0001`). The prefix, year, and zero-padded sequence number are auto-generated server-side.
+Tickets are identified as `TKT-YYYY-XXXXXX` (e.g. `TKT-2026-001234`). The prefix, year, and zero-padded sequence number are auto-generated server-side.
 
 ---
 

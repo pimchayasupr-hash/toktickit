@@ -292,23 +292,23 @@ export const UserManagement: React.FC = () => {
           </div>
 
           {/* Desktop & Tablet Table (>= 768px) */}
-          <div className="tkt-table-container tkt-desktop-tablet">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-              <thead className="bg-slate-50 font-semibold text-slate-700">
+          <div className="tkt-table-container tkt-desktop-tablet" style={{ overflowX: 'auto', width: '100%' }}>
+            <table className="tkt-table" style={{ width: '100%', minWidth: '680px' }}>
+              <thead>
                 <tr>
-                  <th className="px-4 py-3">Full Name</th>
-                  <th className="px-4 py-3">Email Address</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th style={{ width: '24%' }}>Full Name</th>
+                  <th style={{ width: '28%' }}>Email Address</th>
+                  <th style={{ width: '16%' }}>Role</th>
+                  <th style={{ width: '12%' }}>Status</th>
+                  <th style={{ width: '20%', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 bg-white">
+              <tbody>
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-slate-900">{u.name}</td>
-                    <td className="px-4 py-3 text-slate-600">{u.email}</td>
-                    <td className="px-4 py-3">
+                  <tr key={u.id}>
+                    <td style={{ fontWeight: 600, color: '#0f172a' }}>{u.name}</td>
+                    <td style={{ color: '#475569', fontSize: '0.825rem' }}>{u.email}</td>
+                    <td>
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
                         u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border-purple-200' :
                         u.role === 'STAFF' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
@@ -317,25 +317,25 @@ export const UserManagement: React.FC = () => {
                         {u.role === 'ADMIN' ? 'Administrator' : u.role === 'STAFF' ? 'IT Staff' : 'Requester'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       {u.isActive ? (
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Active</span>
                       ) : (
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Inactive</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right space-x-2">
+                    <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                       <button
                         onClick={() => { setModalError(null); setEditingUser({ ...u }); }}
-                        className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded border border-slate-300"
-                        style={{ minHeight: '36px' }}
+                        className="tkt-btn-secondary"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', marginRight: '0.4rem', display: 'inline-block', width: 'auto' }}
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => { setModalError(null); setNewInitialPassword(''); setResettingUser(u); }}
-                        className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-xs rounded border border-amber-200"
-                        style={{ minHeight: '36px' }}
+                        className="tkt-btn-secondary"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', backgroundColor: '#fffbeb', borderColor: '#fde68a', color: '#92400e', display: 'inline-block', width: 'auto' }}
                       >
                         Reset Password
                       </button>

@@ -30,7 +30,7 @@
 > "Create client components for Login, ChangePasswordModal, Navbar with user/role badge, StaffTicketQueue, StaffTicketDetail with tabbed comments/notes, and UserManagement, ensuring removal of the legacy Development Requester selector."
 
 ### Prompt 8: Comprehensive Automated Test Suite Generation
-> "Generate Jest/Supertest API tests under server/tests/lab-03/, RTL component tests under client/src/tests/lab-03/, and Playwright E2E tests under e2e/lab-03/ achieving 100% AC traceability."
+> "Generate Vitest/Supertest API tests under server/tests/lab-03/, RTL component tests under client/src/tests/lab-03/, and Playwright E2E tests under e2e/lab-03/ achieving 100% AC traceability."
 
 ---
 

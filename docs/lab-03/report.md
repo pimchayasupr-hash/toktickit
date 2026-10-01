@@ -369,7 +369,7 @@ Thank you @supa-gif173 and @MiMikoChAn913 for catching these important issues! I
 1. Fixed Brand Typo: Corrected `TikTockIT` -> `TokTickIT` in `client/src/App.tsx` navigation bar and verified across components.
 2. Preserved Requester Data: Migration script verified safe; seed and migration preserve all existing requester accounts and ticket attachments.
 3. Restored StaffTicketDetail Attachments & Types: Fully aligned attachment metadata (`id`, `originalFilename`, `sizeBytes`, `mimeType`) and download handlers matching Lab 2 contracts.
-4. Verified Status/Priority Badges & Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 9/9).
+4. Verified Status/Priority Badges & Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 12/12).
 ```
 
 #### Round 3 Final Approval Comment (Approved วันที่ 2026-09-19T03:55:54Z โดย @supa-gif173):
