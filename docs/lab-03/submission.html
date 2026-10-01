@@ -261,7 +261,7 @@
     <p><strong>GitHub Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit">https://github.com/pimchayasupr-hash/toktickit</a></p>
     <p><strong>Production Release Branch (main):</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/tree/main">https://github.com/pimchayasupr-hash/toktickit/tree/main</a> (Merge commit <code>b5494cb</code>)</p>
     <p><strong>Integration Staging Branch (lab3-staging):</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/tree/lab3-staging">https://github.com/pimchayasupr-hash/toktickit/tree/lab3-staging</a></p>
-    <p><strong>GitHub Project (Kanban Board):</strong> <a href="https://github.com/users/pimchayasupr-hash/projects">https://github.com/users/pimchayasupr-hash/projects</a></p>
+    <p><strong>GitHub Project (Kanban Board):</strong> <a href="https://github.com/users/pimchayasupr-hash/projects/1">https://github.com/users/pimchayasupr-hash/projects/1</a></p>
   </div>
 
   <table>
@@ -318,7 +318,7 @@
         <td>Final Polish &amp; Passwords</td>
         <td><code>feature/issue-39-final-fixes</code> &rarr; <code>lab3-staging</code></td>
         <td>@supa-gif173</td>
-        <td><strong>@pimchayasupr-hash</strong></td>
+        <td><strong>@supa-gif173</strong></td>
         <td>2026-09-17 20:12:56</td>
         <td><a href="https://github.com/pimchayasupr-hash/toktickit/pull/39">PR #39</a></td>
       </tr>
@@ -487,7 +487,7 @@
 <li>Fixed Brand Typo: Corrected <code>TikTockIT</code> -&gt; <code>TokTickIT</code> in <code>client/src/App.tsx</code> navigation bar and verified across components.</li>
 <li>Preserved Requester Data: Migration script verified safe; seed and migration preserve all existing requester accounts and ticket attachments.</li>
 <li>Restored StaffTicketDetail Attachments &amp; Types: Fully aligned attachment metadata (<code>id</code>, <code>originalFilename</code>, <code>sizeBytes</code>, <code>mimeType</code>) and download handlers matching Lab 2 contracts.</li>
-<li>Verified Status/Priority Badges &amp; Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 9/9)."</li>
+<li>Verified Status/Priority Badges &amp; Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 9/9 (27/27 at final submission))."</li>
 </ul>
 </li>
 <li>
@@ -510,164 +510,195 @@
   <h2>5. README.md and .gitignore Evidence</h2>
   <h3>5.1 Rendered README.md</h3>
   <div class="rendered-markdown">
-    <h1>TokTickIT</h1>
-<p>TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk application designed for Account and Access, Hardware, Software, and Network service requests. This repository contains the <strong>Lab 2 MVP (Requester-Facing IT Service Desk)</strong> full-stack application.</p>
+<h1>TokTickIT</h1>
+<p>TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk application designed for Account and Access, Hardware, Software, and Network service requests. This repository contains the <strong>Lab 3 Role-Based IT Service Desk</strong> full-stack application with JWT authentication, RBAC (Requester / IT Staff / Administrator), and a fully tested backend API.</p>
 <ul>
 <li><strong>Frontend:</strong> React 19 + TypeScript + Vite + Bootstrap 5 (<code>client/</code>)</li>
 <li><strong>Backend:</strong> Node.js + Express + TypeScript (<code>server/</code>)</li>
 <li><strong>Database:</strong> PostgreSQL accessed via Prisma ORM (<code>server/prisma/</code>)</li>
-<li><strong>Testing:</strong> Vitest (frontend component/unit tests &amp; backend API tests), Supertest, Playwright (end-to-end integration tests)</li>
+<li><strong>Auth:</strong> JSON Web Tokens (JWT) with role-based middleware (<code>server/src/middleware/authMiddleware.ts</code>)</li>
+<li><strong>Testing:</strong> Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — <strong>145 / 145 tests passing</strong></li>
 </ul>
 <hr />
-<h2>Key Features (Lab 2 MVP)</h2>
+<h2>Key Features (Lab 3)</h2>
 <ul>
-<li><strong>Development Requester Selector:</strong> Quick-switch menu to simulate different requesters (e.g. Standard User, VIP User, user with active tickets) for identity and permissions testing.</li>
-<li><strong>Create Ticket Flow:</strong> Comprehensive ticket submission form supporting Category, Priority, Urgency, Detailed Description, and file attachment uploads (PDF, PNG, JPG &lt;= 5MB, max 3 files).</li>
-<li><strong>My Tickets View:</strong> Filterable and searchable ticket directory supporting status filtering (Open, In Progress, Resolved, Closed), category filtering, priority sorting, search by keywords/ID, and dynamic pagination.</li>
-<li><strong>Ticket Detail View:</strong> Interactive view presenting full ticket metadata, responsive status timeline tracker, requester contact card, and attachment download/deletion interface.</li>
-<li><strong>Attachment Management:</strong> Multipart upload via Multer with validation checks, file type verification, size enforcement, and cascade deletion.</li>
+<li><strong>JWT Authentication:</strong> Email + password login returning a signed JWT Bearer token. Automatic forced password-change flow for users with <code>mustChangePassword = true</code>.</li>
+<li><strong>Role-Based Access Control (RBAC):</strong> Three roles — <code>REQUESTER</code>, <code>STAFF</code>, <code>ADMIN</code>. All authorization rules are enforced server-side; UI navigation adapts per role.</li>
+<li><strong>Requester Workflow:</strong> Create tickets, view owned tickets, add attachments and Public Comments, indicate "Problem Appears Resolved".</li>
+<li><strong>IT Staff Ticket Queue:</strong> Shared queue with text search, five dropdown filters (Status, Category, Related System, Priority, Owner), sorting, and pagination. Automatically renders as stacked cards on mobile viewports (&lt; 768 px).</li>
+<li><strong>IT Staff Operations:</strong> Claim/reassign ticket ownership, update IT Priority, execute permitted status transitions (NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED → REOPENED / CANCELLED), post Public Comments and private Internal Notes.</li>
+<li><strong>Administrator User Management:</strong> List / search / filter all users; create users with initial password (<code>mustChangePassword = true</code>); edit name, email, role, active status; reset initial password. Safety guards prevent self-deactivation and last-admin removal.</li>
+<li><strong>Zen Green Design System:</strong> All screens use <code>#005a36</code> / <code>#008751</code> / <code>#e8f5e9</code> color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.</li>
 </ul>
 <hr />
 <h2>Repository Structure</h2>
 <pre><code>toktickit/
 ├── client/                          # React + TypeScript + Vite frontend
 │   ├── src/
-│   │   ├── components/              # UI Components (RequesterSelector, TicketForm, TicketList, TicketDetail)
-│   │   ├── context/                 # Requester Context &amp; active user state management
-│   │   └── tests/                   # Frontend Vitest &amp; React Testing Library tests
-│   └── package.json
-├── server/                          # Node.js + Express REST API server
-│   ├── prisma/                      # Prisma schema, SQL migrations, &amp; seed script (`seed.ts`)
+│   │   ├── components/              # UI Components (Login, Navbar, TicketForm, StaffQueue, UserManagement, …)
+│   │   ├── context/                 # AuthContext — current user, JWT storage, role helpers
+│   │   └── tests/lab-03/            # React Testing Library component tests (28 tests)
+│   └── vite.config.ts
+│
+├── server/                          # Node.js + Express + TypeScript backend
 │   ├── src/
-│   │   ├── routes/                  # API Controllers (`tickets.ts`, `attachments.ts`, `requesters.ts`)
-│   │   ├── middleware/              # Multer file upload &amp; validation middlewares
-│   │   └── uploads/                 # Server-side file attachment storage
-│   └── tests/lab-02/                # Backend Vitest + Supertest integration tests
-├── docs/
-│   ├── lab-01/                      # Lab 1 foundation documentation
-│   └── lab-02/                      # Lab 2 specifications, UI/API specs, test reports, reviewer logs
-│       ├── specification.md
-│       ├── api-spec.md
-│       ├── ui-spec.md
-│       ├── tests.md                 # Test execution matrix &amp; Section 27 Final Test Results
-│       ├── reviewer.md              # Peer review logs &amp; partner PR links
-│       └── ai-use.md                # AI usage disclosure
-├── e2e/lab-02/                      # Playwright End-to-End integration test suite
-├── artifacts/lab-02/screenshots/    # Verification evidence screenshots (Create Ticket, My Tickets, Detail, Selection)
-├── package.json                     # Monorepo root package.json with scripts
-├── .gitignore
-└── README.md
+│   │   ├── middleware/
+│   │   │   └── authMiddleware.ts    # JWT verification + role guard (requireRole)
+│   │   ├── routes/
+│   │   │   ├── auth.ts              # POST /api/auth/login, POST /api/auth/change-password, GET /api/auth/me, POST /api/auth/logout
+│   │   │   ├── tickets.ts           # CRUD tickets (Requester-scoped + Staff/Admin)
+│   │   │   ├── staff.ts             # Staff Queue, claim/reassign, status transitions, comments, notes
+│   │   │   └── admin.ts             # Admin user management endpoints
+│   │   └── index.ts                 # Express app entry point
+│   ├── prisma/
+│   │   ├── schema.prisma            # User, Ticket, PublicComment, InternalNote models
+│   │   ├── migrations/              # Prisma migration history (Lab 2 → Lab 3 migration included)
+│   │   └── seed.ts                  # Idempotent seed — 1 Admin, 1 Staff, 3 Requesters + demo tickets
+│   └── tests/lab-03/                # Vitest + Supertest API integration tests (90 tests)
+│
+├── e2e/lab-03/                      # Playwright end-to-end tests (27 tests)
+│   ├── auth.spec.ts
+│   ├── staff-queue.spec.ts
+│   ├── admin-users.spec.ts
+│   └── responsive-overflow.spec.ts
+│
+└── docs/lab-03/                     # Lab 3 documentation
+    ├── specification.md             # 11-section Spec DD document
+    ├── tests.md                     # Test DD + traceability matrix (145/145)
+    ├── report.md                    # Sprint report / Git workflow evidence
+    ├── ui-spec.md                   # UI layout &amp; screen wireframes
+    ├── api-spec.md                  # OpenAPI-style endpoint reference
+    ├── submission.html              # Compiled PDF submission source
+    └── LAB3_SUBMISSION.pdf          # Final submission PDF
 </code></pre>
 <hr />
-<h2>Setup &amp; Local Development</h2>
+<h2>Environment Variables</h2>
+<p>Create <code>server/.env</code> (copy from <code>server/.env.example</code> and fill in):</p>
+<pre><code class="language-env">DATABASE_URL=&quot;postgresql://USER:PASSWORD@localhost:5432/toktickit?schema=public&quot;
+PORT=4000
+JWT_SECRET=&quot;your-strong-random-secret-key-here&quot;
+</code></pre>
+<blockquote>
+<p><strong>Note:</strong> <code>JWT_SECRET</code> is required in production. A default fallback is used only during local development. Use a cryptographically random string (≥ 32 characters) in any shared or deployed environment.</p>
+</blockquote>
+<hr />
+<h2>Setup &amp; Running Locally</h2>
 <h3>Prerequisites</h3>
 <ul>
-<li>Node.js 18+ and npm</li>
-<li>A running PostgreSQL database instance (local PostgreSQL server or Docker container)</li>
+<li>Node.js 20+</li>
+<li>PostgreSQL 15+</li>
+<li>npm 9+</li>
 </ul>
-<h3>1. Clone and Install Dependencies</h3>
-<pre><code class="language-bash">git clone https://github.com/pimchayasupr-hash/toktickit.git
-cd toktickit
+<h3>Installation</h3>
+<pre><code class="language-bash"># Install backend dependencies
+cd server &amp;&amp; npm install
 
-# Install root dependencies
-npm install
+# Install frontend dependencies
+cd ../client &amp;&amp; npm install
 
-# Install client dependencies
-cd client &amp;&amp; npm install
-
-# Install server dependencies
-cd ../server &amp;&amp; npm install
-cd ..
+# Install Playwright browsers (for E2E tests)
+cd .. &amp;&amp; npx playwright install --with-deps chromium
 </code></pre>
-<h3>2. Configure Environment Variables</h3>
-<p>Create a <code>.env</code> file inside the <code>server/</code> directory based on <code>.env.example</code>:</p>
-<pre><code class="language-bash">cd server
-cp .env.example .env
-</code></pre>
-<p>Ensure your <code>.env</code> contains your local database connection string and server configuration:</p>
-<pre><code class="language-env">DATABASE_URL=&quot;postgresql://&lt;user&gt;:&lt;password&gt;@localhost:5432/toktickit_db?schema=public&quot;
-PORT=3000
-UPLOAD_DIR=uploads
-</code></pre>
-<h3>3. Run Database Migrations and Seed Data</h3>
-<pre><code class="language-bash">cd server
-# Run migrations
-npx prisma migrate dev
+<h3>Database Setup</h3>
+<pre><code class="language-bash"># Apply all migrations (creates schema + Lab 2→Lab 3 migration)
+cd server &amp;&amp; npx prisma migrate deploy
 
-# Seed database with initial requesters and sample tickets
-npm run prisma:seed
-cd ..
+# (Optional) Seed demo data
+npx prisma db seed
 </code></pre>
-<h3>4. Run Development Servers</h3>
-<p>You can launch both the backend API and frontend client from the root directory:</p>
-<pre><code class="language-bash"># Terminal 1: Backend API (http://localhost:3000)
-npm run dev:server
-
-# Terminal 2: Frontend Client (http://localhost:5173)
-npm run dev:client
-</code></pre>
-<hr />
-<h2>Running Tests</h2>
-<p>The test suite covers backend API integration tests, frontend React component unit tests, and Playwright end-to-end user flows.</p>
-<pre><code class="language-bash"># Run all Vitest suites (Backend + Frontend)
-npm test
-
-# Run Backend tests only (32/32 Passed)
-npm run test:server
-
-# Run Frontend tests only (11/11 Passed)
-npm run test:client
-
-# Run Playwright End-to-End tests (1/1 Flow Passed)
-npx playwright test
-</code></pre>
-<h3>Test Suite Execution Summary</h3>
-<ul>
-<li><strong>Backend API Tests (Vitest + Supertest):</strong> 32 tests passed</li>
-<li><strong>Frontend UI Tests (Vitest + React Testing Library):</strong> 11 tests passed</li>
-<li><strong>End-to-End Tests (Playwright):</strong> 1 E2E flow test passed</li>
-<li><strong>Total:</strong> 44 / 44 tests passing (100%)</li>
-</ul>
-<hr />
-<h2>Tech Stack &amp; Architecture</h2>
+<p>Default seeded accounts:</p>
 <table>
 <thead>
 <tr>
-<th>Area</th>
-<th>Technology Stack</th>
+<th>Role</th>
+<th>Email</th>
+<th>Initial Password</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Frontend</td>
-<td>React 19 + TypeScript + Vite + Bootstrap 5</td>
+<td>Admin</td>
+<td><code>admin@toktickit.local</code></td>
+<td><code>Admin@1234</code></td>
 </tr>
 <tr>
-<td>Backend</td>
-<td>Node.js + Express 5 + TypeScript + Multer</td>
+<td>Staff</td>
+<td><code>staff@toktickit.local</code></td>
+<td><code>Staff@1234</code></td>
 </tr>
 <tr>
-<td>Database</td>
-<td>PostgreSQL + Prisma ORM</td>
+<td>Requester</td>
+<td><code>requester@toktickit.local</code></td>
+<td><code>Req@1234</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>All seeded users have <code>mustChangePassword = true</code> — a password change is required on first login.</p>
+</blockquote>
+<h3>Running</h3>
+<pre><code class="language-bash"># Terminal 1 — Backend (port 4000)
+cd server &amp;&amp; npm run dev
+
+# Terminal 2 — Frontend (port 5173)
+cd client &amp;&amp; npm run dev
+</code></pre>
+<p>Open <a href="http://localhost:5173">http://localhost:5173</a> in your browser.</p>
+<hr />
+<h2>Running Tests</h2>
+<pre><code class="language-bash"># Server tests (90 tests — API integration, authorization matrix, unit)
+cd server &amp;&amp; npm test
+
+# Client tests (28 tests — component feedback states, form validation)
+cd client &amp;&amp; npm test
+
+# Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
+npx playwright test --project=chromium
+</code></pre>
+<p>All 145 tests pass on <code>main</code> and <code>lab3-staging</code> branches.</p>
+<hr />
+<h2>Ticket ID Format</h2>
+<p>Tickets are identified as <code>TIC-YYYY-NNNN</code> (e.g. <code>TIC-2026-0001</code>). The prefix, year, and zero-padded sequence number are auto-generated server-side.</p>
+<hr />
+<h2>Status Lifecycle</h2>
+<pre><code>NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED
+                ↑                                      ↓
+                └──────────── REOPENED ←───────────────┘
+NEW / OPEN / IN_PROGRESS / WAITING_FOR_REQUESTER → CANCELLED
+</code></pre>
+<hr />
+<h2>Branch Strategy</h2>
+<table>
+<thead>
+<tr>
+<th>Branch</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>main</code></td>
+<td>Production-ready code; merge via reviewed PRs only</td>
 </tr>
 <tr>
-<td>API Style</td>
-<td>RESTful JSON API + Multipart Form Data</td>
+<td><code>lab3-staging</code></td>
+<td>Lab 3 integration target</td>
 </tr>
 <tr>
-<td>Testing</td>
-<td>Vitest, Supertest, Playwright</td>
+<td><code>feature/issue-*</code></td>
+<td>Individual feature branches</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2>Git Workflow &amp; Peer Reviews</h2>
-<p>Development follows feature branch branching model merged into <code>lab2-staging</code> via peer-reviewed Pull Requests, and finally merged into <code>main</code>.</p>
+<h2>Documentation</h2>
+<p>Full Lab 3 documentation is in <a href="docs/lab-03/"><code>docs/lab-03/</code></a>:</p>
 <ul>
-<li>Detailed peer review logs, partner PR reviews, and approval links are recorded in <a href="file:///Users/pimchayasuprateravarnit/toktickit/docs/lab-02/reviewer.md"><code>docs/lab-02/reviewer.md</code></a>.</li>
-<li>Detailed test cases and evidence matrix are recorded in <a href="file:///Users/pimchayasuprateravarnit/toktickit/docs/lab-02/tests.md"><code>docs/lab-02/tests.md</code></a>.</li>
+<li><a href="docs/lab-03/specification.md"><code>specification.md</code></a> — Spec DD (Sprint Goal → FR → BR → UI → Data → API → AC)</li>
+<li><a href="docs/lab-03/tests.md"><code>tests.md</code></a> — Test DD (145 tests with full traceability matrix)</li>
+<li><a href="docs/lab-03/report.md"><code>report.md</code></a> — Sprint report and Git workflow evidence</li>
 </ul>
-  </div>
+</div>
 
   <h3>5.2 Rendered .gitignore</h3>
   <pre><code>node_modules/
@@ -797,7 +828,7 @@ test-results/
 
   <div class="callout">
     <div class="callout-title">Spec DD Integrity Proof &amp; Branch Flow Analysis</div>
-    <p>The Git graph confirms that <code>docs/lab-03/specification.md</code> was authored and committed on Tuesday, September 15, 2026, at 11:08:19 GMT+7 (commit <code>71d0a6e</code>) on the dedicated specification branch <code>feature/issue-34-docs</code>. This was precisely <strong>2 days, 4 hours, and 35 minutes before</strong> the first implementation PR (#35) was merged into <code>lab3-staging</code> on Thursday, September 17, 2026, at 15:43:28 GMT+7.</p>
+    <p>The Git graph confirms that <code>docs/lab-03/specification.md</code> was authored and committed on Tuesday, September 15, 2026, at 11:08:19 GMT+7 (commit <code>71d0a6e</code>) on the dedicated specification branch <code>feature/issue-34-docs</code>. The initial auth implementation commit (<code>999e51b</code>) was made four minutes earlier at 11:04:17 GMT+7 on the parallel feature branch; both were on separate branches and the specification was completed and committed before either feature branch was merged. The specification PR (#38) was merged into <code>lab3-staging</code> on Thursday, September 17, 2026, at 15:43:28 GMT+7.</p>
     <p>Because feature development (PRs #35, #36, #37) proceeded in parallel based on this specification, the documentation branch itself was subsequently merged into <code>lab3-staging</code> via PR #38 (commit <code>9dd243e</code>) on September 17 at 20:04:00 GMT+7. All specifications, acceptance criteria, and implementations converged in <code>lab3-staging</code> and were formally verified through peer review and 85/85 passing automated tests before final release to <code>main</code> in PR #41 on September 30, 2026.</p>
   </div>
 
@@ -966,7 +997,245 @@ test-results/
 </tbody>
 </table>
 <hr />
-<h2>6. Authorization Matrix (Role × Endpoint Permissions)</h2>
+<h2>6. UI Specification Summary</h2>
+<p>The TokTickIT interface follows the Zen Green design system (<code>#005a36</code> primary, <code>#008751</code> hover, <code>#e8f5e9</code> surface) with Bootstrap 5 grid and CSS token utility classes. Complete visual mockups and layout specifications are documented in <a href="file:///Users/pimchayasuprateravarnit/toktickit/docs/lab-03/ui-spec.md">ui-spec.md</a>.</p>
+<h3>6.1 Screen Structure &amp; Modes</h3>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>View Mode</th>
+<th>Edit / Create Mode</th>
+<th>Primary Controls</th>
+<th>Min Touch Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Login</strong></td>
+<td>Static form</td>
+<td>Input email &amp; password</td>
+<td>Email input, password input with show/hide toggle, Submit button</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>Change Password</strong></td>
+<td>Modal overlay</td>
+<td>Current, New, Confirm inputs</td>
+<td>Rule validation checklist, "Update Password &amp; Continue" button</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>Requester Tickets</strong></td>
+<td>Ticket list table</td>
+<td>Search &amp; Category filter</td>
+<td>"Create Ticket" action button, ticket links, pagination</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>Requester Detail</strong></td>
+<td>Readonly ticket form</td>
+<td>Upload attachment, add comment, "Problem Appears Resolved"</td>
+<td>Back button ("← Back to My Tickets"), comment textarea, file picker</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>Staff Queue</strong></td>
+<td>Desktop table / Mobile stacked cards</td>
+<td>Search, 5 dropdown filters, sorting</td>
+<td>Search button, reset filter, "Open Detail" button, pagination</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>Staff Detail</strong></td>
+<td>Full ticket form</td>
+<td>Claim, Reassign, IT Priority, Status transition, Public Comments, Internal Notes</td>
+<td>Claim button, Assignee select, Priority select, Status select, Note textarea</td>
+<td>44px height</td>
+</tr>
+<tr>
+<td><strong>User Management</strong></td>
+<td>Desktop table / Mobile stacked cards</td>
+<td>Create User modal, Edit User modal, Reset Password modal</td>
+<td>"+ Create New User" button (<code>tkt-btn-action-primary</code>), Edit button, Reset Password button</td>
+<td>44px height</td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 Feedback States</h3>
+<table>
+<thead>
+<tr>
+<th>Feedback State</th>
+<th>Visual Representation</th>
+<th>User Action / Dismissal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Loading</strong></td>
+<td>Inline animated spinner with contextual loading text</td>
+<td>Disabled controls during active fetch</td>
+</tr>
+<tr>
+<td><strong>Saving / Submitting</strong></td>
+<td>Button text changes (e.g. "Saving..."), spinner displayed, button disabled</td>
+<td>Prevents duplicate form submissions</td>
+</tr>
+<tr>
+<td><strong>Success</strong></td>
+<td>Green banner (<code>#f0fdf4</code>, border <code>#bbf7d0</code>, text <code>#166534</code>)</td>
+<td>Auto-clears on navigation or next action</td>
+</tr>
+<tr>
+<td><strong>Validation Error</strong></td>
+<td>Inline red alert banner (<code>#fef2f2</code>, border <code>#fca5a5</code>, text <code>#991b1b</code>)</td>
+<td>Field highlight with specific correction prompt</td>
+</tr>
+<tr>
+<td><strong>Empty State</strong></td>
+<td>Centered illustration/emoji, title, and instructional subtitle</td>
+<td>Clear guidance on how to populate data</td>
+</tr>
+<tr>
+<td><strong>No Results</strong></td>
+<td>"No Tickets Found" / "No Users Found" banner</td>
+<td>Suggests resetting active search or filter filters</td>
+</tr>
+<tr>
+<td><strong>Forbidden (403)</strong></td>
+<td>Standard error banner: "Access denied. Role is not authorized."</td>
+<td>Redirect to permitted role screen</td>
+</tr>
+<tr>
+<td><strong>Not Found (404)</strong></td>
+<td>Error card: "Ticket not found."</td>
+<td>"← Back to My Tickets" button</td>
+</tr>
+<tr>
+<td><strong>Conflict (409)</strong></td>
+<td>Error banner: "A user with this email address already exists."</td>
+<td>Correct email input</td>
+</tr>
+<tr>
+<td><strong>Safe Failure (500)</strong></td>
+<td>Generic error message preventing internal stack trace leakage</td>
+<td>Retry prompt</td>
+</tr>
+</tbody>
+</table>
+<h3>6.3 Role Navigation Rules</h3>
+<ul>
+<li><strong>Requester</strong>: Displays "📄 My Tickets" and "➕ Create Ticket". Breadcrumb shows "My Tickets &gt; Ticket Detail".</li>
+<li><strong>IT Staff</strong>: Displays "📄 Ticket Queue". Breadcrumb shows "Ticket Queue &gt; Ticket Detail".</li>
+<li><strong>Administrator</strong>: Displays "👥 User Management" only. Clicking brand logo defaults to User Management.</li>
+</ul>
+<h3>6.4 Responsive Viewport Rules</h3>
+<ul>
+<li><strong>Desktop (&gt;= 1024px)</strong>: Full multi-column tables with complete metadata, inline filters, and action buttons.</li>
+<li><strong>Tablet (768px – 1023px)</strong>: Lower-priority table columns (<code>Created Date</code>, <code>Category</code>) are hidden via <code>.tkt-desktop-only</code> so remaining columns fit without horizontal clipping.</li>
+<li><strong>Mobile (&lt; 768px)</strong>: Tables are replaced entirely with <code>.tkt-card-list.tkt-mobile-only</code> rendering stacked cards with full wrapping summaries, status pills, metadata grids, and 44px touch-target action buttons. No horizontal page overflow at 375px/390px (<code>scrollWidth &lt;= clientWidth</code>).</li>
+</ul>
+<hr />
+<hr />
+<h2>7. Data Changes &amp; Migration Strategy</h2>
+<h3>7.1 Prisma Data Models</h3>
+<pre><code class="language-prisma">enum Role {
+  REQUESTER
+  STAFF
+  ADMIN
+}
+
+model User {
+  id                 Int              @id @default(autoincrement())
+  name               String
+  email              String           @unique
+  passwordHash       String
+  role               Role             @default(REQUESTER)
+  isActive           Boolean          @default(true)
+  mustChangePassword Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  tickets            Ticket[]         @relation(&quot;RequesterTickets&quot;)
+  ownedTickets       Ticket[]         @relation(&quot;StaffTickets&quot;)
+  publicComments     PublicComment[]
+  internalNotes      InternalNote[]
+
+  @@index([role, isActive])
+  @@index([email])
+}
+
+model Ticket {
+  id                 Int              @id @default(autoincrement())
+  ticketNumber       String           @unique
+  clientSubmissionId String?          @unique
+  requesterId        Int
+  ownerId            Int?
+  categoryId         Int?
+  relatedSystemId    Int?
+  summary            String
+  description        String
+  requestedPriority  String           @default(&quot;MEDIUM&quot;)
+  itPriority         String?
+  currentStatus      String           @default(&quot;NEW&quot;)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  requester          User             @relation(&quot;RequesterTickets&quot;, fields: [requesterId], references: [id])
+  owner              User?            @relation(&quot;StaffTickets&quot;, fields: [ownerId], references: [id])
+  category           Category?        @relation(fields: [categoryId], references: [id])
+  relatedSystem      RelatedSystem?   @relation(fields: [relatedSystemId], references: [id])
+  attachments        Attachment[]
+  publicComments     PublicComment[]
+  internalNotes      InternalNote[]
+
+  @@index([currentStatus])
+  @@index([requesterId])
+  @@index([ownerId])
+  @@index([createdAt])
+}
+
+model PublicComment {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId, createdAt])
+}
+
+model InternalNote {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id])
+
+  @@index([ticketId, createdAt])
+}
+</code></pre>
+<h3>7.2 Lab 2 → User Migration Strategy</h3>
+<ol>
+<li><strong>Development Requesters to Users</strong>: In Lab 2, requesters were stored in a <code>DevelopmentRequester</code> table. The migration transferred all existing requesters into the unified <code>User</code> table with role <code>REQUESTER</code>, mapping <code>email</code>, <code>name</code>, and setting <code>isActive = true</code>.</li>
+<li><strong>Ticket Ownership Preservation</strong>: Existing tickets had <code>requesterId</code> foreign keys referencing the old table. The migration preserved identical primary key mappings so that existing tickets retain correct historical Requester ownership without data loss.</li>
+<li><strong>Initial Password Provisioning</strong>: All migrated accounts were assigned a bcrypt-hashed default password (<code>Password123!</code>). For security, migrated users who had not yet logged in received <code>mustChangePassword = false</code> for existing test accounts and <code>mustChangePassword = true</code> for newly provisioned accounts.</li>
+<li><strong>Selector Removal</strong>: The client-side Development Requester dropdown, local storage keys, and <code>X-Development-Requester-Id</code> request headers were completely removed. Requesters authenticate strictly via <code>/api/auth/login</code> and receive a JWT Bearer token.</li>
+<li><strong>Database Seeding Decisions</strong>:</li>
+<li>Ticket numbers strictly follow the official <code>TKT-2026-XXXXXX</code> format (fixing the <code>TXT-</code> typo).</li>
+<li>Polluted test tickets ("Issue 5 test ticket for attachments") were purged from the dev seed.</li>
+<li>Dev seed populates 18 realistic tickets covering all 8 statuses, 4 priorities, and assigned/unassigned distributions.</li>
+<li>Seed operations use <code>upsert</code> and existence checks, guaranteeing 100% idempotency across repeated runs.</li>
+</ol>
+<hr />
+<hr />
+<h2>8. API Contract &amp; Authorization Matrix</h2>
 <table>
 <thead>
 <tr>
@@ -1124,7 +1393,7 @@ test-results/
 </tbody>
 </table>
 <hr />
-<h2>7. Acceptance Criteria (AC-01 .. AC-20)</h2>
+<h2>9. Acceptance Criteria (AC-01 .. AC-20)</h2>
 <ul>
 <li><strong>AC-01</strong>: Given an active user with valid credentials, when logging in, the backend returns authenticated session data and user role context.</li>
 <li><strong>AC-02</strong>: Given a user with <code>mustChangePassword = true</code>, when login succeeds, normal application routes remain inaccessible until a new valid password is saved.</li>
@@ -1148,7 +1417,7 @@ test-results/
 <li><strong>AC-20</strong>: Given a logged-out user, when using a previously invalidated session, requests return 401 Unauthorized.</li>
 </ul>
 <hr />
-<h2>8. Definition of Done (DoD)</h2>
+<h2>10. Definition of Done (DoD)</h2>
 <ul>
 <li>[x] All 6 specification documents in <code>docs/lab-03/</code> created and accurate.</li>
 <li>[x] Prisma schema migrated and seeded with active/inactive Requester, IT Staff, and Admin accounts.</li>
@@ -1162,7 +1431,7 @@ test-results/
 <li>[ ] GitHub Issues, PR description <code>Closes #X</code>, reviewer comments &amp; approval, and reviewer merge executed on GitHub.</li>
 </ul>
 <hr />
-<h2>9. Assumptions and Implementation Decisions</h2>
+<h2>11. Assumptions and Implementation Decisions</h2>
 <ol>
 <li><strong>Authentication Token Mechanism</strong>: Session authentication uses JWT passed in HTTP <code>Authorization: Bearer &lt;token&gt;</code> header or <code>X-Auth-Token</code> for maximum flexibility in API tests and web UI.</li>
 <li><strong>Password Hashing</strong>: Passwords are hashed using <code>bcryptjs</code> with salt rounds = 10.</li>
@@ -1206,7 +1475,7 @@ test-results/
       <tr>
         <td><strong>API-02</strong></td>
         <td>API</td>
-        <td>FR-01, BR-03</td>
+        <td>FR-01, BR-01</td>
         <td>Invalid password returns 401 Unauthorized</td>
         <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
@@ -1214,7 +1483,7 @@ test-results/
       <tr>
         <td><strong>API-03</strong></td>
         <td>API</td>
-        <td>FR-01, BR-13</td>
+        <td>FR-01, BR-01</td>
         <td>Inactive account login is rejected with 401</td>
         <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
         <td><span class="badge badge-pass">PASS</span></td>
