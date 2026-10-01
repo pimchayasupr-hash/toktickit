@@ -48,8 +48,9 @@
 }
 ```
 - **Errors**:
-  - `400 Bad Request`: `VALIDATION_ERROR` (Missing email/password format)
-  - `401 Unauthorized`: `INVALID_CREDENTIALS` (Email/password incorrect or user inactive)
+  - `400 Bad Request`: `VALIDATION_ERROR` (Missing email or password)
+  - `401 Unauthorized`: `INVALID_CREDENTIALS` (Invalid email address or password)
+  - `401 Unauthorized`: `ACCOUNT_DEACTIVATED` (Your account has been deactivated. Please contact an administrator.)
 
 #### `POST /api/auth/logout`
 - **Description**: Log out current authenticated user session.
@@ -122,7 +123,7 @@
   "tickets": [
     {
       "id": 10,
-      "ticketNumber": "TXT-2026-001234",
+      "ticketNumber": "TKT-2026-001234",
       "summary": "Laptop battery drains quickly",
       "description": "Battery loses charge within 30 minutes...",
       "requestedPriority": "MEDIUM",
