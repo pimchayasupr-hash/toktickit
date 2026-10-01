@@ -332,7 +332,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 
 ---
 
-## 9. Acceptance Criteria (AC-01 .. AC-20)
+## 9. Acceptance Criteria (AC-01 .. AC-22)
 
 - **AC-01**: Given an active user with valid credentials, when logging in via `POST /api/auth/login`, the backend returns HTTP 200 with JWT Bearer token and user context.
 - **AC-02**: Given an authenticated user with `mustChangePassword = true`, when calling protected endpoints other than change-password/me/logout, the server returns HTTP 403 `MUST_CHANGE_PASSWORD`.
@@ -354,6 +354,8 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - **AC-18**: Given an Administrator user, when resetting an initial password, `mustChangePassword` is set to `true` and the password hash updates.
 - **AC-19**: Given a Requester user, when clicking "Problem Appears Resolved", a structured public resolution comment is posted without directly modifying ticket status.
 - **AC-20**: Given a logged-out user, when calling API endpoints with a blacklisted token, the server returns HTTP 401 Unauthorized.
+- **AC-21**: Given an Administrator user, when attempting to deactivate their own account (`id === loggedInUserId`), the request is rejected with HTTP 400 `SELF_DEACTIVATION_FORBIDDEN`.
+- **AC-22**: Given an Administrator user, when attempting to deactivate or change the role of the last remaining active Administrator account, the request is rejected with HTTP 400 `LAST_ADMIN_PROTECTION`.
 
 ---
 

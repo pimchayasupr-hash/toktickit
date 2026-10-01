@@ -2,7 +2,7 @@
 
 ## 1. Test Strategy & Coverage Scope
 
-The Lab 3 test suite provides 100% traceability across all Functional Requirements (FR), Business Rules (BR), Acceptance Criteria (AC-01..AC-20), and the complete Role × Endpoint Authorization Matrix.
+The Lab 3 test suite provides 100% traceability across all Functional Requirements (FR), Business Rules (BR), Acceptance Criteria (AC-01..AC-22), and the complete Role × Endpoint Authorization Matrix.
 
 ### Test Layers
 1. **Server API Tests (`server/tests/lab-03/`)**: Supertest API endpoints verifying authentication, authorization headers, matrix permissions, validation status codes, Prisma data isolation, and safety rules.
@@ -16,56 +16,75 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | Test ID | Test Layer | Requirement / AC | Description & Verification Target | Automated Test File | Final Status |
 |---|---|---|---|---|---|
 | **API-01** | API | AC-01, FR-01, BR-01 | Valid user login returns auth token & user profile | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-02** | API | AC-01, BR-01 | Invalid password or unknown email returns 401 | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-03** | API | AC-03, BR-01 | Inactive account login attempt returns 401 error | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-04** | API | AC-02, BR-02 | Mandatory password change updates password & clears flag | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-04b** | API | AC-13, AC-20 | Protected endpoint without valid token returns 401 | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-05** | API | AC-04, BR-03 | Authenticated requester ticket list ignores client requesterId | `server/tests/lab-03/authorization.api.test.ts` | Pass |
-| **API-06** | API | AC-14, BR-03 | Requester accessing another requester's ticket returns 404 | `server/tests/lab-03/authorization.api.test.ts` | Pass |
-| **API-07** | API | AC-08, AC-11, BR-04 | Requester requesting Staff Queue or Internal Notes returns 403 | `server/tests/lab-03/authorization.api.test.ts` | Pass |
-| **API-07b** | API | AC-12 | Staff requesting Admin endpoints returns 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-02** | API | AC-01, FR-01, BR-01 | Invalid password or unknown email returns 401 | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-03** | API | AC-03, FR-01, BR-01 | Inactive account login attempt returns 401 error | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-04** | API | AC-02, FR-02, BR-02, BR-06 | Mandatory password change updates password & clears flag | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-04b** | API | AC-13, AC-20, FR-03 | Protected endpoint without valid token or with blacklisted token returns 401 | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-05** | API | AC-04, FR-05, FR-06, BR-03 | Authenticated requester ticket list ignores client requesterId | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-06** | API | AC-14, FR-06, BR-03 | Requester accessing another requester's ticket returns 404 | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-07** | API | AC-09, AC-11, FR-15, BR-04 | Requester requesting Staff Queue or Internal Notes returns 403 | `server/tests/lab-03/authorization.api.test.ts` | Pass |
+| **API-07b** | API | AC-12, BR-13 | Staff requesting Admin endpoints returns 403 Forbidden | `server/tests/lab-03/authorization.api.test.ts` | Pass |
 | **API-08** | API | AC-05, FR-09, FR-10 | IT Staff Ticket Queue returns paginated tickets with filters | `server/tests/lab-03/staff-queue.api.test.ts` | Pass |
-| **API-09** | API | AC-06, FR-11 | IT Staff claim & reassign ticket updates owner in DB | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
-| **API-10** | API | AC-07, FR-12, FR-13 | IT Priority update and valid status transition succeed | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
-| **API-11** | API | AC-07, BR-10 | Invalid status transition (e.g. NEW -> CLOSED) returns 400 | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
-| **API-12** | API | AC-15, FR-14, BR-11 | Append Public Comment succeeds; whitespace rejected | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
-| **API-13** | API | AC-16, FR-15, BR-11 | Append Internal Note succeeds for Staff/Admin | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
-| **API-14** | API | AC-09, FR-18, BR-14 | Admin create user with duplicate email returns 409 Conflict | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
-| **API-15** | API | AC-10, BR-15 | Admin self-deactivation attempt returns 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
-| **API-16** | API | AC-10, BR-16 | Deactivating last active Admin attempt returns 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-09** | API | AC-06, FR-11, BR-07 | IT Staff claim & reassign ticket updates owner in DB | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-10** | API | AC-07, FR-12, BR-08 | IT Priority update independently of Requested Priority | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-11** | API | AC-08, FR-13, BR-09, BR-10 | Status transitions via approved matrix; invalid returns 400 | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-12** | API | AC-15, FR-07, FR-14, FR-16, BR-11, BR-12 | Append Public Comment succeeds; whitespace rejected | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
+| **API-13** | API | AC-09, AC-16, FR-15, BR-04, BR-11, BR-12 | Append Internal Note succeeds for Staff/Admin; Requester forbidden | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
+| **API-14** | API | AC-10, FR-18, BR-14 | Admin create user with duplicate email returns 409 Conflict | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-15** | API | AC-21, FR-21, BR-15, BR-17 | Admin self-deactivation attempt returns 400 Bad Request | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-16** | API | AC-22, FR-21, BR-16 | Blocks changing role of the last active Administrator account | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-16b** | API | AC-22, FR-21, BR-16 | Blocks changing role of last active Admin to REQUESTER | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-17** | API | AC-17, FR-17 | Admin search users by name/email & filter by role | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
+| **API-17b** | API | FR-19 | Admin update user name and role succeeds | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-18** | API | AC-18, FR-20 | Admin reset initial password forces password change flag | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
-| **API-19** | API | AC-03, BR-04 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-20** | API | AC-13, BR-04 | Protected endpoint with `mustChangePassword=true` blocks all operations except /auth/me, /change-password, /logout | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-21** | API | AC-03, BR-01 | Inactive account blocks login even with correct password | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **API-22** | API | AC-02, BR-02 | Password change rejects empty, missing, or incorrect `currentPassword` | `server/tests/lab-03/auth.api.test.ts` | Pass |
-| **UT-01** | Unit | BR-02 | Password validator rejects passwords < 8 chars | `server/tests/lab-03/unit.test.ts` | Pass |
-| **UT-02** | Unit | BR-02 | Password validator enforces uppercase, lowercase, digit, special char requirements | `server/tests/lab-03/unit.test.ts` | Pass |
-| **UT-03** | Unit | BR-11 | Comment validator rejects empty/whitespace-only strings | `server/tests/lab-03/unit.test.ts` | Pass |
-| **UT-04** | Unit | BR-11 | Comment validator enforces min=1, max=2000 char boundaries | `server/tests/lab-03/unit.test.ts` | Pass |
-| **UT-05** | Unit | BR-10 | Status transition matrix allows all valid transitions from NEW, IN_PROGRESS | `server/tests/lab-03/unit.test.ts` | Pass |
-| **UT-06** | Unit | BR-10 | Status transition matrix blocks all invalid transitions; CANCELLED is terminal | `server/tests/lab-03/unit.test.ts` | Pass |
-| **MT-01** | Migration | BR-05 | Lab 2 DB populated with legacy Requesters/Tickets/Attachments survives Lab 3 migration with zero data loss | `server/tests/lab-03/migration-regression.test.ts` | Pass |
-| **MT-02** | Migration | BR-05 | Seed idempotency: re-running `prisma db seed` does not duplicate records or throw constraint violations | `server/tests/lab-03/seed-idempotency.test.ts` | Pass |
-| **UI-01** | UI | AC-01, AC-02 | Login form renders fields, validation errors, and loading state | `client/src/tests/lab-03/Login.test.tsx` | Pass |
-| **UI-02** | UI | AC-02, BR-02 | Mandatory password change form enforces password rules | `client/src/tests/lab-03/ChangePassword.test.tsx` | Pass |
-| **UI-03** | UI | FR-09, FR-10 | Staff Ticket Queue table renders filters, search, and badges | `client/src/tests/lab-03/StaffTicketQueue.test.tsx` | Pass |
-| **UI-04** | UI | FR-11, FR-12 | Staff Ticket Detail renders claim/reassign and IT priority | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
-| **UI-05** | UI | AC-08, FR-15 | Visually distinguishes Public Comments from Internal Notes | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
-| **UI-06** | UI | FR-17..FR-21 | User Management modal renders create/edit/reset forms & validation | `client/src/tests/lab-03/UserManagement.test.tsx` | Pass |
-| **E2E-01** | E2E | AC-01, AC-02 | E2E complete authentication, initial password change & logout | `e2e/lab-03/authentication.spec.ts` | Pass |
-| **E2E-02** | E2E | AC-05..AC-08 | E2E IT Staff queue search, ticket detail claim, status & notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
-| **E2E-03** | E2E | AC-09, AC-10 | E2E Administrator user creation, search, edit & safety checks | `e2e/lab-03/user-administration.spec.ts` | Pass |
-| **E2E-04** | E2E | AC-13, BR-04 | E2E Logout revokes session; direct URL access redirects to login; unauthenticated API returns 401 | `e2e/lab-03/authentication.spec.ts` | Pass |
-| **E2E-05** | E2E | AC-07, BR-10 | E2E Staff claims ticket and performs status transition sequence | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
-| **E2E-06** | E2E | AC-02, BR-02 | E2E New user first login triggers mandatory password change modal | `e2e/lab-03/user-administration.spec.ts` | Pass |
-| **E2E-07** | E2E | AC-10, BR-15, BR-16 | E2E Admin safety rules block self-deactivation and last-admin demotion | `e2e/lab-03/user-administration.spec.ts` | Pass |
-| **E2E-08** | E2E | §10, Handout | Zero horizontal overflow on Login screen at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
-| **E2E-09** | E2E | §10, Handout | Zero horizontal overflow on IT Staff Queue at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
-| **E2E-10** | E2E | §10, Handout | Zero horizontal overflow on Staff Detail & Admin User Management at all viewports | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
-| **E2E-11** | E2E | §10, AC-19 | Zen Green primary button (`#005a36`) background & white text verified by computed styles | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
-| **E2E-12** | E2E | §10, AC-19 | Keyboard Escape key closes admin modal (accessibility) | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
-| **E2E-13** | E2E | §10, AC-19 | Axe-core accessibility scan: zero critical violations on Login and Staff Queue pages | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **API-19** | API | AC-02, BR-02, BR-06 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-20** | API | AC-02, FR-02, FR-04, BR-02 | Protected endpoint with `mustChangePassword=true` blocks all operations except /auth/me, /change-password, /logout | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-21** | API | AC-03, FR-01, BR-01 | Inactive account blocks login even with correct password | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-22** | API | AC-02, FR-02, BR-02 | Password change rejects empty, missing, or incorrect `currentPassword` | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-25** | API | AC-19, FR-08, BR-05 | Requester "Problem Appears Resolved" appends system public comment without changing status | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
+| **UT-01** | Unit | BR-02, BR-06 | Password validator rejects passwords < 8 chars | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-02** | Unit | BR-02, BR-06 | Password validator enforces uppercase, lowercase, digit, special char requirements | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-03** | Unit | FR-16, BR-11, BR-12 | Comment validator rejects empty/whitespace-only strings | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-04** | Unit | FR-16, BR-11, BR-12 | Comment validator enforces min=1, max=2000 char boundaries | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-05** | Unit | FR-13, BR-09, BR-10 | Status transition matrix allows all valid transitions from NEW, IN_PROGRESS | `server/tests/lab-03/unit.test.ts` | Pass |
+| **UT-06** | Unit | FR-13, BR-09, BR-10 | Status transition matrix blocks all invalid transitions; CANCELLED is terminal | `server/tests/lab-03/unit.test.ts` | Pass |
+| **MT-01** | Migration | FR-06, BR-03, BR-05 | Lab 2 DB populated with legacy Requesters/Tickets/Attachments survives Lab 3 migration with zero data loss | `server/tests/lab-03/migration-regression.test.ts` | Pass |
+| **MT-02** | Migration | FR-06, BR-05 | Seed idempotency: re-running `prisma db seed` does not duplicate records or throw constraint violations | `server/tests/lab-03/seed-idempotency.test.ts` | Pass |
+| **UI-01** | UI | AC-01, AC-02, FR-01, FR-02 | Login form renders fields, validation errors, and loading state | `client/src/tests/lab-03/Login.test.tsx` | Pass |
+| **UI-02** | UI | AC-02, FR-02, BR-02 | Mandatory password change form enforces password rules | `client/src/tests/lab-03/ChangePassword.test.tsx` | Pass |
+| **UI-03** | UI | AC-05, FR-09, FR-10 | Staff Ticket Queue table renders filters, search, and badges | `client/src/tests/lab-03/StaffTicketQueue.test.tsx` | Pass |
+| **UI-04** | UI | AC-06, AC-07, AC-08, AC-19, FR-08, FR-11, FR-12, FR-13 | Staff Ticket Detail renders claim/reassign, IT priority, and status transitions | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
+| **UI-05** | UI | AC-15, AC-16, FR-14, FR-15, BR-04, BR-11 | Visually distinguishes Public Comments from Internal Notes | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
+| **UI-06** | UI | AC-10, AC-17, AC-21, AC-22, FR-17, FR-18, FR-19, FR-20, FR-21, BR-14, BR-15, BR-16, BR-17 | User Management modal renders create/edit/reset forms & validation | `client/src/tests/lab-03/UserManagement.test.tsx` | Pass |
+| **E2E-01** | E2E | AC-01, AC-02, AC-20, FR-01, FR-02, FR-03 | E2E complete authentication, initial password change & logout | `e2e/lab-03/authentication.spec.ts` | Pass |
+| **E2E-02** | E2E | AC-05, AC-06, AC-07, AC-08, AC-15, AC-16, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15 | E2E IT Staff queue search, ticket detail claim, status & notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
+| **E2E-03** | E2E | AC-10, AC-17, AC-18, FR-17, FR-18, FR-19, FR-20 | E2E Administrator user creation, search, edit & safety checks | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-04** | E2E | AC-13, AC-20, FR-03, BR-04 | E2E Logout revokes session; direct URL access redirects to login; unauthenticated API returns 401 | `e2e/lab-03/authentication.spec.ts` | Pass |
+| **E2E-05** | E2E | AC-06, AC-07, AC-08, FR-11, FR-12, FR-13, BR-08, BR-09, BR-10 | E2E Staff claims ticket and performs status transition sequence | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
+| **E2E-06** | E2E | AC-02, FR-02, BR-02 | E2E New user first login triggers mandatory password change modal | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-07** | E2E | AC-21, AC-22, FR-21, BR-15, BR-16 | E2E Admin safety rules block self-deactivation and last-admin demotion | `e2e/lab-03/user-administration.spec.ts` | Pass |
+| **E2E-08** | E2E | UI-Spec §6 | Zero horizontal overflow on Login screen at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-09** | E2E | UI-Spec §6 | Zero horizontal overflow on IT Staff Queue at 375px/390px/820px/1440px | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-10** | E2E | UI-Spec §6 | Zero horizontal overflow on Staff Detail & Admin User Management at all viewports | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-11** | E2E | UI-Spec §6 | Zen Green primary button (`#005a36`) background & white text verified by computed styles | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-12** | E2E | UI-Spec §6 | Keyboard Escape key closes admin modal (accessibility) | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+| **E2E-13** | E2E | UI-Spec §6 | Axe-core accessibility scan: zero critical violations on Login and Staff Queue pages | `e2e/lab-03/responsive-overflow.spec.ts` | Pass |
+
+### 2.1 Automated Traceability Verification Output (`python3 scripts/check-traceability.py`)
+
+```text
+=== Specification Definition Audit ===
+Defined Acceptance Criteria: 22 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22)
+Defined Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
+Defined Business Rules:      17 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17)
+
+=== Traceability Matrix Coverage Audit ===
+Referenced Acceptance Criteria: 22 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22)
+Referenced Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
+Referenced Business Rules:      17 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17)
+
+✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-22), FUNCTIONAL REQUIREMENTS (FR-01..FR-21), AND BUSINESS RULES (BR-01..BR-17) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.
+```
 
 ---
 

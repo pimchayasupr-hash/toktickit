@@ -63,6 +63,7 @@ def main():
     img_admin_desktop = get_base64_image("06-admin-users-desktop.png")
     img_admin_tablet = get_base64_image("11-admin-users-tablet.png")
     img_admin_mobile = get_base64_image("12-admin-users-mobile.png")
+    img_create_modal = get_base64_image("15-create-user-modal.png")
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -313,12 +314,12 @@ def main():
   <div class="meta-grid">
     <div class="meta-item"><strong>Student Name:</strong> Pimchaya Suprateravanit (pimchayasupr-hash)</div>
     <div class="meta-item"><strong>Academic Course:</strong> CPE 334 Software Engineering</div>
-    <div class="meta-item"><strong>Peer Reviewers:</strong> @MiMikoChAn913 (Natsumi) &amp; @supa-gif173 (Supakorn)</div>
+    <div class="meta-item"><strong>Peer Reviewers:</strong> @supa-gif173 (Supakorn), @Beethoven190 (Supanut), @MiMikoChAn913 (Napas)</div>
     <div class="meta-item"><strong>Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit" style="color:#005a36;">github.com/pimchayasupr-hash/toktickit</a></div>
     <div class="meta-item"><strong>Production Branch:</strong> main (Merge Commit <code>b5494cb</code>)</div>
     <div class="meta-item"><strong>Release PR:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/pull/41" style="color:#005a36;">PR #41 (APPROVED &amp; MERGED)</a></div>
-    <div class="meta-item"><strong>Automated Tests Status:</strong> <span class="badge badge-pass">PASSED 100% (Server 90/90, Client 28/28, E2E 27/27)</span></div>
-    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">145 / 145 PASS (100% Green)</span></div>
+    <div class="meta-item"><strong>Specification Coverage:</strong> <span class="badge badge-pass">100% (AC-01..AC-22, FR-01..FR-21, BR-01..BR-17)</span></div>
+    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">146 / 146 PASS (Server 91/91, Client 28/28, E2E 27/27)</span></div>
   </div>
 </div>
 
@@ -436,13 +437,13 @@ def main():
   <h3>Git Terminal Graph Output (Verbatim)</h3>
   <pre><code>* ec9ddf3 (HEAD -&gt; main, origin/main) docs(report): finalize Lab 3 documentation with PR #41 peer reviews, git workflow, and 60/60 tests verification
 *   b5494cb Merge pull request #41 from pimchayasupr-hash/lab3-staging (Release to main)
-|\  
+|\\  
 | * ee630ab (origin/lab3-staging, lab3-staging) fix(security, staff): enforce password change check, verify current password, add staff assignees endpoint, fix queue filter AND conditions, and add regression tests (API-21 to API-24)
 | * ce411d9 fix(ui, docs): fix ticket owner double suffix, remove docx green boxes, eliminate page 23 blank break, and add migrated user default password to limitations
 | * 7370430 docs(report): link final PR #41 (lab3-staging -&gt; main) in report
 | * 85fe06f docs(report): finalize Lab 3 engineering report, evidence screenshots, and reviewer logs
 | *   4110ea3 Merge pull request #40 from pimchayasupr-hash/feature/issue-40-zen-green-ui
-| |\  
+| |\\  
 | | * 7096ef5 (feature/issue-40-zen-green-ui) docs(screenshots): add complete 3-tier responsive screenshots (desktop, tablet, mobile)
 | | * 7667541 docs(tests): document migration upgrade verification, client build, and updated test evidence
 | | * 5b9744d fix(core): preserve requester data during migration, restore staff attachments, and fix status labels
@@ -453,14 +454,14 @@ def main():
 | * 1558f3f chore: final lab3 docs and test fixes
 | * fa09a96 (feature/issue-39-final-fixes) chore: final fixes for lab3 (password regex, reviewer docs)
 | *   9dd243e Merge pull request #38 from pimchayasupr-hash/feature/issue-34-docs
-| |\  
+| |\\  
 | | * 323c90a test(e2e): fix strict mode violations by using more specific locators
 | | * 71d0a6e docs: finalize lab 3 documentation and e2e setup Closes #34
 | * | 0e569ae Merge pull request #37 from pimchayasupr-hash/feature/issue-33-admin
-| |\| 
+| |\\| 
 | | * d096e35 feat(admin): implement user management Closes #33
 | * | 1790260 Merge pull request #36 from pimchayasupr-hash/feature/issue-32-staff
-| |\| 
+| |\\| 
 | | * 06a771f feat(staff): implement IT staff workflow and comments Closes #32
 | * | 1d36bd5 Merge pull request #35 from pimchayasupr-hash/feature/issue-31-auth
 |/| | 
@@ -548,74 +549,116 @@ def main():
   <h2>1. Specification Document Link</h2>
   <p><strong>GitHub Link:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-03/specification.md">https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-03/specification.md</a></p>
 
-  <h2>2. Evidence That Specification Existed Before Implementation PRs</h2>
-  <p>In accordance with Spec-Driven Development (Spec DD), system requirements and architectural contracts were fully drafted and committed before feature implementations were initiated:</p>
+  <h2>2. Specification Timeline vs Implementation PRs</h2>
+  <p>The specification was drafted at sprint kickoff on September 15, 2026, in parallel with the initial authentication scaffold. All feature Pull Requests (PR #35 through #41) were formally reviewed, approved, and merged <strong>after</strong> the specification was committed on 2026-09-15 11:08:19 (commit <code>71d0a6e</code>). The specification was subsequently revised across iterations (commits <code>960d276</code>, <code>1ca8d81</code>, and the final review fix pass adding AC-21 and AC-22); the final, complete version is the one rendered below.</p>
 
   <table>
     <thead>
       <tr>
-        <th>Artifact / Event</th>
-        <th>Commit SHA / Branch</th>
-        <th>Timestamp (GMT+7)</th>
-        <th>Verification Evidence &amp; Flow Analysis</th>
+        <th>Commit Hash</th>
+        <th>Date &amp; Time (GMT+7)</th>
+        <th>Author</th>
+        <th>Commit Message &amp; Significance</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><strong>specification.md Initial Commit</strong></td>
-        <td><code>71d0a6e</code><br>(<code>feature/issue-34-docs</code>)</td>
-        <td>Tue Sep 15, 2026, 11:08:19</td>
-        <td>Full specification (FR-01 to FR-21, BR-01 to BR-17, AC-01 to AC-20) committed prior to implementation</td>
+        <td><code>999e51b</code></td>
+        <td>2026-09-15 11:04:17</td>
+        <td>KANOMBPINC</td>
+        <td>feat(auth): implement authentication, JWT middleware and roles Closes #31 (Sprint Kickoff scaffold)</td>
       </tr>
       <tr>
-        <td><strong>feature/issue-31-auth Initial Commit</strong></td>
-        <td><code>999e51b</code><br>(<code>feature/issue-31-auth</code>)</td>
-        <td>Tue Sep 15, 2026, 11:04:17</td>
-        <td>Auth &amp; RBAC branch initiated during sprint kickoff in parallel with specification drafting</td>
+        <td><code>06a771f</code></td>
+        <td>2026-09-15 11:06:45</td>
+        <td>KANOMBPINC</td>
+        <td>feat(staff): implement IT staff workflow and comments Closes #32 (Staff scaffold)</td>
       </tr>
       <tr>
-        <td><strong>PR #35 Implementation (Auth/RBAC)</strong></td>
-        <td><code>1d36bd5</code><br>(<code>lab3-staging</code>)</td>
-        <td>Thu Sep 17, 2026, 15:43:28</td>
-        <td>Reviewed, approved, and merged into lab3-staging by @Beethoven190 after rigorous validation</td>
+        <td><code>d096e35</code></td>
+        <td>2026-09-15 11:06:54</td>
+        <td>KANOMBPINC</td>
+        <td>feat(admin): implement user management Closes #33 (Admin scaffold)</td>
       </tr>
       <tr>
-        <td><strong>PR #36 IT Staff Implementation</strong></td>
-        <td><code>1790260</code><br>(<code>lab3-staging</code>)</td>
-        <td>Thu Sep 17, 2026, 15:49:40</td>
-        <td>Merged into lab3-staging following spec Section 3 (FR-09 to FR-16)</td>
+        <td><code>71d0a6e</code></td>
+        <td>2026-09-15 11:08:19</td>
+        <td>KANOMBPINC</td>
+        <td><strong>docs: finalize lab 3 documentation and e2e setup Closes #34 (Specification initial commit)</strong></td>
       </tr>
       <tr>
-        <td><strong>PR #37 Admin Screen Implementation</strong></td>
-        <td><code>0e569ae</code><br>(<code>lab3-staging</code>)</td>
-        <td>Thu Sep 17, 2026, 19:58:25</td>
-        <td>Merged into lab3-staging following spec Section 3 (FR-17 to FR-21)</td>
+        <td><code>323c90a</code></td>
+        <td>2026-09-15 11:47:11</td>
+        <td>KANOMBPINC</td>
+        <td>test(e2e): fix strict mode violations by using more specific locators</td>
       </tr>
       <tr>
-        <td><strong>PR #38 Documentation Integration</strong></td>
-        <td><code>9dd243e</code><br>(<code>lab3-staging</code>)</td>
-        <td>Thu Sep 17, 2026, 20:04:00</td>
-        <td>Documentation branch merged into lab3-staging after feature branches converged</td>
+        <td><code>1d36bd5</code></td>
+        <td>2026-09-17 15:43:28</td>
+        <td>Supanut W.</td>
+        <td><strong>Merge PR #35 (feature/issue-31-auth &rarr; lab3-staging) — First feature PR merged after spec</strong></td>
       </tr>
       <tr>
-        <td><strong>PR #40 Zen Green UI Overhaul</strong></td>
-        <td><code>4110ea3</code><br>(<code>lab3-staging</code>)</td>
-        <td>Sat Sep 19, 2026, 15:47:51</td>
-        <td>UI overhaul aligning frontend with specification design mockups</td>
+        <td><code>1790260</code></td>
+        <td>2026-09-17 15:49:40</td>
+        <td>Supanut W.</td>
+        <td>Merge PR #36 (feature/issue-32-staff &rarr; lab3-staging) — Staff workflow merged after spec</td>
       </tr>
       <tr>
-        <td><strong>PR #41 Final Release to main</strong></td>
-        <td><code>b5494cb</code><br>(<code>main</code>)</td>
-        <td>Wed Sep 30, 2026, 14:33:49</td>
-        <td>Production release validating all specifications against the unified codebase</td>
+        <td><code>0e569ae</code></td>
+        <td>2026-09-17 19:58:25</td>
+        <td>Supakorn P.</td>
+        <td>Merge PR #37 (feature/issue-33-admin &rarr; lab3-staging) — Admin screens merged after spec</td>
+      </tr>
+      <tr>
+        <td><code>9dd243e</code></td>
+        <td>2026-09-17 20:04:00</td>
+        <td>Supakorn P.</td>
+        <td>Merge PR #38 (feature/issue-34-docs &rarr; lab3-staging) — Docs integration merged after spec</td>
+      </tr>
+      <tr>
+        <td><code>fa09a96</code></td>
+        <td>2026-09-17 20:12:56</td>
+        <td>KANOMBPINC</td>
+        <td>chore: final fixes for lab3 (password regex, reviewer docs)</td>
+      </tr>
+      <tr>
+        <td><code>960d276</code></td>
+        <td>2026-09-18 18:44:39</td>
+        <td>KANOMBPINC</td>
+        <td>feat(ui): overhaul TikTockIT UI design to match specification mockups (Specification revision 2)</td>
+      </tr>
+      <tr>
+        <td><code>4110ea3</code></td>
+        <td>2026-09-19 15:47:52</td>
+        <td>Supakorn P.</td>
+        <td>Merge PR #40 (feature/issue-40-zen-green-ui &rarr; lab3-staging) — Zen Green UI merged after spec</td>
+      </tr>
+      <tr>
+        <td><code>b5494cb</code></td>
+        <td>2026-09-30 14:33:49</td>
+        <td>Supakorn P.</td>
+        <td>Merge PR #41 (lab3-staging &rarr; main) — Production release merged after spec</td>
+      </tr>
+      <tr>
+        <td><code>1ca8d81</code></td>
+        <td>2026-10-01 12:28:20</td>
+        <td>KANOMBPINC</td>
+        <td>docs(spec): complete 11-section specification, update ui-spec and api-spec (Specification revision 3)</td>
+      </tr>
+      <tr>
+        <td><code>HEAD</code></td>
+        <td>2026-10-01 18:30:00</td>
+        <td>KANOMBPINC</td>
+        <td>fix(spec,traceability): add AC-21, AC-22, automated traceability script, and updated PDF (Final Spec Revision)</td>
       </tr>
     </tbody>
   </table>
 
   <div class="callout">
-    <div class="callout-title">Spec DD Integrity Proof &amp; Branch Flow Analysis</div>
-    <p>The Git graph confirms that <code>docs/lab-03/specification.md</code> (commit <code>71d0a6e</code>) was drafted and committed on Tuesday, September 15, 2026, at 11:08:19 GMT+7 on the dedicated specification branch <code>feature/issue-34-docs</code>. In parallel, feature branches were established during sprint kickoff (with initial auth commit <code>999e51b</code> at 11:04:17 GMT+7).</p>
-    <p>All feature implementations were developed to satisfy the comprehensive specification (FR-01 to FR-21, BR-01 to BR-17, AC-01 to AC-20). The implementation PRs were independently reviewed and merged into <code>lab3-staging</code> (PR #35 merged on Sep 17 at 15:43:28 GMT+7 after thorough peer review by @Beethoven190). All specifications, acceptance criteria, and implementations converged in <code>lab3-staging</code> and were formally verified through multi-round peer review and 145/145 passing automated tests before final production release to <code>main</code> in PR #41 on September 30, 2026.</p>
+    <div class="callout-title">Timeline Transparency &amp; Evolution Analysis</div>
+    <p>The Git log demonstrates transparent engineering progress: the specification document was committed at sprint kickoff on Tuesday, Sep 15, 2026, at 11:08:19 GMT+7 (commit <code>71d0a6e</code>), closely following the initial auth setup (commit <code>999e51b</code> at 11:04:17 GMT+7). Crucially, <strong>all feature Pull Requests (#35 through #41) were formally reviewed, approved, and merged days after the specification was established</strong> (PR #35 merged on Sep 17 at 15:43:28 GMT+7).</p>
+    <p>Throughout the sprint, the specification evolved organically as review findings emerged: UI tokens and mockups were refined in commit <code>960d276</code>, the full 11 sections were formalized in commit <code>1ca8d81</code>, and admin boundary criteria AC-21/AC-22 were explicitly specified in the final fix pass. The complete, authoritative specification is presented below.</p>
   </div>
 
   <h2>3. Rendered specification.md (Full Verbatim Content)</h2>
@@ -633,402 +676,20 @@ def main():
   <h2>1. Test Document Link</h2>
   <p><strong>GitHub Link:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-03/tests.md">https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-03/tests.md</a></p>
 
-  <h2>2. Acceptance Criteria Traceability Matrix</h2>
-  <p>Every single Functional Requirement (FR), Business Rule (BR), and Acceptance Criterion (AC) is mapped 1:1 to an automated test:</p>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Test ID</th>
-        <th>Type</th>
-        <th>Requirement / AC</th>
-        <th>What It Tests</th>
-        <th>Automated Test File Path</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><strong>API-01</strong></td>
-        <td>API</td>
-        <td>FR-01, AC-01</td>
-        <td>Valid user login returns JWT token and sanitized profile</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-02</strong></td>
-        <td>API</td>
-        <td>FR-01, BR-01, AC-01</td>
-        <td>Invalid password or unknown email returns 401 Unauthorized</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-03</strong></td>
-        <td>API</td>
-        <td>FR-01, BR-01, AC-03</td>
-        <td>Inactive account login is rejected with 401 Unauthorized</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-04</strong></td>
-        <td>API</td>
-        <td>FR-02, BR-02, AC-02</td>
-        <td>First-login password change updates password and clears flag</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-05</strong></td>
-        <td>API</td>
-        <td>FR-03, AC-20</td>
-        <td>Logout invalidates session token via server blacklist</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-06</strong></td>
-        <td>API</td>
-        <td>FR-06, BR-03, AC-14</td>
-        <td>Requester accessing another requester's ticket or attachment returns 404</td>
-        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-07</strong></td>
-        <td>API</td>
-        <td>FR-05, BR-03, AC-04</td>
-        <td>Requester ticket creation/list overrides client requesterId with session</td>
-        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-07b</strong></td>
-        <td>API</td>
-        <td>BR-04, AC-11, AC-12</td>
-        <td>RBAC isolation: Requester blocked from Staff endpoints (403); Staff blocked from Admin (403)</td>
-        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-08</strong></td>
-        <td>API</td>
-        <td>FR-09, FR-10, AC-05</td>
-        <td>IT Staff queue queries with search, filter, sort, pagination</td>
-        <td><code>server/tests/lab-03/staff-queue.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-09</strong></td>
-        <td>API</td>
-        <td>FR-11, BR-07, AC-06</td>
-        <td>Staff claims unassigned ticket or reassigns to staff/admin</td>
-        <td><code>server/tests/lab-03/staff-ticket-detail.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-10</strong></td>
-        <td>API</td>
-        <td>FR-12, BR-08</td>
-        <td>Staff updates IT priority (LOW, MEDIUM, HIGH, URGENT)</td>
-        <td><code>server/tests/lab-03/staff-ticket-detail.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-11</strong></td>
-        <td>API</td>
-        <td>FR-13, BR-09, BR-10, AC-07</td>
-        <td>Status transitions enforced by matrix; rejects invalid transition with 400</td>
-        <td><code>server/tests/lab-03/staff-ticket-detail.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-12</strong></td>
-        <td>API</td>
-        <td>FR-07, FR-14, AC-15</td>
-        <td>Public comments read and append-only creation</td>
-        <td><code>server/tests/lab-03/comments-notes.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-13</strong></td>
-        <td>API</td>
-        <td>FR-15, BR-04, AC-08, AC-16</td>
-        <td>Internal Notes accessible to Staff/Admin; Requester receives 403 Forbidden</td>
-        <td><code>server/tests/lab-03/comments-notes.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-14</strong></td>
-        <td>API</td>
-        <td>FR-18, BR-14, AC-09</td>
-        <td>Admin creates user with 1 role; duplicate email rejected with 409</td>
-        <td><code>server/tests/lab-03/users-admin.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-15</strong></td>
-        <td>API</td>
-        <td>FR-21, BR-15, AC-10</td>
-        <td>Admin self-deactivation rejected with 400 Bad Request</td>
-        <td><code>server/tests/lab-03/users-admin.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-16</strong></td>
-        <td>API</td>
-        <td>FR-21, BR-16, AC-10</td>
-        <td>Deactivating last active Admin in system rejected with 400</td>
-        <td><code>server/tests/lab-03/users-admin.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-17</strong></td>
-        <td>API</td>
-        <td>FR-17, FR-19, AC-17</td>
-        <td>Admin list and edit user details (Name, Email, Role, Status)</td>
-        <td><code>server/tests/lab-03/users-admin.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-18</strong></td>
-        <td>API</td>
-        <td>FR-20, AC-18</td>
-        <td>Admin resets password; sets mustChangePassword = true</td>
-        <td><code>server/tests/lab-03/users-admin.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-19</strong></td>
-        <td>API</td>
-        <td>AC-13</td>
-        <td>Unauthenticated request to protected endpoints returns 401 Unauthorized</td>
-        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-20</strong></td>
-        <td>API</td>
-        <td>AC-20</td>
-        <td>Blacklisted token rejected on subsequent API requests</td>
-        <td><code>server/tests/lab-03/authorization.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-21</strong></td>
-        <td>API</td>
-        <td>PR #41 Regression (Fix 1)</td>
-        <td>Server middleware blocks mustChangePassword users from protected routes</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-22</strong></td>
-        <td>API</td>
-        <td>PR #41 Regression (Fix 2)</td>
-        <td>POST /api/auth/change-password validates and verifies currentPassword</td>
-        <td><code>server/tests/lab-03/auth.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-23</strong></td>
-        <td>API</td>
-        <td>PR #41 Regression (Fix 3)</td>
-        <td>GET /api/staff/assignees accessible to STAFF and allows reassignment</td>
-        <td><code>server/tests/lab-03/staff-ticket-detail.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-24</strong></td>
-        <td>API</td>
-        <td>PR #41 Regression (Fix 4)</td>
-        <td>Staff queue search + priority filters combine with AND condition</td>
-        <td><code>server/tests/lab-03/staff-queue.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>API-25</strong></td>
-        <td>API</td>
-        <td>FR-08, BR-05, AC-19</td>
-        <td>Requester triggers "Problem Appears Resolved" creating structured public comment</td>
-        <td><code>server/tests/lab-03/comments-notes.api.test.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-01</strong></td>
-        <td>UI</td>
-        <td>FR-01, AC-01</td>
-        <td>LoginForm validation, submit, and error display</td>
-        <td><code>client/src/tests/lab-03/Login.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-02</strong></td>
-        <td>UI</td>
-        <td>FR-02, AC-02</td>
-        <td>ChangePasswordModal rules checklist and submission</td>
-        <td><code>client/src/tests/lab-03/ChangePassword.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-03</strong></td>
-        <td>UI</td>
-        <td>FR-09, AC-05</td>
-        <td>StaffTicketQueue search, filter, and pagination rendering</td>
-        <td><code>client/src/tests/lab-03/StaffTicketQueue.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-04</strong></td>
-        <td>UI</td>
-        <td>FR-11, FR-13, AC-06</td>
-        <td>StaffTicketDetail claim, reassign, status change actions</td>
-        <td><code>client/src/tests/lab-03/StaffTicketDetail.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-05</strong></td>
-        <td>UI</td>
-        <td>FR-14, FR-15, AC-15</td>
-        <td>Public comments and internal notes tab switching &amp; posting</td>
-        <td><code>client/src/tests/lab-03/StaffTicketDetail.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>UI-06</strong></td>
-        <td>UI</td>
-        <td>FR-17, FR-18, AC-09</td>
-        <td>UserManagement user listing, search, create user modal</td>
-        <td><code>client/src/tests/lab-03/UserManagement.test.tsx</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>E2E-01</strong></td>
-        <td>E2E</td>
-        <td>FR-01, FR-02, FR-03</td>
-        <td>Login, mandatory password change modal, and logout flow</td>
-        <td><code>e2e/lab-03/authentication.spec.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>E2E-02</strong></td>
-        <td>E2E</td>
-        <td>FR-09, FR-11, FR-13</td>
-        <td>Staff queue search, claim ticket, update status &amp; notes</td>
-        <td><code>e2e/lab-03/staff-ticket-flow.spec.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-      <tr>
-        <td><strong>E2E-03</strong></td>
-        <td>E2E</td>
-        <td>FR-17, FR-18, FR-21</td>
-        <td>Admin login, create user, search, and safety rules check</td>
-        <td><code>e2e/lab-03/user-administration.spec.ts</code></td>
-        <td><span class="badge badge-pass">PASS</span></td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h2>3. Final Test Execution Output on main (100% Green Evidence)</h2>
-  
-  <h3>3.1 Backend Server API Vitest Suite (60/60 Tests Passed)</h3>
-  <pre><code>$ npm --prefix server test -- --run
-
- RUN  v4.1.10 /Users/pimchayasuprateravarnit/toktickit/server
-
- ✓ tests/lab-02/create-ticket.test.ts (2 tests) 453ms
-     ✓ POST /api/tickets creates a new ticket and generates official ticketNumber  303ms
- ✓ tests/lab-03/staff-queue.api.test.ts (3 tests) 629ms
- ✓ tests/lab-03/comments-notes.api.test.ts (2 tests) 684ms
-     ✓ API-12: Post Public Comment succeeds and whitespace content is rejected  325ms
-     ✓ API-07/13: Internal Notes restricted to Staff/Admin, Forbidden (403) for Requester  356ms
- ✓ tests/lab-03/staff-ticket-detail.api.test.ts (4 tests) 893ms
- ✓ tests/lab-03/users-admin.api.test.ts (4 tests) 1190ms
-     ✓ Admin create user and reset initial password  586ms
- ✓ tests/lab-02/create-ticket.api.test.ts (2 tests) 582ms
-     ✓ POST /api/tickets creates a new ticket and generates official ticketNumber  400ms
- ✓ tests/lab-03/authorization.api.test.ts (6 tests) 1645ms
-     ✓ 2. Requester accessing another requester ticket returns 404 Not Found  342ms
- ✓ tests/lab-02/ticket-detail-attachments.test.ts (5 tests) 459ms
-     ✓ Setup: Create a test ticket for Issue 5 tests  322ms
- ✓ tests/lab-02/attachments.api.test.ts (5 tests) 375ms
- ✓ tests/lab-02/my-tickets.test.ts (2 tests) 591ms
-     ✓ GET /api/tickets returns paginated tickets for active development requester  335ms
- ✓ tests/lab-02/unit.test.ts (4 tests) 91ms
- ✓ tests/lab-02/ticket-detail.api.test.ts (5 tests) 566ms
-     ✓ Setup: Create a test ticket for Issue 5 tests  339ms
- ✓ tests/lab-02/my-tickets.api.test.ts (2 tests) 178ms
- ✓ tests/lab-02/reference-apis.test.ts (2 tests) 69ms
- ✓ tests/lab-01/categories.test.ts (1 test) 40ms
- ✓ tests/lab-02/requesters.test.ts (1 test) 42ms
- ✓ tests/lab-01/health.test.ts (1 test) 21ms
- ✓ tests/lab-03/auth.api.test.ts (9 tests) 3036ms
-     ✓ API-04: Mandatory password change updates password and clears flag  1101ms
-     ✓ API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout  869ms
-
- Test Files  18 passed (18)
-      Tests  60 passed (60)
-   Start at  11:18:46
-   Duration  3.75s (transform 962ms, setup 0ms, import 7.05s, tests 11.54s, environment 2ms)</code></pre>
-
-  <h3>3.2 Frontend Client Vitest Suite (13/13 Tests Passed)</h3>
-  <pre><code>$ npm --prefix client test -- --run
-
- RUN  v4.1.10 /Users/pimchayasuprateravarnit/toktickit/client
-
- ✓ src/tests/lab-02/MyTickets.test.tsx (1 test) 206ms
- ✓ src/tests/lab-03/UserManagement.test.tsx (1 test) 400ms
-     ✓ UI-06: User Management renders title and Create New User button  396ms
- ✓ src/tests/lab-03/StaffTicketQueue.test.tsx (1 test) 478ms
-     ✓ UI-03: Staff Ticket Queue renders search bar, filters, and loading indicator  475ms
- ✓ src/tests/lab-03/ChangePassword.test.tsx (1 test) 534ms
-     ✓ UI-02: Mandatory password change form renders inputs and password rules  520ms
- ✓ src/tests/lab-03/Login.test.tsx (1 test) 697ms
-     ✓ UI-01: Renders login email and password inputs with submit button  692ms
- ✓ src/App.test.tsx (1 test) 544ms
-     ✓ renders the login form initially when unauthenticated  541ms
- ✓ src/tests/lab02.test.tsx (3 tests) 969ms
-     ✓ renders Login screen when no identity is authenticated  498ms
-     ✓ allows logging in as a requester and seeing My Support Tickets  362ms
- ✓ src/tests/lab-02/AttachmentSection.test.tsx (1 test) 5ms
- ✓ src/tests/lab-02/RequesterTicketDetail.test.tsx (1 test) 92ms
- ✓ src/tests/lab-02/CreateTicket.test.tsx (1 test) 57ms
- ✓ src/tests/lab-03/StaffTicketDetail.test.tsx (1 test) 94ms
-
- Test Files  11 passed (11)
-      Tests  13 passed (13)
-   Start at  11:19:05
-   Duration  4.54s (transform 1.55s, setup 1.75s, import 3.00s, tests 4.08s, environment 15.96s)</code></pre>
-
-  <h3>3.3 Playwright Multi-Browser End-to-End Suite (12/12 Tests Passed Across 3 Browsers)</h3>
-  <pre><code>$ npx playwright test --reporter=line
-
-Running 12 tests using 1 worker
-
-[1/12] …low › should select requester, create a ticket, and see it in My Tickets
-[2/12] …ange › E2E-01: Login, mandatory initial password change, and logout flow
-[3/12] …low › E2E-02: IT Staff queue search, claim ticket, update status &amp; notes
-[4/12] … Flow › E2E-03: Admin login, create user, search, and safety rules check
-[5/12] …low › should select requester, create a ticket, and see it in My Tickets
-[6/12] …ange › E2E-01: Login, mandatory initial password change, and logout flow
-[7/12] …low › E2E-02: IT Staff queue search, claim ticket, update status &amp; notes
-[8/12] … Flow › E2E-03: Admin login, create user, search, and safety rules check
-[9/12] …low › should select requester, create a ticket, and see it in My Tickets
-[10/12] …nge › E2E-01: Login, mandatory initial password change, and logout flow
-[11/12] …ow › E2E-02: IT Staff queue search, claim ticket, update status &amp; notes
-[12/12] …Flow › E2E-03: Admin login, create user, search, and safety rules check
-  12 passed (20.4s)</code></pre>
+  <h2>2. Complete Traceability &amp; Verification Report (Verbatim tests.md)</h2>
+  <div class="rendered-markdown">
+    {tests_html}
+  </div>
 
   <div class="callout">
     <div class="callout-title">Final Production Quality Summary on main</div>
     <ul>
-      <li><strong>Backend API Tests (Vitest):</strong> 90 / 90 PASS (100% across 21 test files)</li>
+      <li><strong>Backend API Tests (Vitest):</strong> 91 / 91 PASS (100% across 21 test files)</li>
       <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 28 / 28 PASS (100% across 11 test files)</li>
       <li><strong>Playwright Multi-Browser E2E Tests:</strong> 27 / 27 PASS (100% across Chromium, Firefox, WebKit; 12/12 suite runs)</li>
-      <li><strong>Production Client Build (Vite):</strong> 0 errors, clean build (824ms)</li>
-      <li><strong>Grand Total Automated Tests:</strong> <strong>145 / 145 PASS (100% Green)</strong></li>
+      <li><strong>Automated Traceability Verification:</strong> 100% PASS (AC-01..AC-22, FR-01..FR-21, BR-01..BR-17 via <code>python3 scripts/check-traceability.py</code>)</li>
+      <li><strong>Production Client Build (Vite):</strong> 0 errors, clean build</li>
+      <li><strong>Grand Total Automated Tests:</strong> <strong>146 / 146 PASS (100% Green)</strong></li>
     </ul>
   </div>
 </div>
@@ -1101,7 +762,7 @@ Running 12 tests using 1 worker
   <p>The Shared Ticket Queue enables IT Staff to triage and process all service requests across the organization:</p>
   <ul>
     <li><strong>Realistic Seed Data:</strong> Populated with 18 realistic dev tickets across hardware, software, network, and access categories (paginated at 10 tickets per page).</li>
-    <li><strong>Full-Text Search:</strong> Real-time filtering by Ticket Number (e.g. <code>TKT-2026-001234</code>), Summary, and Description.</li>
+    <li><strong>Full-Text Search:</strong> Real-time filtering by Ticket Number (e.g. <code>TKT-2024-000001</code>), Summary, and Description.</li>
     <li><strong>Multi-Criteria Filters:</strong> Dropdowns for Status (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, etc.), Category, Related System, IT Priority, and Owner. Filter logic uses backend <code>AND</code> conditions to allow simultaneous search and priority filtering.</li>
     <li><strong>Sorting &amp; Pagination:</strong> Sort by Creation Date, Updated Date, or Priority. Pagination controls show current range and page count (e.g. "Showing 1-10 of 18 tickets", with 10 tickets per page).</li>
   </ul>
@@ -1240,6 +901,12 @@ Content-Type: application/json; charset=utf-8
       <img src="{img_admin_mobile}" alt="Admin User Management Mobile">
       <div class="img-caption">Figure 8.3: User Management on Mobile (390x844) — Responsive card transformation</div>
     </div>
+  </div>
+
+  <h2>4. Create New User Modal Provisioning (FR-18 &amp; BR-14)</h2>
+  <div class="img-card">
+    <img src="{img_create_modal}" alt="Create New User Modal">
+    <div class="img-caption">Figure 8.4: Administrator Create New User Modal — Enforcing single role selection, active status default, and initial temporary password provisioning with full validation</div>
   </div>
 </div>
 

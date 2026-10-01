@@ -116,7 +116,7 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     expect(updateRes.body.user.role).toBe('REQUESTER');
   });
 
-  it('BR-16: Blocks changing role of the last active Administrator account', async () => {
+  it('API-16 / AC-22: Blocks changing role of the last active Administrator account', async () => {
     const token = await getAdminToken();
 
     const meRes = await request(app)
@@ -129,6 +129,24 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
       .patch(`/api/admin/users/${adminId}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ role: 'STAFF' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('LAST_ADMIN_PROTECTION');
+  });
+
+  it('API-16b / AC-22: Blocks changing role of last active Admin to REQUESTER', async () => {
+    const token = await getAdminToken();
+
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+    const adminId = meRes.body.user.id;
+
+    // Attempt to demote self/last admin to REQUESTER
+    const res = await request(app)
+      .patch(`/api/admin/users/${adminId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ role: 'REQUESTER' });
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('LAST_ADMIN_PROTECTION');
