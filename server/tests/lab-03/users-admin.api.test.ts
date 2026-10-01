@@ -89,4 +89,61 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     expect(resetRes.status).toBe(200);
     expect(resetRes.body.user.mustChangePassword).toBe(true);
   });
+
+  it('Admin updates user role successfully for non-admin user', async () => {
+    const token = await getAdminToken();
+
+    // Create a staff user
+    const testEmail = `role.change.${Date.now()}@toktickit.com`;
+    const createRes = await request(app)
+      .post('/api/admin/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Role Change User',
+        email: testEmail,
+        role: 'STAFF',
+        initialPassword: 'InitialPassword123!',
+      });
+    const userId = createRes.body.user.id;
+
+    // Update role to REQUESTER
+    const updateRes = await request(app)
+      .patch(`/api/admin/users/${userId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ role: 'REQUESTER' });
+
+    expect(updateRes.status).toBe(200);
+    expect(updateRes.body.user.role).toBe('REQUESTER');
+  });
+
+  it('BR-16: Blocks changing role of the last active Administrator account', async () => {
+    const token = await getAdminToken();
+
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+    const adminId = meRes.body.user.id;
+
+    // Attempt to demote self/last admin to STAFF
+    const res = await request(app)
+      .patch(`/api/admin/users/${adminId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ role: 'STAFF' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('LAST_ADMIN_PROTECTION');
+  });
+
+  it('Admin search users by keyword', async () => {
+    const token = await getAdminToken();
+
+    const res = await request(app)
+      .get('/api/admin/users?search=Jennifer')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.users.length).toBeGreaterThan(0);
+    expect(res.body.users[0].name).toContain('Jennifer');
+  });
 });
+

@@ -26,4 +26,25 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     await page.click('button:has-text("Add Internal Note")');
     await expect(page.locator('p').filter({ hasText: 'Playwright E2E Internal Note verification.' }).first()).toBeVisible();
   });
+
+  test('E2E-05: Requester triggers Problem Appears Resolved action', async ({ page }) => {
+    await page.goto('http://localhost:5173');
+
+    // Login as Requester Jennifer Anderson
+    await page.fill('input[type="email"]', 'jennifer.anderson@example.com');
+    await page.fill('input[type="password"]', 'Password123!');
+    await page.click('button:has-text("Sign In")');
+
+    await expect(page.getByText('My IT Support Tickets')).toBeVisible();
+
+    // Open first ticket detail
+    await page.locator('.tkt-ticket-link').first().click();
+
+    await expect(page.getByRole('button', { name: /Problem Appears Resolved/i })).toBeVisible();
+    await page.click('button:has-text("Problem Appears Resolved")');
+
+    // Verify resolution feedback message
+    await expect(page.getByText(/Thank you! IT Staff has been notified/i)).toBeVisible();
+    await expect(page.getByText(/Requester indicated that the problem appears resolved/i)).toBeVisible();
+  });
 });

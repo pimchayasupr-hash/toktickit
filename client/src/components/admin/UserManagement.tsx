@@ -33,6 +33,18 @@ export const UserManagement: React.FC = () => {
     fetchUsers();
   }, [roleFilter]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showCreateModal) setShowCreateModal(false);
+        if (editingUser) setEditingUser(null);
+        if (resettingUser) setResettingUser(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal, editingUser, resettingUser]);
+
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
@@ -345,8 +357,9 @@ export const UserManagement: React.FC = () => {
 
             <form onSubmit={handleCreateUser} className="space-y-4 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Full Name *</label>
+                <label htmlFor="createName" className="block font-medium text-slate-700 mb-1">Full Name *</label>
                 <input
+                  id="createName"
                   type="text"
                   required
                   value={createName}
@@ -356,8 +369,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Email Address *</label>
+                <label htmlFor="createEmail" className="block font-medium text-slate-700 mb-1">Email Address *</label>
                 <input
+                  id="createEmail"
                   type="email"
                   required
                   value={createEmail}
@@ -367,8 +381,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Role *</label>
+                <label htmlFor="createRole" className="block font-medium text-slate-700 mb-1">Role *</label>
                 <select
+                  id="createRole"
                   value={createRole}
                   onChange={(e) => setCreateRole(e.target.value as Role)}
                   className="w-full p-2 border border-slate-300 rounded"
@@ -380,8 +395,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Initial Password *</label>
+                <label htmlFor="createInitialPassword" className="block font-medium text-slate-700 mb-1">Initial Password *</label>
                 <input
+                  id="createInitialPassword"
                   type="password"
                   required
                   value={createInitialPassword}

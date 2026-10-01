@@ -76,9 +76,10 @@ export const ChangePasswordModal: React.FC = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="tkt-form-group">
-              <label className="tkt-label">Current (temporary) password</label>
+              <label htmlFor="currentPassword" className="tkt-label">Current (temporary) password</label>
               <div className="tkt-input-wrapper">
                 <input
+                  id="currentPassword"
                   type={showCurrent ? 'text' : 'password'}
                   required
                   value={currentPassword}
@@ -111,9 +112,10 @@ export const ChangePasswordModal: React.FC = () => {
             </div>
 
             <div className="tkt-form-group">
-              <label className="tkt-label">New password</label>
+              <label htmlFor="newPassword" className="tkt-label">New password</label>
               <div className="tkt-input-wrapper">
                 <input
+                  id="newPassword"
                   type={showNew ? 'text' : 'password'}
                   required
                   value={newPassword}
@@ -146,9 +148,10 @@ export const ChangePasswordModal: React.FC = () => {
             </div>
 
             <div className="tkt-form-group">
-              <label className="tkt-label">Confirm new password</label>
+              <label htmlFor="confirmPassword" className="tkt-label">Confirm new password</label>
               <div className="tkt-input-wrapper">
                 <input
+                  id="confirmPassword"
                   type={showConfirm ? 'text' : 'password'}
                   required
                   value={confirmPassword}

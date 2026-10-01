@@ -47,12 +47,14 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-page);
   color: var(--text-main);
   min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -190,16 +192,31 @@ input, select, textarea, button {
   border-color: rgba(220, 38, 38, 0.9);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .tkt-brand-sub {
-    display: none;
+    display: none !important;
   }
   .tkt-user-info,
   .tkt-user-text {
     display: none !important;
   }
   .tkt-nav-container {
-    padding: 0 0.75rem;
+    padding: 0 0.5rem;
+    gap: 0.25rem;
+  }
+  .tkt-nav-tab {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.775rem;
+    gap: 0.25rem;
+  }
+  .tkt-brand {
+    gap: 0.35rem;
+  }
+  .tkt-brand-title {
+    font-size: 1.05rem;
+  }
+  .tkt-nav-profile {
+    gap: 0.4rem;
   }
 }
 
@@ -473,7 +490,8 @@ input, select, textarea, button {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  overflow: hidden;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .tkt-table {

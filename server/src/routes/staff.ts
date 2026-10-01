@@ -20,9 +20,41 @@ router.get('/tickets', async (req: AuthRequest, res: Response): Promise<void> =>
   try {
     const { status, categoryId, relatedSystemId, priority, ownerId, search, sort, page = '1', pageSize = '10' } = req.query;
 
+    // Validate page
+    if (page !== undefined && page !== null && page !== '') {
+      const parsedPage = Number(page);
+      if (!Number.isInteger(parsedPage) || parsedPage < 1) {
+        res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Page must be an integer >= 1.' } });
+        return;
+      }
+    }
+
+    // Validate pageSize
+    if (pageSize !== undefined && pageSize !== null && pageSize !== '') {
+      const parsedPageSize = Number(pageSize);
+      if (!Number.isInteger(parsedPageSize) || parsedPageSize < 1 || parsedPageSize > 100) {
+        res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'PageSize must be an integer between 1 and 100.' } });
+        return;
+      }
+    }
+
+    // Validate sort
+    const VALID_SORTS = ['createdAt_desc', 'createdAt_asc', 'updatedAt_desc', 'updatedAt_asc', 'priority_desc', 'priority_asc'];
+    if (sort && typeof sort === 'string' && sort.trim() !== '') {
+      if (!VALID_SORTS.includes(sort.trim())) {
+        res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Invalid sort parameter.' } });
+        return;
+      }
+    }
+
     const andConditions: any[] = [];
 
+    const VALID_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'PENDING_VENDOR', 'RESOLVED', 'CLOSED', 'REOPENED', 'CANCELLED'];
     if (status && typeof status === 'string' && status.trim() !== '') {
+      if (!VALID_STATUSES.includes(status.trim())) {
+        res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Invalid status filter value.' } });
+        return;
+      }
       andConditions.push({ currentStatus: status.trim() });
     }
 
@@ -77,6 +109,8 @@ router.get('/tickets', async (req: AuthRequest, res: Response): Promise<void> =>
     if (sort === 'createdAt_desc') orderBy = { createdAt: 'desc' };
     else if (sort === 'createdAt_asc') orderBy = { createdAt: 'asc' };
     else if (sort === 'updatedAt_asc') orderBy = { updatedAt: 'asc' };
+    else if (sort === 'priority_desc') orderBy = { itPriority: 'desc' };
+    else if (sort === 'priority_asc') orderBy = { itPriority: 'asc' };
 
     const [total, tickets] = await Promise.all([
       prisma.ticket.count({ where }),

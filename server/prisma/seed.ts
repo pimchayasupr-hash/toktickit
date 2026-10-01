@@ -170,14 +170,10 @@ export async function seedDatabase() {
   const sysGrade = systemMap.get('Grade Submission App')!;
   const sysPrinter = systemMap.get('Printer')!;
 
-  // 4. Clean up polluted/legacy ticket numbers if present
+  // 4. Clean up legacy ticket numbers if present
   await prisma.ticket.deleteMany({
     where: {
-      OR: [
-        { ticketNumber: { startsWith: 'TXT-2026-' } },
-        { summary: { contains: 'Issue 5 test ticket' } },
-        { summary: { contains: 'Playwright E2E' } },
-      ],
+      ticketNumber: { startsWith: 'TXT-2026-' },
     },
   });
 
@@ -466,11 +462,13 @@ export async function seedDatabase() {
   console.log('Seeding completed successfully with 18 realistic tickets.');
 }
 
-seedDatabase()
-  .catch((error) => {
-    console.error('Seed failed:', error);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (!process.env.VITEST) {
+  seedDatabase()
+    .catch((error) => {
+      console.error('Seed failed:', error);
+      process.exitCode = 1;
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
