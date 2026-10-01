@@ -333,7 +333,7 @@ def main():
     <p><strong>GitHub Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit">https://github.com/pimchayasupr-hash/toktickit</a></p>
     <p><strong>Production Release Branch (main):</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/tree/main">https://github.com/pimchayasupr-hash/toktickit/tree/main</a> (Merge commit <code>b5494cb</code>)</p>
     <p><strong>Integration Staging Branch (lab3-staging):</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/tree/lab3-staging">https://github.com/pimchayasupr-hash/toktickit/tree/lab3-staging</a></p>
-    <p><strong>GitHub Project (Kanban Board):</strong> <a href="https://github.com/users/pimchayasupr-hash/projects">https://github.com/users/pimchayasupr-hash/projects</a></p>
+    <p><strong>GitHub Project (Kanban Board):</strong> <a href="https://github.com/users/pimchayasupr-hash/projects/1">https://github.com/users/pimchayasupr-hash/projects/1</a></p>
   </div>
 
   <table>
@@ -390,7 +390,7 @@ def main():
         <td>Final Polish &amp; Passwords</td>
         <td><code>feature/issue-39-final-fixes</code> &rarr; <code>lab3-staging</code></td>
         <td>@supa-gif173</td>
-        <td><strong>@pimchayasupr-hash</strong></td>
+        <td><strong>@supa-gif173</strong></td>
         <td>2026-09-17 20:12:56</td>
         <td><a href="https://github.com/pimchayasupr-hash/toktickit/pull/39">PR #39</a></td>
       </tr>

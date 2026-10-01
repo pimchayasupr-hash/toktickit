@@ -52,7 +52,7 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
   - *Comment*: "Robust Backend Security: Adding the regex validation directly to server/src/routes/auth.ts (BR-04, AC-03) provides a crucial layer of defense-in-depth. Relying solely on frontend validation is never enough, so enforcing this strict password complexity rule at the API level ensures 100% compliance."
   - *Response*: "Thank you for the thorough review and the quick approval! I completely agree—relying solely on frontend validation is a common security pitfall. Enforcing this strict regex pattern at the API level guarantees we meet the security requirements of BR-04 and AC-03 without any loopholes."
 - **Approval Status**: Approved by `@supa-gif173`
-- **Merged By**: `@pimchayasupr-hash`
+- **Merged By**: `@supa-gif173`
 
 ### PR #40: Zen Green Design System Overhaul & Visual Evidence
 - **Branch**: `feature/issue-40-zen-green-ui` → `lab3-staging`
