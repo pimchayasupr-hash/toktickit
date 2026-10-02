@@ -128,7 +128,9 @@ describe('Lab 3 - Complete Role × Endpoint Authorization Matrix Test Suite', ()
     expect(queueRes.status).toBe(200);
 
     // Notes
-    const notesRes = await request(app).get('/api/tickets/1/notes').set('Authorization', `Bearer ${token}`);
+    const ticketId = queueRes.body.tickets[0]?.id;
+    expect(ticketId).toBeDefined();
+    const notesRes = await request(app).get(`/api/tickets/${ticketId}/notes`).set('Authorization', `Bearer ${token}`);
     expect(notesRes.status).toBe(200);
   });
 

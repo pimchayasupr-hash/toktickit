@@ -14,9 +14,9 @@ describe('Lab 3 - IT Staff Ticket Detail & Operations API Suite', () => {
   it('API-09: IT Staff claim & reassign ticket updates owner in DB', async () => {
     const token = await getStaffToken();
 
-    // Get ticket TXT-2026-001232 (unassigned)
+    // Get ticket TKT-2026-001232 (unassigned)
     const queueRes = await request(app)
-      .get('/api/staff/tickets?search=TXT-2026-001232')
+      .get('/api/staff/tickets?search=TKT-2026-001232')
       .set('Authorization', `Bearer ${token}`);
 
     const ticket = queueRes.body.tickets[0];
