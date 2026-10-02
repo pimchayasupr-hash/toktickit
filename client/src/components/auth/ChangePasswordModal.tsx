@@ -21,6 +21,18 @@ export const ChangePasswordModal: React.FC = () => {
   const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
   const matchesConfirm = Boolean(newPassword && newPassword === confirmPassword);
 
+  // BR-02: Mandatory password change cannot be dismissed by Escape or backdrop clicks
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);

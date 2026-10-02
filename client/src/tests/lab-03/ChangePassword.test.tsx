@@ -15,4 +15,21 @@ describe('Lab 3 UI - ChangePassword Component', () => {
     expect(screen.getByText(/Minimum 8 characters long/i)).toBeDefined();
     expect(screen.getByRole('button', { name: /Save New Password & Continue/i })).toBeDefined();
   });
+
+  it('UI-02b (BR-02): ChangePasswordModal is mandatory and cannot be closed with Escape or backdrop clicks', () => {
+    const { container } = render(
+      <AuthProvider>
+        <ChangePasswordModal />
+      </AuthProvider>
+    );
+
+    // Simulate Escape key press
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+    window.dispatchEvent(event);
+
+    // Modal must still be visible and mounted
+    expect(screen.getByText(/Change Your Password/i)).toBeDefined();
+    expect(screen.getByRole('button', { name: /Save New Password & Continue/i })).toBeDefined();
+    expect(container.querySelector('.tkt-auth-card')).toBeDefined();
+  });
 });

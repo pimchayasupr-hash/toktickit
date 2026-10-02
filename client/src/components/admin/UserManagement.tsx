@@ -60,6 +60,24 @@ export const UserManagement: React.FC = () => {
     fetchUsers();
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showCreateModal) {
+          setShowCreateModal(false);
+          resetCreateForm();
+        } else if (editingUser) {
+          setEditingUser(null);
+        } else if (resettingUser) {
+          setResettingUser(null);
+          setNewInitialPassword('');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal, editingUser, resettingUser]);
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setModalError(null);

@@ -25,4 +25,26 @@ describe('Lab 3 UI - UserManagement Component', () => {
       expect(screen.getByPlaceholderText(/Search users by name or email/i)).toBeDefined();
     });
   });
+
+  it('UI-06b: Pressing Escape closes open modal in User Management', async () => {
+    render(
+      <AuthProvider>
+        <UserManagement />
+      </AuthProvider>
+    );
+
+    // Click Create New User
+    const createBtn = await screen.findByRole('button', { name: /Create New User/i });
+    createBtn.click();
+
+    expect(await screen.findByText(/Create New User Account/i)).toBeDefined();
+
+    // Fire Escape key
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true });
+    window.dispatchEvent(event);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Create New User Account/i)).toBeNull();
+    });
+  });
 });
