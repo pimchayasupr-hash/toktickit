@@ -3,7 +3,24 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
-export const JWT_SECRET = process.env.JWT_SECRET || 'toktickit-lab3-secret-key-2026';
+
+/**
+ * Returns the JWT secret, throwing a fatal error at startup when running in
+ * production without the JWT_SECRET environment variable set.
+ * Accepts an optional env object for testability.
+ */
+export function getJwtSecret(env: Record<string, string | undefined> = process.env): string {
+  const secret = env['JWT_SECRET'];
+  if (env['NODE_ENV'] === 'production' && !secret) {
+    throw new Error(
+      'FATAL: JWT_SECRET environment variable must be set in production mode. ' +
+      'Refusing to start with a hard-coded fallback secret.'
+    );
+  }
+  return secret || 'toktickit-lab3-secret-key-2026';
+}
+
+export const JWT_SECRET = getJwtSecret();
 
 // Server-side Token Revocation Blacklist for Logout Invalidation
 const tokenBlacklist = new Set<string>();
