@@ -3,6 +3,10 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+// Local Development Only Credentials
+// (Do NOT use in production environments)
+const DEV_DEFAULT_PASSWORD = 'Password123!';
+
 const USERS = [
   // Requesters (Active >= 4, Inactive >= 1)
   {
@@ -101,9 +105,16 @@ const RELATED_SYSTEMS = [
 async function main() {
   console.log('Seeding database for Lab 3...');
 
-  const defaultPasswordHash = await bcrypt.hash('Password123!', 10);
+  // Remove test artifact tickets from dev data
+  await prisma.ticket.deleteMany({
+    where: {
+      summary: { in: ['Issue 5 test ticket for attachments', 'Regression Test Ticket'] },
+    },
+  });
 
-  // Seed Users
+  const defaultPasswordHash = await bcrypt.hash(DEV_DEFAULT_PASSWORD, 10);
+
+  // Seed Users (Upsert)
   const userMap = new Map<string, number>();
   for (const u of USERS) {
     const user = await prisma.user.upsert({
@@ -126,7 +137,7 @@ async function main() {
     userMap.set(u.email, user.id);
   }
 
-  // Seed Categories
+  // Seed Categories (Upsert)
   const categoryMap = new Map<string, number>();
   for (const name of CATEGORIES) {
     const cat = await prisma.category.upsert({
@@ -137,7 +148,7 @@ async function main() {
     categoryMap.set(name, cat.id);
   }
 
-  // Seed Related Systems
+  // Seed Related Systems (Upsert)
   const systemMap = new Map<string, number>();
   for (const name of RELATED_SYSTEMS) {
     const sys = await prisma.relatedSystem.upsert({
@@ -151,17 +162,24 @@ async function main() {
   const req1Id = userMap.get('jennifer.anderson@example.com')!;
   const req2Id = userMap.get('michael.brown@example.com')!;
   const req3Id = userMap.get('sarah.jenkins@example.com')!;
+  const req4Id = userMap.get('david.kim@example.com')!;
+
   const staff1Id = userMap.get('michael.staff@toktickit.com')!;
   const staff2Id = userMap.get('sarah.staff@toktickit.com')!;
+  const staff3Id = userMap.get('david.staff@toktickit.com')!;
 
   const catHardware = categoryMap.get('Hardware')!;
   const catNetwork = categoryMap.get('Network')!;
   const catSoftware = categoryMap.get('Software')!;
+  const catAccount = categoryMap.get('Account and Access')!;
+
   const sysLaptop = systemMap.get('Corporate Laptop')!;
   const sysVpn = systemMap.get('VPN')!;
   const sysEmail = systemMap.get('Email')!;
+  const sysWifi = systemMap.get('Campus Wi-Fi')!;
+  const sysPrinter = systemMap.get('Printer')!;
 
-  // Seed Sample Tickets
+  // Canonical Seed Tickets across statuses, priorities, assigned/unassigned
   const sampleTickets = [
     {
       ticketNumber: 'TXT-2026-001234',
@@ -199,6 +217,66 @@ async function main() {
       itPriority: 'MEDIUM',
       currentStatus: 'NEW',
     },
+    {
+      ticketNumber: 'TXT-2026-001235',
+      requesterId: req4Id,
+      ownerId: staff3Id,
+      categoryId: catNetwork,
+      relatedSystemId: sysWifi,
+      summary: 'Campus Wi-Fi drops intermittently in Building C',
+      description: 'Wi-Fi connection drops every 15-20 minutes when working on the 3rd floor.',
+      requestedPriority: 'LOW',
+      itPriority: 'LOW',
+      currentStatus: 'WAITING_FOR_REQUESTER',
+    },
+    {
+      ticketNumber: 'TXT-2026-001236',
+      requesterId: req1Id,
+      ownerId: staff1Id,
+      categoryId: catHardware,
+      relatedSystemId: sysPrinter,
+      summary: 'Department printer jam on 4th floor',
+      description: 'Paper jam in tray 2 of the network printer. Error code E-04.',
+      requestedPriority: 'URGENT',
+      itPriority: 'URGENT',
+      currentStatus: 'RESOLVED',
+    },
+    {
+      ticketNumber: 'TXT-2026-001237',
+      requesterId: req2Id,
+      ownerId: staff2Id,
+      categoryId: catAccount,
+      relatedSystemId: sysEmail,
+      summary: 'Request for secondary email alias setup',
+      description: 'Please set up an alias for project coordination: dev-leads@toktickit.com.',
+      requestedPriority: 'LOW',
+      itPriority: 'LOW',
+      currentStatus: 'CLOSED',
+    },
+    {
+      ticketNumber: 'TXT-2026-001238',
+      requesterId: req3Id,
+      ownerId: null,
+      categoryId: catSoftware,
+      relatedSystemId: sysLaptop,
+      summary: 'Software license expired after OS reinstall',
+      description: 'Development tool IDE license is reporting expired following OS image reflash.',
+      requestedPriority: 'HIGH',
+      itPriority: 'HIGH',
+      currentStatus: 'REOPENED',
+    },
+    {
+      ticketNumber: 'TXT-2026-001239',
+      requesterId: req4Id,
+      ownerId: null,
+      categoryId: catAccount,
+      relatedSystemId: sysVpn,
+      summary: 'Duplicate request for temporary access',
+      description: 'Accidental duplicate submission; already requested under previous ticket.',
+      requestedPriority: 'LOW',
+      itPriority: 'LOW',
+      currentStatus: 'CANCELLED',
+    },
   ];
 
   for (const t of sampleTickets) {
@@ -210,12 +288,18 @@ async function main() {
         currentStatus: t.currentStatus,
         ownerId: t.ownerId,
         itPriority: t.itPriority,
+        requestedPriority: t.requestedPriority,
+        categoryId: t.categoryId,
+        relatedSystemId: t.relatedSystemId,
       },
       create: t,
     });
 
-    // Seed Sample Public Comments & Internal Notes for first ticket
+    // Seed Sample Public Comments & Internal Notes for first ticket (idempotent)
     if (t.ticketNumber === 'TXT-2026-001234') {
+      await prisma.publicComment.deleteMany({ where: { ticketId: ticket.id } });
+      await prisma.internalNote.deleteMany({ where: { ticketId: ticket.id } });
+
       await prisma.publicComment.createMany({
         data: [
           {
@@ -231,7 +315,6 @@ async function main() {
             createdAt: new Date(Date.now() - 3600000 * 12),
           },
         ],
-        skipDuplicates: true,
       });
 
       await prisma.internalNote.createMany({
@@ -243,12 +326,11 @@ async function main() {
             createdAt: new Date(Date.now() - 3600000 * 10),
           },
         ],
-        skipDuplicates: true,
       });
     }
   }
 
-  console.log('Seeding completed successfully.');
+  console.log(`Seeding completed successfully: ${USERS.length} users, ${CATEGORIES.length} categories, ${RELATED_SYSTEMS.length} related systems, ${sampleTickets.length} tickets.`);
 }
 
 main()
