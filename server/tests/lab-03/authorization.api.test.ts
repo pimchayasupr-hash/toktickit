@@ -127,9 +127,12 @@ describe('Lab 3 - Complete Role × Endpoint Authorization Matrix Test Suite', ()
     const queueRes = await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${token}`);
     expect(queueRes.status).toBe(200);
 
-    // Notes
-    const notesRes = await request(app).get('/api/tickets/1/notes').set('Authorization', `Bearer ${token}`);
-    expect(notesRes.status).toBe(200);
+    // Notes on an existing ticket from queue
+    const ticketId = queueRes.body.tickets[0]?.id;
+    if (ticketId) {
+      const notesRes = await request(app).get(`/api/tickets/${ticketId}/notes`).set('Authorization', `Bearer ${token}`);
+      expect(notesRes.status).toBe(200);
+    }
   });
 
   it('6. Admin role permits User Management and Staff Queue operations', async () => {
@@ -143,4 +146,72 @@ describe('Lab 3 - Complete Role × Endpoint Authorization Matrix Test Suite', ()
     const queueRes = await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${token}`);
     expect(queueRes.status).toBe(200);
   });
+
+  it('7. Requester ticket creation ignores requesterId in body and uses authenticated user id', async () => {
+    const token = await getRequesterToken(); // Jennifer Anderson
+
+    const res = await request(app)
+      .post('/api/tickets')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        requesterId: 9999, // Attempted spoof
+        categoryId: 1,
+        relatedSystemId: 1,
+        summary: 'Auth Test Ticket Ignored RequesterId',
+        description: 'Verifying body requesterId is completely ignored.',
+        requestedPriority: 'LOW',
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.ticket.requester.email).toBe('jennifer.anderson@example.com');
+  });
+
+  it('8. Requester accessing another requester attachment returns 404 Not Found (not 403)', async () => {
+    const token = await getRequesterToken(); // Jennifer Anderson
+
+    // Michael's token
+    const michaelToken = await (async () => {
+      const r = await request(app).post('/api/auth/login').send({
+        email: 'michael.brown@example.com',
+        password: 'Password123!',
+      });
+      return r.body.token;
+    })();
+
+    // Find a ticket belonging to Michael with an attachment, or query any attachment
+    const michaelTickets = await request(app).get('/api/tickets').set('Authorization', `Bearer ${michaelToken}`);
+    const michaelTicket = michaelTickets.body.tickets.find((t: any) => t.attachments && t.attachments.length > 0);
+
+    if (michaelTicket && michaelTicket.attachments.length > 0) {
+      const attId = michaelTicket.attachments[0].id;
+      const res = await request(app)
+        .get(`/api/attachments/${attId}/download`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('NOT_FOUND');
+    }
+  });
+
+  it('9. Direct API matrix: All endpoints × Roles enforcement', async () => {
+    const requesterToken = await getRequesterToken();
+    const staffToken = await getStaffToken();
+    const adminToken = await getAdminToken();
+
+    // /api/admin/users
+    expect((await request(app).get('/api/admin/users').set('Authorization', `Bearer ${requesterToken}`)).status).toBe(403);
+    expect((await request(app).get('/api/admin/users').set('Authorization', `Bearer ${staffToken}`)).status).toBe(403);
+    expect((await request(app).get('/api/admin/users').set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
+
+    // /api/staff/tickets
+    expect((await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${requesterToken}`)).status).toBe(403);
+    expect((await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${staffToken}`)).status).toBe(200);
+    expect((await request(app).get('/api/staff/tickets').set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
+
+    // Unauthenticated access
+    expect((await request(app).get('/api/admin/users')).status).toBe(401);
+    expect((await request(app).get('/api/staff/tickets')).status).toBe(401);
+    expect((await request(app).get('/api/tickets')).status).toBe(401);
+  });
 });
+

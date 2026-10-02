@@ -14,9 +14,9 @@ describe('Lab 3 - IT Staff Ticket Detail & Operations API Suite', () => {
   it('API-09: IT Staff claim & reassign ticket updates owner in DB', async () => {
     const token = await getStaffToken();
 
-    // Get ticket TXT-2026-001232 (unassigned)
+    // Get ticket TKT-2026-001232 (unassigned)
     const queueRes = await request(app)
-      .get('/api/staff/tickets?search=TXT-2026-001232')
+      .get('/api/staff/tickets?search=TKT-2026-001232')
       .set('Authorization', `Bearer ${token}`);
 
     const ticket = queueRes.body.tickets[0];
@@ -110,5 +110,48 @@ describe('Lab 3 - IT Staff Ticket Detail & Operations API Suite', () => {
     expect(reassignRes.body.ticket.ownerId).toBe(targetAssignee.id);
     expect(reassignRes.body.ticket.owner.id).toBe(targetAssignee.id);
   });
+
+  it('rejects assigning ticket to an inactive user or a Requester user', async () => {
+    const token = await getStaffToken();
+
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${token}`);
+
+    const ticket = queueRes.body.tickets[0];
+
+    // Attempt to assign to inactive staff (James Wilson, email: james.staff.inactive@toktickit.com, id: 6)
+    // Find James or inactive user id
+    const adminRes = await request(app).post('/api/auth/login').send({
+      email: 'admin@toktickit.com',
+      password: 'Password123!',
+    });
+    const adminToken = adminRes.body.token;
+
+    const usersRes = await request(app).get('/api/admin/users').set('Authorization', `Bearer ${adminToken}`);
+    const inactiveUser = usersRes.body.users.find((u: any) => !u.isActive);
+    const requesterUser = usersRes.body.users.find((u: any) => u.role === 'REQUESTER');
+
+    if (inactiveUser) {
+      const resInactive = await request(app)
+        .patch(`/api/staff/tickets/${ticket.id}/assign`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ ownerId: inactiveUser.id });
+
+      expect(resInactive.status).toBe(400);
+      expect(resInactive.body.error.code).toBe('VALIDATION_ERROR');
+    }
+
+    if (requesterUser) {
+      const resRequester = await request(app)
+        .patch(`/api/staff/tickets/${ticket.id}/assign`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ ownerId: requesterUser.id });
+
+      expect(resRequester.status).toBe(400);
+      expect(resRequester.body.error.code).toBe('VALIDATION_ERROR');
+    }
+  });
 });
+
 

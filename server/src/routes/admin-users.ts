@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient, Role } from '@prisma/client';
 import { authenticateUser, requireRole, requirePasswordChangeCheck, AuthRequest } from '../middleware/authMiddleware';
+import { isValidPassword } from '../utils/validators';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -77,9 +78,14 @@ router.post('/users', async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
-    if (rawPassword.length < 8) {
+    if (!isValidPassword(rawPassword)) {
       res.status(400).json({
-        error: { code: 'VALIDATION_ERROR', message: 'Initial password must be at least 8 characters long.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message:
+            'Initial password must be at least 8 characters and contain an uppercase letter, ' +
+            'a lowercase letter, a digit, and a special character.',
+        },
       });
       return;
     }
@@ -220,9 +226,14 @@ router.post('/users/:id/reset-password', async (req: AuthRequest, res: Response)
     const targetUserId = parseId(req.params.id);
     const { initialPassword } = req.body;
 
-    if (!initialPassword || typeof initialPassword !== 'string' || initialPassword.length < 8) {
+    if (!initialPassword || typeof initialPassword !== 'string' || !isValidPassword(initialPassword)) {
       res.status(400).json({
-        error: { code: 'VALIDATION_ERROR', message: 'Initial password must be at least 8 characters long.' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message:
+            'Initial password must be at least 8 characters and contain an uppercase letter, ' +
+            'a lowercase letter, a digit, and a special character.',
+        },
       });
       return;
     }

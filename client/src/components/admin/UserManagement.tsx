@@ -33,6 +33,18 @@ export const UserManagement: React.FC = () => {
     fetchUsers();
   }, [roleFilter]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showCreateModal) setShowCreateModal(false);
+        if (editingUser) setEditingUser(null);
+        if (resettingUser) setResettingUser(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCreateModal, editingUser, resettingUser]);
+
   const fetchUsers = async () => {
     setLoading(true);
     setError(null);
@@ -185,7 +197,7 @@ export const UserManagement: React.FC = () => {
         </div>
         <button
           onClick={() => { resetCreateForm(); setShowCreateModal(true); }}
-          className="px-4 py-2.5 bg-[#005a36] hover:bg-[#008751] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
+          className="tkt-btn-action-primary"
         >
           <span>➕</span> Create New User
         </button>
@@ -218,7 +230,7 @@ export const UserManagement: React.FC = () => {
         </select>
       </div>
 
-      {/* Users Table */}
+      {/* Users Content Area */}
       {error && <div role="alert" className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm">{error}</div>}
 
       {loading ? (
@@ -226,58 +238,114 @@ export const UserManagement: React.FC = () => {
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-emerald-600 border-t-transparent"></div>
           <p className="mt-3 text-sm text-slate-500">Loading user accounts...</p>
         </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead className="bg-slate-50 font-semibold text-slate-700">
-              <tr>
-                <th className="px-4 py-3">Full Name</th>
-                <th className="px-4 py-3">Email Address</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 bg-white">
-              {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="px-4 py-3 font-semibold text-slate-900">{u.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{u.email}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                      u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border-purple-200' :
-                      u.role === 'STAFF' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
-                      'bg-blue-100 text-blue-800 border-blue-200'
-                    }`}>
-                      {u.role === 'ADMIN' ? 'Administrator' : u.role === 'STAFF' ? 'IT Staff' : 'Requester'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    {u.isActive ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Active</span>
-                    ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Inactive</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right space-x-2">
-                    <button
-                      onClick={() => { setModalError(null); setEditingUser({ ...u }); }}
-                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded border border-slate-300"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => { setModalError(null); setNewInitialPassword(''); setResettingUser(u); }}
-                      className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-xs rounded border border-amber-200"
-                    >
-                      Reset Password
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      ) : users.length === 0 ? (
+        <div className="bg-white p-12 text-center rounded-xl shadow-sm border border-slate-200">
+          <span style={{ fontSize: '2.5rem' }}>👥</span>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.5rem 0 0.25rem 0', color: '#0f172a' }}>No Users Found</h3>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Try adjusting your search query or role filter.</p>
         </div>
+      ) : (
+        <>
+          {/* Mobile View: Stacked Card List (< 768px) */}
+          <div className="tkt-card-list tkt-mobile-only" data-testid="mobile-user-cards">
+            {users.map((u) => (
+              <div key={u.id} className="tkt-user-card">
+                <div className="tkt-user-card-header">
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#0f172a' }}>{u.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{u.email}</div>
+                  </div>
+                  <div>
+                    {u.isActive ? (
+                      <span className="tkt-pill tkt-pill-status-open">Active</span>
+                    ) : (
+                      <span className="tkt-pill tkt-pill-status-closed">Inactive</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <span className="tkt-pill" style={{
+                    backgroundColor: u.role === 'ADMIN' ? '#ede9fe' : u.role === 'STAFF' ? '#dcfce7' : '#e0f2fe',
+                    color: u.role === 'ADMIN' ? '#6d28d9' : u.role === 'STAFF' ? '#15803d' : '#0369a1',
+                    border: `1px solid ${u.role === 'ADMIN' ? '#ddd6fe' : u.role === 'STAFF' ? '#bbf7d0' : '#bae6fd'}`,
+                  }}>
+                    {u.role === 'ADMIN' ? 'Administrator' : u.role === 'STAFF' ? 'IT Staff' : 'Requester'}
+                  </span>
+                </div>
+                <div className="tkt-user-card-actions">
+                  <button
+                    onClick={() => { setModalError(null); setEditingUser({ ...u }); }}
+                    className="tkt-user-card-btn"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => { setModalError(null); setNewInitialPassword(''); setResettingUser(u); }}
+                    className="tkt-user-card-btn"
+                    style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a', color: '#92400e' }}
+                  >
+                    Reset Password
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop & Tablet Table (>= 768px) */}
+          <div className="tkt-table-container tkt-desktop-tablet" style={{ overflowX: 'auto', width: '100%' }}>
+            <table className="tkt-table" style={{ width: '100%', minWidth: '680px' }}>
+              <thead>
+                <tr>
+                  <th style={{ width: '24%' }}>Full Name</th>
+                  <th style={{ width: '28%' }}>Email Address</th>
+                  <th style={{ width: '16%' }}>Role</th>
+                  <th style={{ width: '12%' }}>Status</th>
+                  <th style={{ width: '20%', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td style={{ fontWeight: 600, color: '#0f172a' }}>{u.name}</td>
+                    <td style={{ color: '#475569', fontSize: '0.825rem' }}>{u.email}</td>
+                    <td>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                        u.role === 'ADMIN' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                        u.role === 'STAFF' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                        'bg-blue-100 text-blue-800 border-blue-200'
+                      }`}>
+                        {u.role === 'ADMIN' ? 'Administrator' : u.role === 'STAFF' ? 'IT Staff' : 'Requester'}
+                      </span>
+                    </td>
+                    <td>
+                      {u.isActive ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Active</span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">Inactive</span>
+                      )}
+                    </td>
+                    <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <button
+                        onClick={() => { setModalError(null); setEditingUser({ ...u }); }}
+                        className="tkt-btn-secondary"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', marginRight: '0.4rem', display: 'inline-block', width: 'auto' }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => { setModalError(null); setNewInitialPassword(''); setResettingUser(u); }}
+                        className="tkt-btn-secondary"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', backgroundColor: '#fffbeb', borderColor: '#fde68a', color: '#92400e', display: 'inline-block', width: 'auto' }}
+                      >
+                        Reset Password
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* Modal: Create User */}
@@ -289,8 +357,9 @@ export const UserManagement: React.FC = () => {
 
             <form onSubmit={handleCreateUser} className="space-y-4 text-xs">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Full Name *</label>
+                <label htmlFor="createName" className="block font-medium text-slate-700 mb-1">Full Name *</label>
                 <input
+                  id="createName"
                   type="text"
                   required
                   value={createName}
@@ -300,8 +369,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Email Address *</label>
+                <label htmlFor="createEmail" className="block font-medium text-slate-700 mb-1">Email Address *</label>
                 <input
+                  id="createEmail"
                   type="email"
                   required
                   value={createEmail}
@@ -311,8 +381,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Role *</label>
+                <label htmlFor="createRole" className="block font-medium text-slate-700 mb-1">Role *</label>
                 <select
+                  id="createRole"
                   value={createRole}
                   onChange={(e) => setCreateRole(e.target.value as Role)}
                   className="w-full p-2 border border-slate-300 rounded"
@@ -324,8 +395,9 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Initial Password *</label>
+                <label htmlFor="createInitialPassword" className="block font-medium text-slate-700 mb-1">Initial Password *</label>
                 <input
+                  id="createInitialPassword"
                   type="password"
                   required
                   value={createInitialPassword}
@@ -358,7 +430,8 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="submit"
                   disabled={modalSubmitting}
-                  className="px-4 py-1.5 bg-[#005a36] text-white rounded font-semibold disabled:opacity-50"
+                  className="tkt-btn-action-primary"
+                  style={{ minHeight: '38px', padding: '0.4rem 1rem' }}
                 >
                   {modalSubmitting ? 'Saving...' : 'Save User'}
                 </button>
@@ -433,7 +506,8 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="submit"
                   disabled={modalSubmitting}
-                  className="px-4 py-1.5 bg-[#005a36] text-white rounded font-semibold disabled:opacity-50"
+                  className="tkt-btn-action-primary"
+                  style={{ minHeight: '38px', padding: '0.4rem 1rem' }}
                 >
                   {modalSubmitting ? 'Updating...' : 'Update Account'}
                 </button>
@@ -475,7 +549,8 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="submit"
                   disabled={modalSubmitting}
-                  className="px-4 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded font-semibold disabled:opacity-50"
+                  className="tkt-btn-action-primary"
+                  style={{ backgroundColor: '#b45309', borderColor: '#b45309', minHeight: '38px', padding: '0.4rem 1rem' }}
                 >
                   {modalSubmitting ? 'Resetting...' : 'Set New Initial Password'}
                 </button>

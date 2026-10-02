@@ -9,6 +9,38 @@ interface StaffTicketDetailProps {
   onBack: () => void;
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  NEW: 'New',
+  OPEN: 'Open',
+  IN_PROGRESS: 'In Progress',
+  WAITING_FOR_REQUESTER: 'Waiting for Requester',
+  PENDING: 'Pending',
+  RESOLVED: 'Resolved',
+  CANCELLED: 'Cancelled',
+  CLOSED: 'Closed',
+  REOPENED: 'Reopened',
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  URGENT: 'Urgent',
+};
+
+const getPriorityBadgeClass = (priority?: string) => {
+  switch (priority) {
+    case 'URGENT':
+      return 'tkt-pill-priority-urgent';
+    case 'HIGH':
+      return 'tkt-pill-priority-high';
+    case 'MEDIUM':
+      return 'tkt-pill-priority-medium';
+    default:
+      return 'tkt-pill-priority-low';
+  }
+};
+
 const PERMITTED_TRANSITIONS: Record<string, string[]> = {
   NEW: ['OPEN', 'IN_PROGRESS', 'CANCELLED'],
   OPEN: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'IN_PROGRESS'],
@@ -35,6 +67,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Soft Removal Modal State
   const [removingAttachment, setRemovingAttachment] = useState<Attachment | null>(null);
@@ -151,6 +184,34 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     }
   };
 
+  const handleDownloadAttachment = async (attachmentId: number, filename: string) => {
+    setDownloadError(null);
+    try {
+      const res = await fetch(`/api/attachments/${attachmentId}/download`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        let errorMsg = `Download failed (${res.status})`;
+        try {
+          const data = await res.json();
+          if (data?.error?.message) errorMsg = data.error.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.download = filename;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
+    } catch (err: any) {
+      setDownloadError(err?.message || 'Failed to download attachment. Please try again.');
+    }
+  };
+
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) return;
@@ -235,7 +296,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   if (loading) {
     return (
       <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }}>
-        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket detail...</p>
       </div>
     );
@@ -245,7 +306,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
     return (
       <div style={{ maxWidth: '1080px', margin: '2rem auto', padding: '0 1rem' }}>
         <button onClick={onBack} className="tkt-btn-back" style={{ marginBottom: '1rem' }}>
-          ← Back to Queue
+          ← Back to Ticket Queue
         </button>
         <div role="alert" className="tkt-alert-error">
           <span>⚠️</span>
@@ -265,10 +326,10 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {/* Breadcrumb Header */}
       <div className="tkt-breadcrumb-bar">
         <div className="tkt-breadcrumb-text">
-          My Queue &gt; <span>Ticket Detail</span>
+          Ticket Queue &gt; <span>Ticket Detail</span>
         </div>
         <button onClick={onBack} className="tkt-btn-back">
-          ← Back to Queue
+          ← Back to Ticket Queue
         </button>
       </div>
 
@@ -289,7 +350,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               readOnly
               value={ticket.ticketNumber}
               className="tkt-input"
-              style={{ backgroundColor: '#f8fafc', color: '#005a36', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
+              style={{ backgroundColor: '#f8fafc', color: '#006B3C', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
             />
           </div>
 
@@ -332,8 +393,8 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           <div>
             <label className="tkt-label">Requested Priority</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className={`tkt-pill ${ticket.requestedPriority === 'HIGH' || ticket.requestedPriority === 'URGENT' ? 'tkt-pill-priority-high' : ticket.requestedPriority === 'MEDIUM' ? 'tkt-pill-priority-medium' : 'tkt-pill-priority-low'}`}>
-                {ticket.requestedPriority}
+              <span className={`tkt-pill ${getPriorityBadgeClass(ticket.requestedPriority)}`}>
+                {PRIORITY_LABELS[ticket.requestedPriority] || ticket.requestedPriority}
               </span>
             </div>
           </div>
@@ -346,9 +407,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               className="tkt-input"
               style={{ fontWeight: 600, color: '#166534', backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }}
             >
-              <option value={ticket.currentStatus}>{ticket.currentStatus}</option>
+              <option value={ticket.currentStatus}>{STATUS_LABELS[ticket.currentStatus] || ticket.currentStatus}</option>
               {allowedStatuses.map((s) => (
-                <option key={s} value={s}>→ {s}</option>
+                <option key={s} value={s}>→ {STATUS_LABELS[s] || s}</option>
               ))}
             </select>
           </div>
@@ -452,6 +513,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </button>
         </form>
 
+        {downloadError && (
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }} role="alert">
+            ⚠️ {downloadError}
+          </div>
+        )}
+
         <div style={{ display: 'grid', gap: '0.5rem' }}>
           {activeAttachments.length === 0 ? (
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>No active attachments.</p>
@@ -459,14 +526,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             activeAttachments.map((a) => (
               <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                 <div>
-                  <a
-                    href={`/api/attachments/${a.id}/download`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                    style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     📎 {a.originalFilename}
-                  </a>
+                  </button>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                     ({(a.sizeBytes / 1024).toFixed(1)} KB)
                   </span>

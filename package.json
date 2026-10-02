@@ -5,11 +5,13 @@
     "dev": "npm run dev --prefix client",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
-    "test": "npm run test --prefix server && npm run test --prefix client",
+    "test": "npm run test:traceability && npm run test --prefix server && npm run test --prefix client",
     "test:server": "npm run test --prefix server",
-    "test:client": "npm run test --prefix client"
+    "test:client": "npm run test --prefix client",
+    "test:traceability": "python3 scripts/check-traceability.py"
   },
   "devDependencies": {
-    "@playwright/test": "^1.50.1"
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.0"
   }
 }

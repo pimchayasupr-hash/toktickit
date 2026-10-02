@@ -78,5 +78,50 @@ describe('Lab 3 - IT Staff Ticket Queue API Suite', () => {
     expect(nonMatchingPriorityRes.status).toBe(200);
     expect(nonMatchingPriorityRes.body.tickets.length).toBe(0);
   });
+
+  it('rejects invalid query parameters with 400 VALIDATION_ERROR', async () => {
+    const token = await getStaffToken();
+
+    // Invalid page=0
+    const resPage = await request(app)
+      .get('/api/staff/tickets?page=0')
+      .set('Authorization', `Bearer ${token}`);
+    expect(resPage.status).toBe(400);
+    expect(resPage.body.error.code).toBe('VALIDATION_ERROR');
+
+    // Invalid pageSize=9999
+    const resPageSize = await request(app)
+      .get('/api/staff/tickets?pageSize=9999')
+      .set('Authorization', `Bearer ${token}`);
+    expect(resPageSize.status).toBe(400);
+    expect(resPageSize.body.error.code).toBe('VALIDATION_ERROR');
+
+    // Invalid status
+    const resStatus = await request(app)
+      .get('/api/staff/tickets?status=INVALID_STATUS_VALUE')
+      .set('Authorization', `Bearer ${token}`);
+    expect(resStatus.status).toBe(400);
+    expect(resStatus.body.error.code).toBe('VALIDATION_ERROR');
+
+    // Invalid sort
+    const resSort = await request(app)
+      .get('/api/staff/tickets?sort=DROP_DATABASE')
+      .set('Authorization', `Bearer ${token}`);
+    expect(resSort.status).toBe(400);
+    expect(resSort.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('returns empty results array and total 0 for non-matching filter criteria', async () => {
+    const token = await getStaffToken();
+
+    const res = await request(app)
+      .get('/api/staff/tickets?search=NONEXISTENT_QUERY_FOR_EMPTY_STATE_12345')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.tickets).toEqual([]);
+    expect(res.body.pagination.total).toBe(0);
+  });
 });
+
 

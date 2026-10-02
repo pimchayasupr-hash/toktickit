@@ -4,7 +4,7 @@
 
 ### 1.1 Session Handling
 - **Header**: `Authorization: Bearer <token>`
-- **Token Format**: Signed JSON Web Token (JWT) or secure session token encoding `userId`, `email`, `role`, and `mustChangePassword`.
+- **Token Format**: Signed JSON Web Token (JWT) using HMAC-SHA256 (`HS256`) encoding `userId`, `email`, `role`, and `mustChangePassword`, configured with an 8-hour expiration (`expiresIn: '8h'`).
 - **Error Response Format**: Standardized error envelope used across all endpoints:
 ```json
 {
@@ -48,8 +48,9 @@
 }
 ```
 - **Errors**:
-  - `400 Bad Request`: `VALIDATION_ERROR` (Missing email/password format)
-  - `401 Unauthorized`: `INVALID_CREDENTIALS` (Email/password incorrect or user inactive)
+  - `400 Bad Request`: `VALIDATION_ERROR` (Missing email or password)
+  - `401 Unauthorized`: `INVALID_CREDENTIALS` (Invalid email address or password)
+  - `401 Unauthorized`: `ACCOUNT_DEACTIVATED` (Your account has been deactivated. Please contact an administrator.)
 
 #### `POST /api/auth/logout`
 - **Description**: Log out current authenticated user session.
@@ -97,7 +98,7 @@
 }
 ```
 - **Errors**:
-  - `400 Bad Request`: Validation failure (password weak or current password invalid)
+  - `400 Bad Request`: Validation failure (missing or incorrect current password, or new password failing complexity requirements per BR-18 and AC-23: minimum 8 characters with at least one uppercase letter, one lowercase letter, one number, and one special character)
 
 ---
 
@@ -122,7 +123,7 @@
   "tickets": [
     {
       "id": 10,
-      "ticketNumber": "TXT-2026-001234",
+      "ticketNumber": "TKT-2026-001234",
       "summary": "Laptop battery drains quickly",
       "description": "Battery loses charge within 30 minutes...",
       "requestedPriority": "MEDIUM",
@@ -294,7 +295,9 @@
 }
 ```
 - **Response 201 Created**: Returns created user object (without password hash).
-- **Error 409 Conflict**: If email already exists (BR-14).
+- **Errors**:
+  - `400 Bad Request`: Validation failure (initial password failing complexity requirements per BR-18 and AC-23)
+  - `409 Conflict`: If email already exists (BR-14).
 
 #### `PATCH /api/admin/users/:id`
 - **Authorization**: `ADMIN` ONLY
@@ -324,3 +327,6 @@
   "message": "Initial password updated. User will be prompted to change password on next login."
 }
 ```
+- **Errors**:
+  - `400 Bad Request`: Validation failure (initial password failing complexity requirements per BR-18 and AC-23)
+  - `404 Not Found`: Target user does not exist

@@ -120,7 +120,7 @@ export const LoginForm: React.FC = () => {
               <a
                 href="#forgot-password"
                 onClick={(e) => { e.preventDefault(); alert('Please contact your IT administrator to reset your password.'); }}
-                style={{ fontSize: '0.8rem', color: 'var(--brand-green-primary)', textDecoration: 'none', fontWeight: 500 }}
+                style={{ fontSize: '0.8rem', color: 'var(--color-primary-green)', textDecoration: 'none', fontWeight: 500 }}
               >
                 Forgot your password?
               </a>

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Lab 2: Requester Ticket E2E Flow', () => {
-  test('should select requester, create a ticket, and see it in My Tickets', async ({ page }) => {
+  test('should login as requester, create a ticket, and see it in My Tickets', async ({ page }) => {
     // 1. ไปที่หน้าแรก (หน้าเลือก Requester)
     await page.goto('http://localhost:5173');
 

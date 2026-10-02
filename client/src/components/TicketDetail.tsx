@@ -5,6 +5,63 @@ import { PublicCommentsSection } from './comments/PublicCommentsSection';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
+const STATUS_LABELS: Record<string, string> = {
+  NEW: 'New',
+  OPEN: 'Open',
+  IN_PROGRESS: 'In Progress',
+  WAITING_FOR_REQUESTER: 'Waiting for Requester',
+  PENDING: 'Pending',
+  RESOLVED: 'Resolved',
+  CANCELLED: 'Cancelled',
+  CLOSED: 'Closed',
+  REOPENED: 'Reopened',
+};
+
+const getStatusBadgeClass = (status: string) => {
+  switch (status) {
+    case 'NEW':
+      return 'tkt-pill-status-new';
+    case 'OPEN':
+      return 'tkt-pill-status-open';
+    case 'IN_PROGRESS':
+      return 'tkt-pill-status-in-progress';
+    case 'WAITING_FOR_REQUESTER':
+      return 'tkt-pill-status-waiting';
+    case 'PENDING':
+      return 'tkt-pill-status-pending';
+    case 'RESOLVED':
+      return 'tkt-pill-status-resolved';
+    case 'CANCELLED':
+      return 'tkt-pill-status-cancelled';
+    case 'CLOSED':
+      return 'tkt-pill-status-closed';
+    case 'REOPENED':
+      return 'tkt-pill-status-reopened';
+    default:
+      return 'tkt-pill-status-closed';
+  }
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  URGENT: 'Urgent',
+};
+
+const getPriorityBadgeClass = (priority?: string) => {
+  switch (priority) {
+    case 'URGENT':
+      return 'tkt-pill-priority-urgent';
+    case 'HIGH':
+      return 'tkt-pill-priority-high';
+    case 'MEDIUM':
+      return 'tkt-pill-priority-medium';
+    default:
+      return 'tkt-pill-priority-low';
+  }
+};
+
 interface TicketDetailProps {
   ticketId: number;
   onBack: () => void;
@@ -23,12 +80,41 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Soft Removal Modal State
   const [removingAttachment, setRemovingAttachment] = useState<Attachment | null>(null);
   const [removalReason, setRemovalReason] = useState<string>('');
   const [isRemoving, setIsRemoving] = useState<boolean>(false);
   const [removalError, setRemovalError] = useState<string | null>(null);
+
+  const handleDownloadAttachment = async (attachmentId: number, filename: string) => {
+    setDownloadError(null);
+    try {
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE_URL}/api/attachments/${attachmentId}/download`, { headers });
+      if (!res.ok) {
+        let errorMsg = `Download failed (${res.status})`;
+        try {
+          const data = await res.json();
+          if (data?.error?.message) errorMsg = data.error.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.download = filename;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
+    } catch (err: any) {
+      setDownloadError(err?.message || 'Failed to download attachment. Please try again.');
+    }
+  };
 
   // Problem Appears Resolved State
   const [resolvingState, setResolvingState] = useState(false);
@@ -173,7 +259,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   if (isLoading) {
     return (
       <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }} data-testid="ticket-detail-loading">
-        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket details...</p>
       </div>
     );
@@ -183,7 +269,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
     return (
       <div style={{ maxWidth: '1080px', margin: '2rem auto', padding: '0 1rem' }}>
         <button onClick={onBack} className="tkt-btn-back" style={{ marginBottom: '1rem' }}>
-          ← Back to Queue
+          ← Back to My Tickets
         </button>
         <div role="alert" className="tkt-alert-error" data-testid="ticket-detail-error">
           <span>⚠️</span>
@@ -201,10 +287,10 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
       {/* Breadcrumb Header */}
       <div className="tkt-breadcrumb-bar">
         <div className="tkt-breadcrumb-text">
-          My Queue &gt; <span>Ticket Detail</span>
+          My Tickets &gt; <span>Ticket Detail</span>
         </div>
         <button onClick={onBack} className="tkt-btn-back">
-          ← Back to Queue
+          ← Back to My Tickets
         </button>
       </div>
 
@@ -219,7 +305,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               readOnly
               value={ticket.ticketNumber}
               className="tkt-input"
-              style={{ backgroundColor: '#f8fafc', color: '#005a36', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
+              style={{ backgroundColor: '#f8fafc', color: '#006B3C', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
             />
           </div>
 
@@ -262,8 +348,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">Requested Priority</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className={`tkt-pill ${ticket.requestedPriority === 'HIGH' || ticket.requestedPriority === 'URGENT' ? 'tkt-pill-priority-high' : ticket.requestedPriority === 'MEDIUM' ? 'tkt-pill-priority-medium' : 'tkt-pill-priority-low'}`}>
-                {ticket.requestedPriority}
+              <span className={`tkt-pill ${getPriorityBadgeClass(ticket.requestedPriority)}`}>
+                {PRIORITY_LABELS[ticket.requestedPriority] || ticket.requestedPriority}
               </span>
             </div>
           </div>
@@ -271,8 +357,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">Current Status</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className="tkt-pill tkt-pill-status-in-progress">
-                {ticket.currentStatus}
+              <span className={`tkt-pill ${getStatusBadgeClass(ticket.currentStatus)}`}>
+                {STATUS_LABELS[ticket.currentStatus] || ticket.currentStatus}
               </span>
             </div>
           </div>
@@ -294,8 +380,8 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           <div>
             <label className="tkt-label">IT Priority</label>
             <div style={{ paddingTop: '0.35rem' }}>
-              <span className={`tkt-pill ${ticket.itPriority === 'HIGH' || ticket.itPriority === 'URGENT' ? 'tkt-pill-priority-high' : 'tkt-pill-priority-medium'}`}>
-                {ticket.itPriority || ticket.requestedPriority}
+              <span className={`tkt-pill ${getPriorityBadgeClass(ticket.itPriority || ticket.requestedPriority)}`}>
+                {PRIORITY_LABELS[ticket.itPriority || ticket.requestedPriority] || ticket.itPriority || ticket.requestedPriority}
               </span>
             </div>
           </div>
@@ -334,7 +420,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             onClick={handleProblemResolved}
             disabled={resolvingState}
             className="tkt-btn-primary"
-            style={{ width: 'auto', backgroundColor: '#eaf6ef', color: '#005a36', border: '1px solid #bbf7d0', boxShadow: 'none' }}
+            style={{ width: 'auto', backgroundColor: '#EAF6EF', color: '#006B3C', border: '1px solid #bbf7d0', boxShadow: 'none' }}
           >
             <span>✓</span> {resolvingState ? 'Submitting...' : 'Problem Appears Resolved'}
           </button>
@@ -396,6 +482,12 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                 </button>
               </form>
 
+              {downloadError && (
+                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }} role="alert">
+                  ⚠️ {downloadError}
+                </div>
+              )}
+
               <div style={{ display: 'grid', gap: '0.5rem' }}>
                 {activeAttachments.length === 0 ? (
                   <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>No active attachments.</p>
@@ -403,14 +495,13 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                   activeAttachments.map((a) => (
                     <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                       <div>
-                        <a
-                          href={`/api/attachments/${a.id}/download`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                          style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                         >
                           📎 {a.originalFilename}
-                        </a>
+                        </button>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                           ({(a.sizeBytes / 1024).toFixed(1)} KB)
                         </span>
