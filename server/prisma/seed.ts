@@ -108,10 +108,7 @@ async function main() {
   // Remove test artifact tickets and legacy TXT- tickets from dev data
   await prisma.ticket.deleteMany({
     where: {
-      OR: [
-        { ticketNumber: { startsWith: 'TXT-' } },
-        { summary: { in: ['Issue 5 test ticket for attachments', 'Regression Test Ticket'] } },
-      ],
+      ticketNumber: { startsWith: 'TXT-' },
     },
   });
 
