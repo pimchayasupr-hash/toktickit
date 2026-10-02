@@ -1,72 +1,18 @@
-================================================================
-TokTickIT Lab 3 - Phase 2 Final Verification Evidence
-Date: 2026-10-02
-Database: toktickit (localhost:5432, user: postgres)
-================================================================
-
-
-==========================================
-       PHASE 2 RUN 1
-==========================================
-
---- 1. MIGRATE RESET + SEED (exit 0) ---
-warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
-For more information, see: https://pris.ly/prisma-config
-
-Environment variables loaded from .env
-Prisma schema loaded from prisma/schema.prisma
-Datasource "db": PostgreSQL database "toktickit", schema "public" at "localhost:5432"
-
-Applying migration `20260809145256_add_category`
-Applying migration `20260825075115_lab2_init`
-Applying migration `20260918094134_lab3_auth_rbac`
-
-Database reset successful
-
-The following migration(s) have been applied:
-
-migrations/
-  └─ 20260809145256_add_category/
-    └─ migration.sql
-  └─ 20260825075115_lab2_init/
-    └─ migration.sql
-  └─ 20260918094134_lab3_auth_rbac/
-    └─ migration.sql
-
-Running generate... (Use --skip-generate to skip the generators)
-[2K[1A[2K[GRunning generate... - Prisma Client
-[2K[1A[2K[G✔ Generated Prisma Client (v6.19.3) to ./../../tk-rf/server/node_modules/@prism
-a/client in 94ms
-
-Running seed command `tsx prisma/seed.ts` ...
-Seeding database for Lab 3...
-Seeding completed successfully with 18 realistic tickets.
-
-🌱  The seed command has been executed.
-
-
-
---- 2. BASELINE COUNTS ---
-users=U0=10, tickets=T0=18
-
---- 3. CLIENT BUILD (exit 0) ---
+### client build
 
 > client@0.0.0 build
 > tsc -b && vite build
 
 vite v8.2.1 building client environment for production...
-[2K
-transforming...✓ 29 modules transformed.
+transforming...✓ 29 modules transformed.
 rendering chunks...
 computing gzip size...
 dist/index.html                   0.45 kB │ gzip:  0.29 kB
 dist/assets/index-CpQ5-Tza.css  250.00 kB │ gzip: 35.44 kB
-dist/assets/index-C9wstgMc.js   283.59 kB │ gzip: 76.68 kB
+dist/assets/index-BezkVpYg.js   285.22 kB │ gzip: 77.38 kB
 
-✓ built in 416ms
-
-
---- 4. SERVER VITEST (exit 0) ---
+✓ built in 144ms
+### server vitest
 
 > server@1.0.0 test
 > vitest run --run
@@ -77,19 +23,49 @@ Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
 
  RUN  v4.1.10 /Users/pimchayasuprateravarnit/tk-final/server
 
- ✓ tests/lab-03/auth.api.test.ts (9 tests) 2399ms
-     ✓ API-04: Mandatory password change updates password and clears flag  675ms
-     ✓ API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout  754ms
- ✓ tests/lab-03/authorization.api.test.ts (9 tests) 1325ms
- ✓ tests/lab-03/users-admin.api.test.ts (8 tests) 1122ms
- ✓ tests/lab-03/staff-status-filter.test.ts (3 tests) 426ms
- ✓ tests/lab-03/admin-password-complexity.test.ts (4 tests) 1001ms
-     ✓ accepts compliant initialPassword on admin password reset for a freshly created test user  317ms
- ✓ tests/lab-03/staff-queue.api.test.ts (5 tests) 703ms
- ✓ tests/lab-03/staff-ticket-detail.api.test.ts (5 tests) 917ms
-     ✓ rejects assigning ticket to an inactive user or a Requester user  384ms
- ✓ tests/lab-03/comments-notes.api.test.ts (2 tests) 465ms
- ✓ tests/lab-02/my-tickets.test.ts (2 tests) 368ms
+stdout | tests/lab-03/auth.api.test.ts
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+ ✓ tests/lab-03/auth.api.test.ts (9 tests) 1252ms
+     ✓ API-04: Mandatory password change updates password and clears flag  387ms
+     ✓ API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout  320ms
+stdout | tests/lab-03/authorization.api.test.ts
+◇ injected env (3) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ ✓ tests/lab-03/authorization.api.test.ts (9 tests) 966ms
+stdout | tests/lab-03/users-admin.api.test.ts
+◇ injected env (3) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+
+ ✓ tests/lab-03/users-admin.api.test.ts (8 tests) 778ms
+stdout | tests/lab-03/admin-password-complexity.test.ts
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+ ✓ tests/lab-03/admin-password-complexity.test.ts (4 tests) 573ms
+stdout | tests/lab-03/staff-ticket-detail.api.test.ts
+◇ injected env (3) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+ ✓ tests/lab-03/staff-ticket-detail.api.test.ts (5 tests) 475ms
+stdout | tests/lab-03/comments-notes.api.test.ts
+◇ injected env (3) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+ ✓ tests/lab-03/comments-notes.api.test.ts (2 tests) 267ms
+stdout | tests/lab-03/staff-queue.api.test.ts
+◇ injected env (3) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+ ✓ tests/lab-03/staff-queue.api.test.ts (5 tests) 390ms
+ ✓ tests/lab-03/jwt-secret-guard.test.ts (6 tests) 238ms
+stdout | tests/lab-03/staff-status-filter.test.ts
+◇ injected env (3) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+
+ ✓ tests/lab-03/staff-status-filter.test.ts (3 tests) 256ms
 stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
 Seeding database for Lab 3...
 
@@ -102,31 +78,76 @@ Seeding database for Lab 3...
 stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
 Seeding completed successfully with 18 realistic tickets.
 
- ✓ tests/lab-03/seed-idempotency.test.ts (1 test) 357ms
-     ✓ running seedDatabase() twice causes zero duplicate records and zero errors  355ms
- ✓ tests/lab-02/create-ticket.api.test.ts (2 tests) 299ms
- ✓ tests/lab-02/create-ticket.test.ts (2 tests) 289ms
- ✓ tests/lab-03/migration-regression.test.ts (3 tests) 241ms
- ✓ tests/lab-02/ticket-detail.api.test.ts (5 tests) 111ms
- ✓ tests/lab-02/ticket-detail-attachments.test.ts (5 tests) 85ms
- ✓ tests/lab-02/attachments.api.test.ts (5 tests) 121ms
- ✓ tests/lab-02/my-tickets.api.test.ts (2 tests) 70ms
- ✓ tests/lab-02/reference-apis.test.ts (2 tests) 42ms
- ✓ tests/lab-01/categories.test.ts (1 test) 35ms
- ✓ tests/lab-02/requesters.test.ts (1 test) 32ms
- ✓ tests/lab-02/unit.test.ts (4 tests) 19ms
- ✓ tests/lab-01/health.test.ts (1 test) 17ms
- ✓ tests/lab-03/unit.test.ts (17 tests) 5ms
- ✓ tests/lab-03/jwt-secret-guard.test.ts (5 tests) 4ms
+ ✓ tests/lab-03/seed-idempotency.test.ts (1 test) 196ms
+stdout | tests/lab-02/create-ticket.test.ts
+◇ injected env (3) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ ✓ tests/lab-02/create-ticket.test.ts (2 tests) 197ms
+stdout | tests/lab-02/create-ticket.api.test.ts
+◇ injected env (3) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ ✓ tests/lab-02/create-ticket.api.test.ts (2 tests) 187ms
+stdout | tests/lab-02/my-tickets.test.ts
+◇ injected env (3) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+ ✓ tests/lab-02/my-tickets.test.ts (2 tests) 186ms
+stdout | tests/lab-03/migration-regression.test.ts
+◇ injected env (3) from .env // tip: ⌘ override existing { override: true }
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ ✓ tests/lab-03/migration-regression.test.ts (3 tests) 156ms
+stdout | tests/lab-02/ticket-detail-attachments.test.ts
+◇ injected env (3) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+ ✓ tests/lab-02/ticket-detail-attachments.test.ts (5 tests) 63ms
+stdout | tests/lab-02/attachments.api.test.ts
+◇ injected env (3) from .env // tip: ⌘ suppress logs { quiet: true }
+◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+ ✓ tests/lab-02/attachments.api.test.ts (5 tests) 63ms
+stdout | tests/lab-02/ticket-detail.api.test.ts
+◇ injected env (3) from .env // tip: ⌘ override existing { override: true }
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+
+ ✓ tests/lab-02/ticket-detail.api.test.ts (5 tests) 68ms
+stdout | tests/lab-02/my-tickets.api.test.ts
+◇ injected env (3) from .env // tip: ⌘ suppress logs { quiet: true }
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+ ✓ tests/lab-02/my-tickets.api.test.ts (2 tests) 42ms
+stdout | tests/lab-02/reference-apis.test.ts
+◇ injected env (3) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+
+ ✓ tests/lab-02/reference-apis.test.ts (2 tests) 22ms
+stdout | tests/lab-02/requesters.test.ts
+◇ injected env (3) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+ ✓ tests/lab-02/requesters.test.ts (1 test) 19ms
+stdout | tests/lab-01/categories.test.ts
+◇ injected env (3) from .env // tip: ⌘ enable debugging { debug: true }
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+ ✓ tests/lab-01/categories.test.ts (1 test) 19ms
+ ✓ tests/lab-02/unit.test.ts (4 tests) 13ms
+stdout | tests/lab-01/health.test.ts
+◇ injected env (3) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+ ✓ tests/lab-01/health.test.ts (1 test) 9ms
+ ✓ tests/lab-03/unit.test.ts (17 tests) 2ms
 
  Test Files  24 passed (24)
-      Tests  103 passed (103)
-   Start at  14:14:23
-   Duration  17.82s (transform 238ms, setup 0ms, import 4.37s, tests 10.45s, environment 2ms)
+      Tests  104 passed (104)
+   Start at  19:32:16
+   Duration  9.87s (transform 119ms, setup 0ms, import 1.95s, tests 6.44s, environment 1ms)
 
-
-
---- 5. CLIENT VITEST (exit 0) ---
+### client vitest
 
 > client@0.0.0 test
 > vitest run --run
@@ -220,86 +241,15 @@ act(() => {
 
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
 
- ✓ src/tests/lab-03/Login.test.tsx (4 tests) 889ms
-     ✓ UI-01: Renders login email and password inputs with submit button  420ms
- ✓ src/tests/lab-03/StaffTicketQueue.test.tsx (4 tests) 888ms
-     ✓ UI-03: Renders header, search bar, and search button  531ms
- ✓ src/tests/lab-03/StaffTicketDetail.test.tsx (4 tests) 933ms
-     ✓ renders Claim button when ticket is unassigned  376ms
- ✓ src/tests/lab-03/ChangePassword.test.tsx (4 tests) 1110ms
-     ✓ UI-02: Mandatory password change form renders inputs and password rules  521ms
- ✓ src/App.test.tsx (1 test) 799ms
-     ✓ renders the login form initially when unauthenticated  794ms
- ✓ src/tests/lab-03/UserManagement.test.tsx (4 tests) 1223ms
-     ✓ UI-06: User Management renders title and Create New User button  437ms
-     ✓ opens Create New User modal with form controls when clicking Create button  416ms
-     ✓ renders user records with role badges and edit actions  320ms
- ✓ src/tests/lab02.test.tsx (3 tests) 1436ms
-     ✓ renders Login screen when no identity is authenticated  546ms
-     ✓ allows logging in as a requester and seeing My Support Tickets  773ms
- ✓ src/tests/lab-02/AttachmentSection.test.tsx (1 test) 3ms
-stderr | src/tests/lab-02/CreateTicket.test.tsx > CreateTicket Component Tests (Section 12) > renders Create Ticket component container
-Failed to load reference data: [TypeError: Failed to parse URL from /api/categories] {
-  [cause]: TypeError: Invalid URL
-      at new URL (node:internal/url:819:25)
-      at new URL (file:///Users/pimchayasuprateravarnit/tk-rf/client/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:557:2)
-      at new Request (node:internal/deps/undici/undici:11063:25)
-      at fetch (node:internal/deps/undici/undici:11988:25)
-      at fetch (node:internal/deps/undici/undici:16555:10)
-      at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)
-      at fetchReferenceData (/Users/pimchayasuprateravarnit/tk-final/client/src/components/CreateTicket.tsx:37:11)
-      at /Users/pimchayasuprateravarnit/tk-final/client/src/components/CreateTicket.tsx:57:5
-      at Object.react_stack_bottom_frame (/Users/pimchayasuprateravarnit/tk-rf/client/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
-      at runWithFiberInDEV (/Users/pimchayasuprateravarnit/tk-rf/client/node_modules/react-dom/cjs/react-dom-client.development.js:874:13) {
-    code: 'ERR_INVALID_URL',
-    input: '/api/categories'
-  }
-}
-An update to CreateTicket inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
- ✓ src/tests/lab-02/CreateTicket.test.tsx (1 test) 72ms
-stderr | src/tests/lab-02/RequesterTicketDetail.test.tsx > RequesterTicketDetail Component Tests (Section 12) > renders TicketDetail component container
-An update to TicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to TicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to TicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
- ✓ src/tests/lab-02/RequesterTicketDetail.test.tsx (1 test) 128ms
+ ✓ src/tests/lab-03/ChangePasswordModal-mandatory.test.tsx (3 tests) 320ms
+ ✓ src/tests/lab-03/Login.test.tsx (4 tests) 411ms
+ ✓ src/tests/lab-03/StaffTicketQueue.test.tsx (4 tests) 450ms
+ ✓ src/tests/lab-03/ChangePassword.test.tsx (4 tests) 490ms
+ ✓ src/tests/lab-03/UserManagement.test.tsx (4 tests) 537ms
+ ✓ src/tests/lab-03/StaffTicketDetail.test.tsx (4 tests) 459ms
+ ✓ src/tests/lab02.test.tsx (3 tests) 587ms
+     ✓ allows logging in as a requester and seeing My Support Tickets  310ms
+ ✓ src/tests/lab-02/AttachmentSection.test.tsx (1 test) 2ms
 stderr | src/tests/lab-02/MyTickets.test.tsx > MyTickets Component Tests (Section 12) > renders MyTickets component container
 An update to MyTickets inside a test was not wrapped in act(...).
 
@@ -332,323 +282,7 @@ act(() => {
 
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
 
- ✓ src/tests/lab-02/MyTickets.test.tsx (1 test) 162ms
- ✓ src/tests/lab-03/ChangePasswordModal-mandatory.test.tsx (3 tests) 250ms
-
- Test Files  12 passed (12)
-      Tests  31 passed (31)
-   Start at  14:14:41
-   Duration  6.08s (transform 2.53s, setup 2.85s, import 3.86s, tests 7.89s, environment 20.36s)
-
-
-
---- 6. PLAYWRIGHT CHROMIUM (exit 0) ---
-
-Running 27 tests using 1 worker
-
-(node:49898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-
-
-[1/27] [chromium] › e2e/lab-02/requester-ticket-flow.spec.ts:4:7 › Lab 2: Requester Ticket E2E Flow › should login as requester, create a ticket, and see it in My Tickets
-[2/27] [chromium] › e2e/lab-03/authentication.spec.ts:4:7 › Lab 3 E2E - Authentication & Mandatory Password Change › E2E-01: Login, mandatory initial password change, and logout flow
-[3/27] [chromium] › e2e/lab-03/authentication.spec.ts:27:7 › Lab 3 E2E - Authentication & Mandatory Password Change › E2E-04: Logout blocks direct URL access and unauthenticated API calls return 401
-[4/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:13:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Login screen at Mobile 375px
-[5/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:25:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Queue at Mobile 375px
-[6/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:50:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Ticket Detail at Mobile 375px
-[7/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:74:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Admin User Management at Mobile 375px
-[8/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:13:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Login screen at Mobile 390px
-[9/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:25:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Queue at Mobile 390px
-[10/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:50:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Ticket Detail at Mobile 390px
-[11/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:74:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Admin User Management at Mobile 390px
-[12/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:13:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Login screen at Tablet 820px
-[13/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:25:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Queue at Tablet 820px
-[14/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:50:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Ticket Detail at Tablet 820px
-[15/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:74:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Admin User Management at Tablet 820px
-[16/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:13:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Login screen at Desktop 1440px
-[17/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:25:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Queue at Desktop 1440px
-[18/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:50:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on IT Staff Ticket Detail at Desktop 1440px
-[19/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:74:9 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Zero horizontal overflow on Admin User Management at Desktop 1440px
-[20/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:99:7 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Primary Zen Green button visibility and styling
-[21/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:125:7 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Keyboard Escape key closes admin modals
-[22/27] [chromium] › e2e/lab-03/responsive-overflow.spec.ts:141:7 › Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C) › Accessibility check via axe-core on Login and Queue
-[23/27] [chromium] › e2e/lab-03/staff-ticket-flow.spec.ts:4:7 › Lab 3 E2E - IT Staff Ticket Queue & Detail Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes
-[24/27] [chromium] › e2e/lab-03/staff-ticket-flow.spec.ts:30:7 › Lab 3 E2E - IT Staff Ticket Queue & Detail Flow › E2E-05: Requester triggers Problem Appears Resolved action
-[25/27] [chromium] › e2e/lab-03/user-administration.spec.ts:4:7 › Lab 3 E2E - Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check
-[26/27] [chromium] › e2e/lab-03/user-administration.spec.ts:32:7 › Lab 3 E2E - Administrator User Management Flow › E2E-06: New user first login enforces mandatory password change flow
-[27/27] [chromium] › e2e/lab-03/user-administration.spec.ts:70:7 › Lab 3 E2E - Administrator User Management Flow › E2E-07: Admin safety rules block self-deactivation and last admin demotion
-  27 passed (22.5s)
-
-
---- 7. PRE-CLEANUP POST-TEST COUNTS ---
-users=10, tickets=26
-
---- CLEANUP TEST TICKETS ---
-Cleaned up 8 test tickets
-
---- 8. POST-CLEANUP FINAL COUNTS ---
-users=10 (expected 10), tickets=18 (expected 18)
-
-
-==========================================
-       PHASE 2 RUN 2
-==========================================
-
---- 1. MIGRATE RESET + SEED (exit 0) ---
-warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
-For more information, see: https://pris.ly/prisma-config
-
-Environment variables loaded from .env
-Prisma schema loaded from prisma/schema.prisma
-Datasource "db": PostgreSQL database "toktickit", schema "public" at "localhost:5432"
-
-Applying migration `20260809145256_add_category`
-Applying migration `20260825075115_lab2_init`
-Applying migration `20260918094134_lab3_auth_rbac`
-
-Database reset successful
-
-The following migration(s) have been applied:
-
-migrations/
-  └─ 20260809145256_add_category/
-    └─ migration.sql
-  └─ 20260825075115_lab2_init/
-    └─ migration.sql
-  └─ 20260918094134_lab3_auth_rbac/
-    └─ migration.sql
-
-Running generate... (Use --skip-generate to skip the generators)
-[2K[1A[2K[GRunning generate... - Prisma Client
-[2K[1A[2K[G✔ Generated Prisma Client (v6.19.3) to ./../../tk-rf/server/node_modules/@prism
-a/client in 74ms
-
-Running seed command `tsx prisma/seed.ts` ...
-Seeding database for Lab 3...
-Seeding completed successfully with 18 realistic tickets.
-
-🌱  The seed command has been executed.
-
-
-
---- 2. BASELINE COUNTS ---
-users=U0=10, tickets=T0=18
-
---- 3. CLIENT BUILD (exit 0) ---
-
-> client@0.0.0 build
-> tsc -b && vite build
-
-vite v8.2.1 building client environment for production...
-[2K
-transforming...✓ 29 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/index.html                   0.45 kB │ gzip:  0.29 kB
-dist/assets/index-CpQ5-Tza.css  250.00 kB │ gzip: 35.44 kB
-dist/assets/index-C9wstgMc.js   283.59 kB │ gzip: 76.68 kB
-
-✓ built in 223ms
-
-
---- 4. SERVER VITEST (exit 0) ---
-
-> server@1.0.0 test
-> vitest run --run
-
-(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
-  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
-Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
-
- RUN  v4.1.10 /Users/pimchayasuprateravarnit/tk-final/server
-
- ✓ tests/lab-03/auth.api.test.ts (9 tests) 1614ms
-     ✓ API-04: Mandatory password change updates password and clears flag  488ms
-     ✓ API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout  410ms
- ✓ tests/lab-03/authorization.api.test.ts (9 tests) 1341ms
-     ✓ 9. Direct API matrix: All endpoints × Roles enforcement  333ms
- ✓ tests/lab-03/users-admin.api.test.ts (8 tests) 1138ms
- ✓ tests/lab-03/admin-password-complexity.test.ts (4 tests) 708ms
- ✓ tests/lab-03/staff-ticket-detail.api.test.ts (5 tests) 548ms
- ✓ tests/lab-03/staff-queue.api.test.ts (5 tests) 451ms
- ✓ tests/lab-03/comments-notes.api.test.ts (2 tests) 307ms
- ✓ tests/lab-03/staff-status-filter.test.ts (3 tests) 301ms
- ✓ tests/lab-02/my-tickets.test.ts (2 tests) 211ms
-stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
-Seeding database for Lab 3...
-
-stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
-Seeding completed successfully with 18 realistic tickets.
-
-stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
-Seeding database for Lab 3...
-
-stdout | tests/lab-03/seed-idempotency.test.ts > Lab 3 - Seed Idempotency Test Suite (A6) > running seedDatabase() twice causes zero duplicate records and zero errors
-Seeding completed successfully with 18 realistic tickets.
-
- ✓ tests/lab-03/seed-idempotency.test.ts (1 test) 227ms
- ✓ tests/lab-02/create-ticket.api.test.ts (2 tests) 207ms
- ✓ tests/lab-02/create-ticket.test.ts (2 tests) 209ms
- ✓ tests/lab-03/migration-regression.test.ts (3 tests) 160ms
- ✓ tests/lab-02/attachments.api.test.ts (5 tests) 72ms
- ✓ tests/lab-02/ticket-detail.api.test.ts (5 tests) 100ms
- ✓ tests/lab-02/ticket-detail-attachments.test.ts (5 tests) 80ms
- ✓ tests/lab-02/my-tickets.api.test.ts (2 tests) 52ms
- ✓ tests/lab-02/reference-apis.test.ts (2 tests) 29ms
- ✓ tests/lab-01/categories.test.ts (1 test) 27ms
- ✓ tests/lab-02/requesters.test.ts (1 test) 22ms
- ✓ tests/lab-02/unit.test.ts (4 tests) 15ms
- ✓ tests/lab-01/health.test.ts (1 test) 13ms
- ✓ tests/lab-03/unit.test.ts (17 tests) 3ms
- ✓ tests/lab-03/jwt-secret-guard.test.ts (5 tests) 2ms
-
- Test Files  24 passed (24)
-      Tests  103 passed (103)
-   Start at  14:15:20
-   Duration  12.51s (transform 194ms, setup 0ms, import 2.67s, tests 7.84s, environment 1ms)
-
-
-
---- 5. CLIENT VITEST (exit 0) ---
-
-> client@0.0.0 test
-> vitest run --run
-
-
- RUN  v4.1.10 /Users/pimchayasuprateravarnit/tk-final/client
-
-stderr | src/tests/lab-03/StaffTicketDetail.test.tsx > Lab 3 UI - StaffTicketDetail Component (Modes & Feedback) > UI-04: Renders loading state initially
-An update to StaffTicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to StaffTicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to StaffTicketDetail inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
-stderr | src/tests/lab-03/StaffTicketQueue.test.tsx > Lab 3 UI - StaffTicketQueue Component (Modes & Feedback) > UI-03: Renders header, search bar, and search button
-An update to StaffTicketQueue inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to StaffTicketQueue inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to StaffTicketQueue inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to StaffTicketQueue inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
-stderr | src/tests/lab-03/StaffTicketQueue.test.tsx > Lab 3 UI - StaffTicketQueue Component (Modes & Feedback) > UI-03: Renders header, search bar, and search button
-An update to StaffTicketQueue inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
- ✓ src/tests/lab-03/StaffTicketQueue.test.tsx (4 tests) 531ms
-     ✓ UI-03: Renders header, search bar, and search button  326ms
- ✓ src/tests/lab-03/ChangePassword.test.tsx (4 tests) 609ms
- ✓ src/tests/lab-03/Login.test.tsx (4 tests) 609ms
- ✓ src/App.test.tsx (1 test) 430ms
-     ✓ renders the login form initially when unauthenticated  427ms
- ✓ src/tests/lab-03/UserManagement.test.tsx (4 tests) 720ms
- ✓ src/tests/lab-03/StaffTicketDetail.test.tsx (4 tests) 827ms
-     ✓ renders Claim button when ticket is unassigned  379ms
- ✓ src/tests/lab02.test.tsx (3 tests) 899ms
-     ✓ renders Login screen when no identity is authenticated  343ms
-     ✓ allows logging in as a requester and seeing My Support Tickets  456ms
- ✓ src/tests/lab-02/AttachmentSection.test.tsx (1 test) 3ms
-stderr | src/tests/lab-02/MyTickets.test.tsx > MyTickets Component Tests (Section 12) > renders MyTickets component container
-An update to MyTickets inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to MyTickets inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-An update to MyTickets inside a test was not wrapped in act(...).
-
-When testing, code that causes React state updates should be wrapped into act(...):
-
-act(() => {
-  /* fire events that update state */
-});
-/* assert on the output */
-
-This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
-
- ✓ src/tests/lab-02/MyTickets.test.tsx (1 test) 116ms
+ ✓ src/tests/lab-02/MyTickets.test.tsx (1 test) 88ms
 stderr | src/tests/lab-02/RequesterTicketDetail.test.tsx > RequesterTicketDetail Component Tests (Section 12) > renders TicketDetail component container
 An update to TicketDetail inside a test was not wrapped in act(...).
 
@@ -681,6 +315,7 @@ act(() => {
 
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
 
+ ✓ src/tests/lab-02/RequesterTicketDetail.test.tsx (1 test) 71ms
 stderr | src/tests/lab-02/CreateTicket.test.tsx > CreateTicket Component Tests (Section 12) > renders Create Ticket component container
 Failed to load reference data: [TypeError: Failed to parse URL from /api/categories] {
   [cause]: TypeError: Invalid URL
@@ -709,22 +344,20 @@ act(() => {
 
 This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
 
- ✓ src/tests/lab-02/RequesterTicketDetail.test.tsx (1 test) 89ms
- ✓ src/tests/lab-02/CreateTicket.test.tsx (1 test) 63ms
- ✓ src/tests/lab-03/ChangePasswordModal-mandatory.test.tsx (3 tests) 250ms
+ ✓ src/tests/lab-02/CreateTicket.test.tsx (1 test) 33ms
+ ✓ src/App.test.tsx (1 test) 137ms
+ ✓ src/tests/lab-03/DownloadError.test.tsx (1 test) 192ms
 
- Test Files  12 passed (12)
-      Tests  31 passed (31)
-   Start at  14:15:33
-   Duration  4.00s (transform 1.43s, setup 1.59s, import 2.36s, tests 5.15s, environment 13.38s)
+ Test Files  13 passed (13)
+      Tests  32 passed (32)
+   Start at  19:32:26
+   Duration  2.66s (transform 853ms, setup 1.41s, import 1.65s, tests 3.78s, environment 9.00s)
 
-
-
---- 6. PLAYWRIGHT CHROMIUM (exit 0) ---
+### playwright
 
 Running 27 tests using 1 worker
 
-(node:50273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(node:71881) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
 (Use `node --trace-warnings ...` to show where the warning was created)
 
 
@@ -755,15 +388,15 @@ Running 27 tests using 1 worker
 [25/27] [chromium] › e2e/lab-03/user-administration.spec.ts:4:7 › Lab 3 E2E - Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check
 [26/27] [chromium] › e2e/lab-03/user-administration.spec.ts:32:7 › Lab 3 E2E - Administrator User Management Flow › E2E-06: New user first login enforces mandatory password change flow
 [27/27] [chromium] › e2e/lab-03/user-administration.spec.ts:70:7 › Lab 3 E2E - Administrator User Management Flow › E2E-07: Admin safety rules block self-deactivation and last admin demotion
-  27 passed (19.1s)
+  27 passed (15.5s)
+=== Specification Definition Audit ===
+Defined Acceptance Criteria: 23 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-23)
+Defined Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
+Defined Business Rules:      18 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17, BR-18)
 
+=== Traceability Matrix Coverage Audit ===
+Referenced Acceptance Criteria: 23 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-23)
+Referenced Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
+Referenced Business Rules:      18 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17, BR-18)
 
---- 7. PRE-CLEANUP POST-TEST COUNTS ---
-users=10, tickets=26
-
---- CLEANUP TEST TICKETS ---
-Cleaned up 8 test tickets
-
---- 8. POST-CLEANUP FINAL COUNTS ---
-users=10 (expected 10), tickets=18 (expected 18)
-
+✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-23), FUNCTIONAL REQUIREMENTS (FR-01..FR-21), AND BUSINESS RULES (BR-01..BR-18) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.

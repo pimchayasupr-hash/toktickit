@@ -295,7 +295,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 
 - **Token Format**: JSON Web Token (JWT) signed with HMAC-SHA256 (`HS256`) using a server-side secret (`JWT_SECRET`).
 - **Token Expiry**: Configured to **8 hours** (`expiresIn: '8h'`), providing a realistic full-workday session.
-- **Header Transmission**: Clients transmit tokens via `Authorization: Bearer <token>`. Direct browser file downloads optionally accept `?token=<token>` query parameters for secure attachment streaming.
+- **Header Transmission**: Clients transmit tokens via `Authorization: Bearer <token>`. Attachment downloads use authenticated fetch with Authorization header and client-side Blob URL to prevent exposing bearer tokens in URLs, browser history, or server access logs.
 - **CSRF Considerations**: Because session state is transmitted exclusively via custom headers (`Authorization: Bearer`), the API is immune to cross-site request forgery attacks that affect cookie-based sessions.
 - **Token Revocation (Logout)**: The server maintains an in-memory token revocation blacklist (`tokenBlacklist`). Upon calling `POST /api/auth/logout`, the active token is added to the blacklist and subsequent requests return 401 Unauthorized.
   - *Known Limitation*: In-memory blacklists reset on server restart.
@@ -371,14 +371,14 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - [x] Shared IT Staff Queue with search, filters, sorting, pagination, and mobile stacked cards implemented with Zen Green styling.
 - [x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.
 - [x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.
-- [x] Automated test suites passing: 103/103 server tests, 31/31 client component tests, 27/27 Playwright E2E tests across Chromium, Firefox, WebKit.
+- [x] Automated test suites passing: 104/104 server tests, 32/32 client component tests, 27/27 Playwright E2E tests across Chromium, Firefox, WebKit.
 - Peer review and merge: see reviewer.md
 
 ---
 
 ## 11. Assumptions and Decisions
 
-1. **Authentication Token Mechanism**: Session authentication uses signed JWT tokens passed via `Authorization: Bearer <token>` header, with optional `?token=` parameter for direct browser downloads.
+1. **Authentication Token Mechanism**: Session authentication uses signed JWT tokens passed via `Authorization: Bearer <token>` header. Attachment downloads use authenticated fetch with Authorization header and client-side Blob URL to prevent exposing bearer tokens in URLs.
 2. **Password Hashing**: Passwords are hashed using `bcryptjs` with salt rounds = 10, satisfying industry standards for dictionary and rainbow table attack prevention.
 3. **Problem Appears Resolved Implementation**: Clicking "Problem Appears Resolved" appends a structured Public Comment (`"[SYSTEM]: Requester indicated that the problem appears resolved."`), preserving strict status ownership under BR-05 while alerting IT Staff.
 4. **Admin Access to Staff Endpoints (BR-13)**: Administrators possess API-level authorization to call `/api/staff/*` endpoints for operational emergency support, but the Administrator UI focuses exclusively on User Management to provide a streamlined, distraction-free administration console.

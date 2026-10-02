@@ -260,7 +260,7 @@
     <div class="meta-item"><strong>Production Branch:</strong> main (latest)</div>
     <div class="meta-item"><strong>Release PR:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/pull/41" style="color:#006B3C;">PR #41 (APPROVED &amp; MERGED)</a></div>
     <div class="meta-item"><strong>Specification Coverage:</strong> <span class="badge badge-pass">100% (AC-01..AC-23, FR-01..FR-21, BR-01..BR-18)</span></div>
-    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">161 / 161 PASS (Server 103/103, Client 31/31, E2E 27/27)</span></div>
+    <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">163 / 163 PASS (Server 104/104, Client 32/32, E2E 27/27)</span></div>
   </div>
 </div>
 
@@ -562,7 +562,7 @@
 <li><strong>Backend:</strong> Node.js + Express + TypeScript (<code>server/</code>)</li>
 <li><strong>Database:</strong> PostgreSQL accessed via Prisma ORM (<code>server/prisma/</code>)</li>
 <li><strong>Auth:</strong> JSON Web Tokens (JWT) with role-based middleware (<code>server/src/middleware/authMiddleware.ts</code>)</li>
-<li><strong>Testing:</strong> Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — <strong>161 / 161 tests passing (103 Server, 31 Client, 27 Playwright E2E)</strong></li>
+<li><strong>Testing:</strong> Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — <strong>163 / 163 tests passing (104 Server, 31 Client, 27 Playwright E2E)</strong></li>
 </ul>
 <hr />
 <h2>Key Features (Lab 3)</h2>
@@ -609,7 +609,7 @@
 │
 └── docs/lab-03/                     # Lab 3 documentation
     ├── specification.md             # 11-section Spec DD document
-    ├── tests.md                     # Test DD + traceability matrix (161/161)
+    ├── tests.md                     # Test DD + traceability matrix (163/163)
     ├── report.md                    # Sprint report / Git workflow evidence
     ├── ui-spec.md                   # UI layout &amp; screen wireframes
     ├── api-spec.md                  # OpenAPI-style endpoint reference
@@ -620,7 +620,7 @@
 <h2>Environment Variables</h2>
 <p>Create <code>server/.env</code> (copy from <code>server/.env.example</code> and fill in):</p>
 <pre><code class="language-env">DATABASE_URL=&quot;postgresql://USER:PASSWORD@localhost:5432/toktickit?schema=public&quot;
-PORT=4000
+PORT=3000
 JWT_SECRET=&quot;your-strong-random-secret-key-here&quot;
 </code></pre>
 <blockquote>
@@ -682,7 +682,7 @@ npx prisma db seed
 <p>All seeded users have <code>mustChangePassword = true</code> — a password change is required on first login.</p>
 </blockquote>
 <h3>Running</h3>
-<pre><code class="language-bash"># Terminal 1 — Backend (port 4000)
+<pre><code class="language-bash"># Terminal 1 — Backend (port 3000)
 cd server &amp;&amp; npm run dev
 
 # Terminal 2 — Frontend (port 5173)
@@ -700,7 +700,7 @@ cd client &amp;&amp; npm test
 # Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
 npx playwright test --project=chromium
 </code></pre>
-<p>All 161 tests pass (103 Server, 31 Client, 27 Playwright E2E).</p>
+<p>All 163 tests pass (104 Server, 32 Client, 27 Playwright E2E).</p>
 <hr />
 <h2>Ticket ID Format</h2>
 <p>Tickets are identified as <code>TKT-YYYY-XXXXXX</code> (e.g. <code>TKT-2026-001234</code>). The prefix, year, and zero-padded sequence number are auto-generated server-side.</p>
@@ -740,7 +740,7 @@ NEW / OPEN / IN_PROGRESS / WAITING_FOR_REQUESTER → CANCELLED
 <p>Full Lab 3 documentation is in <a href="docs/lab-03/"><code>docs/lab-03/</code></a>:</p>
 <ul>
 <li><a href="docs/lab-03/specification.md"><code>specification.md</code></a> — Spec DD (Sprint Goal → FR → BR → UI → Data → API → AC)</li>
-<li><a href="docs/lab-03/tests.md"><code>tests.md</code></a> — Test DD (161 tests with full traceability matrix)</li>
+<li><a href="docs/lab-03/tests.md"><code>tests.md</code></a> — Test DD (163 tests with full traceability matrix)</li>
 <li><a href="docs/lab-03/report.md"><code>report.md</code></a> — Sprint report and Git workflow evidence</li>
 </ul>
   </div>
@@ -1498,7 +1498,7 @@ model InternalNote {
 <ul>
 <li><strong>Token Format</strong>: JSON Web Token (JWT) signed with HMAC-SHA256 (<code>HS256</code>) using a server-side secret (<code>JWT_SECRET</code>).</li>
 <li><strong>Token Expiry</strong>: Configured to <strong>8 hours</strong> (<code>expiresIn: '8h'</code>), providing a realistic full-workday session.</li>
-<li><strong>Header Transmission</strong>: Clients transmit tokens via <code>Authorization: Bearer &lt;token&gt;</code>. Direct browser file downloads optionally accept <code>?token=&lt;token&gt;</code> query parameters for secure attachment streaming.</li>
+<li><strong>Header Transmission</strong>: Clients transmit tokens via <code>Authorization: Bearer &lt;token&gt;</code>. Attachment downloads use authenticated fetch with Authorization header and client-side Blob URL to prevent exposing bearer tokens in URLs, browser history, or server access logs.</li>
 <li><strong>CSRF Considerations</strong>: Because session state is transmitted exclusively via custom headers (<code>Authorization: Bearer</code>), the API is immune to cross-site request forgery attacks that affect cookie-based sessions.</li>
 <li><strong>Token Revocation (Logout)</strong>: The server maintains an in-memory token revocation blacklist (<code>tokenBlacklist</code>). Upon calling <code>POST /api/auth/logout</code>, the active token is added to the blacklist and subsequent requests return 401 Unauthorized.</li>
 <li><em>Known Limitation</em>: In-memory blacklists reset on server restart.</li>
@@ -1749,13 +1749,13 @@ model InternalNote {
 <li>[x] Shared IT Staff Queue with search, filters, sorting, pagination, and mobile stacked cards implemented with Zen Green styling.</li>
 <li>[x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.</li>
 <li>[x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.</li>
-<li>[x] Automated test suites passing: 103/103 server tests, 31/31 client component tests, 27/27 Playwright E2E tests across Chromium.</li>
+<li>[x] Automated test suites passing: 104/104 server tests, 32/32 client component tests, 27/27 Playwright E2E tests across Chromium.</li>
 <li>Peer review and merge: see reviewer.md</li>
 </ul>
 <hr />
 <h2>11. Assumptions and Decisions</h2>
 <ol>
-<li><strong>Authentication Token Mechanism</strong>: Session authentication uses signed JWT tokens passed via <code>Authorization: Bearer &lt;token&gt;</code> header, with optional <code>?token=</code> parameter for direct browser downloads.</li>
+<li><strong>Authentication Token Mechanism</strong>: Session authentication uses signed JWT tokens passed via <code>Authorization: Bearer &lt;token&gt;</code> header, Attachment downloads use authenticated fetch with Authorization header and client-side Blob URL to prevent exposing bearer tokens in URLs.</li>
 <li><strong>Password Hashing</strong>: Passwords are hashed using <code>bcryptjs</code> with salt rounds = 10, satisfying industry standards for dictionary and rainbow table attack prevention.</li>
 <li><strong>Problem Appears Resolved Implementation</strong>: Clicking "Problem Appears Resolved" appends a structured Public Comment (<code>"[SYSTEM]: Requester indicated that the problem appears resolved."</code>), preserving strict status ownership under BR-05 while alerting IT Staff.</li>
 <li><strong>Admin Access to Staff Endpoints (BR-13)</strong>: Administrators possess API-level authorization to call <code>/api/staff/*</code> endpoints for operational emergency support, but the Administrator UI focuses exclusively on User Management to provide a streamlined, distraction-free administration console.</li>
@@ -2127,6 +2127,14 @@ model InternalNote {
 <td>Pass</td>
 </tr>
 <tr>
+<td><strong>UI-07</strong></td>
+<td>UI</td>
+<td>Handout §10, Part C</td>
+<td>Safe failure feedback: displays visible alert message when attachment download fails</td>
+<td><code>client/src/tests/lab-03/DownloadError.test.tsx</code></td>
+<td>Pass</td>
+</tr>
+<tr>
 <td><strong>E2E-01</strong></td>
 <td>E2E</td>
 <td>AC-01, AC-02, AC-20, FR-01, FR-02, FR-03</td>
@@ -2456,26 +2464,26 @@ dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
 </code></pre>
 <hr />
 <h2>7. Final Automated Quality Summary (<code>lab3-final</code>)</h2>
-<p>Full dual-run execution logs from clean database resets are recorded verbatim in <code>docs/lab-03/evidence/final-run-2026-10-02.txt</code>.</p>
+<p>Full automated execution logs from preflight verification are recorded verbatim in <code>docs/lab-03/evidence/final-run-2026-10-02.txt</code>.</p>
 <h3>5. Final Quality Summary</h3>
 <ul>
 <li><strong>Client TypeScript / Vite Build</strong>: PASS (0 errors)</li>
-<li><strong>Backend API Tests (Server Vitest)</strong>: 103 / 103 PASS in 24 test files (100%)</li>
-<li><strong>Frontend Component Tests (Client Vitest)</strong>: 31 / 31 PASS in 12 test files (100%)</li>
+<li><strong>Backend API Tests (Server Vitest)</strong>: 104 / 104 PASS in 24 test files (100%)</li>
+<li><strong>Frontend Component Tests (Client Vitest)</strong>: 32 / 32 PASS in 13 test files (100%)</li>
 <li><strong>End-to-End Playwright Tests (Chromium)</strong>: 27 / 27 PASS (100%)</li>
-<li><strong>Grand Total Automated Tests</strong>: <strong>161 / 161 PASS (100% Green)</strong></li>
+<li><strong>Grand Total Automated Tests</strong>: <strong>163 / 163 PASS (100% Green)</strong></li>
 </ul>
   </div>
 
   <div class="callout">
     <div class="callout-title">Final Production Quality Summary on lab3-final</div>
     <ul>
-      <li><strong>Backend API Tests (Vitest):</strong> 103 / 103 PASS (100% across 24 test files)</li>
-      <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 31 / 31 PASS (100% across 12 test files)</li>
+      <li><strong>Backend API Tests (Vitest):</strong> 104 / 104 PASS (100% across 24 test files)</li>
+      <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 32 / 32 PASS (100% across 13 test files)</li>
       <li><strong>Playwright Multi-Browser E2E Tests:</strong> 27 / 27 PASS (100% across Chromium)</li>
       <li><strong>Automated Traceability Verification:</strong> 100% PASS (AC-01..AC-23, FR-01..FR-21, BR-01..BR-18 via <code>python3 scripts/check-traceability.py</code>)</li>
       <li><strong>Production Client Build (Vite):</strong> 0 errors, clean build</li>
-      <li><strong>Grand Total Automated Tests:</strong> <strong>161 / 161 PASS (100% Green)</strong></li>
+      <li><strong>Grand Total Automated Tests:</strong> <strong>163 / 163 PASS (100% Green)</strong></li>
     </ul>
   </div>
 </div>

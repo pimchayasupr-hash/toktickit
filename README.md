@@ -6,7 +6,7 @@ TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk applicati
 - **Backend:** Node.js + Express + TypeScript (`server/`)
 - **Database:** PostgreSQL accessed via Prisma ORM (`server/prisma/`)
 - **Auth:** JSON Web Tokens (JWT) with role-based middleware (`server/src/middleware/authMiddleware.ts`)
-- **Testing:** Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — **161 / 161 tests passing (103 Server, 31 Client, 27 Playwright E2E)**
+- **Testing:** Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — **163 / 163 tests passing (104 Server, 32 Client, 27 Playwright E2E)**
 
 ---
 
@@ -30,7 +30,7 @@ toktickit/
 │   ├── src/
 │   │   ├── components/              # UI Components (Login, Navbar, TicketForm, StaffQueue, UserManagement, …)
 │   │   ├── context/                 # AuthContext — current user, JWT storage, role helpers
-│   │   └── tests/lab-03/            # React Testing Library component tests (31 tests)
+│   │   └── tests/lab-03/            # React Testing Library component tests (32 tests)
 │   └── vite.config.ts
 │
 ├── server/                          # Node.js + Express + TypeScript backend
@@ -47,7 +47,7 @@ toktickit/
 │   │   ├── schema.prisma            # User, Ticket, PublicComment, InternalNote models
 │   │   ├── migrations/              # Prisma migration history (Lab 2 → Lab 3 migration included)
 │   │   └── seed.ts                  # Idempotent seed — 1 Admin, 1 Staff, 3 Requesters + demo tickets
-│   └── tests/lab-03/                # Vitest + Supertest API integration tests (103 tests)
+│   └── tests/lab-03/                # Vitest + Supertest API integration tests (104 tests)
 │
 ├── e2e/lab-03/                      # Playwright end-to-end tests (27 tests)
 │   ├── auth.spec.ts
@@ -57,7 +57,7 @@ toktickit/
 │
 └── docs/lab-03/                     # Lab 3 documentation
     ├── specification.md             # 11-section Spec DD document
-    ├── tests.md                     # Test DD + traceability matrix (161/161)
+    ├── tests.md                     # Test DD + traceability matrix (163/163)
     ├── report.md                    # Sprint report / Git workflow evidence
     ├── ui-spec.md                   # UI layout & screen wireframes
     ├── api-spec.md                  # OpenAPI-style endpoint reference
@@ -73,7 +73,7 @@ Create `server/.env` (copy from `server/.env.example` and fill in):
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/toktickit?schema=public"
-PORT=4000
+PORT=3000
 JWT_SECRET="your-strong-random-secret-key-here"
 ```
 
@@ -125,7 +125,7 @@ Default seeded accounts:
 ### Running
 
 ```bash
-# Terminal 1 — Backend (port 4000)
+# Terminal 1 — Backend (port 3000)
 cd server && npm run dev
 
 # Terminal 2 — Frontend (port 5173)
@@ -144,17 +144,17 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 > ```
 
 ```bash
-# Server tests (103 tests — API integration, authorization matrix, unit)
+# Server tests (104 tests — API integration, authorization matrix, unit)
 cd server && npm test
 
-# Client tests (31 tests — component feedback states, form validation)
+# Client tests (32 tests — component feedback states, form validation)
 cd client && npm test
 
 # Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
 npx playwright test --project=chromium
 ```
 
-All 161 tests pass (103 Server, 31 Client, 27 Playwright E2E).
+All 163 tests pass (104 Server, 32 Client, 27 Playwright E2E).
 
 ---
 
@@ -190,5 +190,5 @@ NEW / OPEN / IN_PROGRESS / WAITING_FOR_REQUESTER → CANCELLED
 Full Lab 3 documentation is in [`docs/lab-03/`](docs/lab-03/):
 
 - [`specification.md`](docs/lab-03/specification.md) — Spec DD (Sprint Goal → FR → BR → UI → Data → API → AC)
-- [`tests.md`](docs/lab-03/tests.md) — Test DD (161 tests with full traceability matrix)
+- [`tests.md`](docs/lab-03/tests.md) — Test DD (163 tests with full traceability matrix)
 - [`report.md`](docs/lab-03/report.md) — Sprint report and Git workflow evidence

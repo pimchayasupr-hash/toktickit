@@ -58,6 +58,7 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | **UI-04** | UI | AC-06, AC-07, AC-08, AC-19, FR-08, FR-11, FR-12, FR-13 | Staff Ticket Detail renders claim/reassign, IT priority, and status transitions | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
 | **UI-05** | UI | AC-15, AC-16, FR-14, FR-15, BR-04, BR-11 | Visually distinguishes Public Comments from Internal Notes | `client/src/tests/lab-03/StaffTicketDetail.test.tsx` | Pass |
 | **UI-06** | UI | AC-10, AC-17, AC-21, AC-22, FR-17, FR-18, FR-19, FR-20, FR-21, BR-14, BR-15, BR-16, BR-17 | User Management modal renders create/edit/reset forms & validation | `client/src/tests/lab-03/UserManagement.test.tsx` | Pass |
+| **UI-07** | UI | Handout §10, Part C | Safe failure feedback: displays visible alert message when attachment download fails | `client/src/tests/lab-03/DownloadError.test.tsx` | Pass |
 | **E2E-01** | E2E | AC-01, AC-02, AC-20, FR-01, FR-02, FR-03 | E2E complete authentication, initial password change & logout | `e2e/lab-03/authentication.spec.ts` | Pass |
 | **E2E-02** | E2E | AC-05, AC-06, AC-07, AC-08, AC-15, AC-16, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15 | E2E IT Staff queue search, ticket detail claim, status & notes | `e2e/lab-03/staff-ticket-flow.spec.ts` | Pass |
 | **E2E-03** | E2E | AC-10, AC-17, AC-18, FR-17, FR-18, FR-19, FR-20 | E2E Administrator user creation, search, edit & safety checks | `e2e/lab-03/user-administration.spec.ts` | Pass |
@@ -336,11 +337,11 @@ dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
 
 ## 7. Final Automated Quality Summary (`lab3-final`)
 
-Full dual-run execution logs from clean database resets are recorded verbatim in [`docs/lab-03/evidence/final-run-2026-10-02.txt`](evidence/final-run-2026-10-02.txt).
+Full automated execution logs from preflight verification are recorded verbatim in [`docs/lab-03/evidence/final-run-2026-10-02.txt`](evidence/final-run-2026-10-02.txt).
 
 - **Client Production Build**: PASS (`tsc -b && vite build` — 0 errors)
-- **Backend API Tests (Server Vitest)**: 103 / 103 PASS in 24 test files (100%)
-- **Frontend Component Tests (Client Vitest)**: 31 / 31 PASS in 12 test files (100%)
+- **Backend API Tests (Server Vitest)**: 104 / 104 PASS in 24 test files (100%)
+- **Frontend Component Tests (Client Vitest)**: 32 / 32 PASS in 13 test files (100%)
 - **Playwright End-to-End Tests (Chromium)**: 27 / 27 PASS (100%)
-- **Grand Total Automated Tests**: **161 / 161 PASS (100% Green)**
+- **Grand Total Automated Tests**: **163 / 163 PASS (100% Green)**
 - **Database Consistency Verification**: Baseline `U0=10, T0=18` -> Post-test `U=10, T=26` (8 test tickets) -> Post-cleanup `U=10, T=18` (100% match)
