@@ -82,7 +82,10 @@ def main():
             print("  - " + err)
         sys.exit(1)
     else:
-        print("\n✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-22), FUNCTIONAL REQUIREMENTS (FR-01..FR-21), AND BUSINESS RULES (BR-01..BR-17) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.")
+        max_ac = max([int(x.split('-')[1]) for x in defined_acs]) if defined_acs else 0
+        max_fr = max([int(x.split('-')[1]) for x in defined_frs]) if defined_frs else 0
+        max_br = max([int(x.split('-')[1]) for x in defined_brs]) if defined_brs else 0
+        print(f"\n✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-{max_ac:02d}), FUNCTIONAL REQUIREMENTS (FR-01..FR-{max_fr:02d}), AND BUSINESS RULES (BR-01..BR-{max_br:02d}) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.")
         sys.exit(0)
 
 if __name__ == "__main__":
