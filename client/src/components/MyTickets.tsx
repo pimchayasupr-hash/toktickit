@@ -126,8 +126,6 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         return <span className="tkt-pill tkt-pill-status-in-progress">In Progress</span>;
       case 'WAITING_FOR_REQUESTER':
         return <span className="tkt-pill tkt-pill-status-pending">Waiting for Requester</span>;
-      case 'PENDING':
-        return <span className="tkt-pill tkt-pill-status-pending">Pending</span>;
       case 'RESOLVED':
         return <span className="tkt-pill tkt-pill-status-resolved">Resolved</span>;
       case 'REOPENED':
