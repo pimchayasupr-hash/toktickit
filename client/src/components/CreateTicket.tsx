@@ -131,7 +131,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
           <div className="flex justify-center gap-3 pt-4">
             <button
               type="button"
-              className="px-5 py-2.5 bg-[#005a36] hover:bg-[#008751] text-white font-semibold rounded-lg text-sm shadow transition-colors"
+              className="px-5 py-2.5 bg-[#006B3C] hover:bg-[#0B7A46] text-white font-semibold rounded-lg text-sm shadow transition-colors"
               onClick={() => onSuccess(createdTicket)}
             >
               View Ticket Details
@@ -267,7 +267,7 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 bg-[#005a36] hover:bg-[#008751] text-white text-sm font-semibold rounded-lg shadow transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 bg-[#006B3C] hover:bg-[#0B7A46] text-white text-sm font-semibold rounded-lg shadow transition-colors disabled:opacity-50"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
             </button>

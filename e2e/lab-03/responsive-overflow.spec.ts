@@ -118,8 +118,8 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
       };
     });
 
-    // Background rgb(0, 90, 54) = #005a36, Color rgb(255, 255, 255) = white
-    expect(styles.backgroundColor).toBe('rgb(0, 90, 54)');
+    // Background rgb(0, 107, 60) = #006B3C (Lab 2 primary), Color rgb(255, 255, 255) = white
+    expect(styles.backgroundColor).toBe('rgb(0, 107, 60)');
     expect(styles.color).toBe('rgb(255, 255, 255)');
   });
 

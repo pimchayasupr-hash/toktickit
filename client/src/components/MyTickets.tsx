@@ -282,7 +282,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
 
       {isLoading ? (
         <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
           <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading tickets...</p>
         </div>
       ) : tickets.length === 0 ? (
