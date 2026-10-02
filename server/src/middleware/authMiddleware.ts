@@ -60,8 +60,6 @@ export const authenticateUser = async (req: AuthRequest, res: Response, next: Ne
       token = authHeader.split(' ')[1];
     } else if (customHeader) {
       token = customHeader;
-    } else if (req.query && typeof req.query.token === 'string') {
-      token = req.query.token;
     }
 
     // STRICT BR-03 ENFORCEMENT: No client-supplied header bypass permitted.

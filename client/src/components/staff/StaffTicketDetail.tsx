@@ -67,6 +67,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Soft Removal Modal State
   const [removingAttachment, setRemovingAttachment] = useState<Attachment | null>(null);
@@ -180,6 +181,34 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       fetchTicketDetail();
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const handleDownloadAttachment = async (attachmentId: number, filename: string) => {
+    setDownloadError(null);
+    try {
+      const res = await fetch(`/api/attachments/${attachmentId}/download`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        let errorMsg = `Download failed (${res.status})`;
+        try {
+          const data = await res.json();
+          if (data?.error?.message) errorMsg = data.error.message;
+        } catch (_) {}
+        throw new Error(errorMsg);
+      }
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.download = filename;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
+    } catch (err: any) {
+      setDownloadError(err?.message || 'Failed to download attachment. Please try again.');
     }
   };
 
@@ -484,6 +513,12 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </button>
         </form>
 
+        {downloadError && (
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }} role="alert">
+            ⚠️ {downloadError}
+          </div>
+        )}
+
         <div style={{ display: 'grid', gap: '0.5rem' }}>
           {activeAttachments.length === 0 ? (
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>No active attachments.</p>
@@ -491,14 +526,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
             activeAttachments.map((a) => (
               <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                 <div>
-                  <a
-                    href={`/api/attachments/${a.id}/download${token ? `?token=${token}` : ''}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{ color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                    style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     📎 {a.originalFilename}
-                  </a>
+                  </button>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                     ({(a.sizeBytes / 1024).toFixed(1)} KB)
                   </span>
