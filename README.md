@@ -140,8 +140,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 > **Prerequisite**: Every full automated test run MUST start from a fresh database reset and seed to guarantee clean initial state and zero cross-test state contamination:
 > ```bash
-> cd server && npx prisma migrate reset --force
+> cd server && npx prisma migrate reset --force && npx prisma db seed
 > ```
+>
+> `migrate reset --force` drops the database, re-applies all migrations, and triggers the seeder configured in `package.json#prisma.seed`. The explicit `&& npx prisma db seed` above is a safety net — if the built-in seeder hook is skipped (e.g. `--skip-seed` flag), the seed still runs. Omitting this step causes Playwright tests to fail because they expect the canonical 5 seeded users and demo tickets.
 
 ```bash
 # Server tests (104 tests — API integration, authorization matrix, unit)
