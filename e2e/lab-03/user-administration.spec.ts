@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test';
+import { PrismaClient } from '../../server/node_modules/@prisma/client';
+
+const prisma = new PrismaClient();
 
 test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
+  test.afterAll(async () => {
+    // E2E hygiene: Clean up all temporary accounts created by Playwright
+    await prisma.user.deleteMany({
+      where: {
+        email: { startsWith: 'e2e.staff.' },
+      },
+    });
+    await prisma.$disconnect();
+  });
+
   test('E2E-03: Admin login, create user, search, and safety rules check', async ({ page }) => {
     await page.goto('http://localhost:5173');
 

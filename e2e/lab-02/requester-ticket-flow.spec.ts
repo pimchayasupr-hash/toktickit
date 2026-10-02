@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
+import { PrismaClient } from '../../server/node_modules/@prisma/client';
+
+const prisma = new PrismaClient();
 
 test.describe('Lab 2: Requester Ticket E2E Flow', () => {
+  test.afterAll(async () => {
+    await prisma.ticket.deleteMany({
+      where: { summary: 'Playwright E2E Test Ticket' },
+    });
+    await prisma.$disconnect();
+  });
   test('should select requester, create a ticket, and see it in My Tickets', async ({ page }) => {
     // 1. ไปที่หน้าแรก (หน้าเลือก Requester)
     await page.goto('http://localhost:5173');

@@ -105,10 +105,13 @@ const RELATED_SYSTEMS = [
 async function main() {
   console.log('Seeding database for Lab 3...');
 
-  // Remove test artifact tickets from dev data
+  // Remove test artifact tickets and legacy TXT- tickets from dev data
   await prisma.ticket.deleteMany({
     where: {
-      summary: { in: ['Issue 5 test ticket for attachments', 'Regression Test Ticket'] },
+      OR: [
+        { ticketNumber: { startsWith: 'TXT-' } },
+        { summary: { in: ['Issue 5 test ticket for attachments', 'Regression Test Ticket'] } },
+      ],
     },
   });
 
@@ -182,7 +185,7 @@ async function main() {
   // Canonical Seed Tickets across statuses, priorities, assigned/unassigned
   const sampleTickets = [
     {
-      ticketNumber: 'TXT-2026-001234',
+      ticketNumber: 'TKT-2026-001234',
       requesterId: req1Id,
       ownerId: staff1Id,
       categoryId: catHardware,
@@ -194,7 +197,7 @@ async function main() {
       currentStatus: 'IN_PROGRESS',
     },
     {
-      ticketNumber: 'TXT-2026-001233',
+      ticketNumber: 'TKT-2026-001233',
       requesterId: req2Id,
       ownerId: staff2Id,
       categoryId: catNetwork,
@@ -206,7 +209,7 @@ async function main() {
       currentStatus: 'OPEN',
     },
     {
-      ticketNumber: 'TXT-2026-001232',
+      ticketNumber: 'TKT-2026-001232',
       requesterId: req3Id,
       ownerId: null,
       categoryId: catSoftware,
@@ -218,7 +221,7 @@ async function main() {
       currentStatus: 'NEW',
     },
     {
-      ticketNumber: 'TXT-2026-001235',
+      ticketNumber: 'TKT-2026-001235',
       requesterId: req4Id,
       ownerId: staff3Id,
       categoryId: catNetwork,
@@ -230,7 +233,7 @@ async function main() {
       currentStatus: 'WAITING_FOR_REQUESTER',
     },
     {
-      ticketNumber: 'TXT-2026-001236',
+      ticketNumber: 'TKT-2026-001236',
       requesterId: req1Id,
       ownerId: staff1Id,
       categoryId: catHardware,
@@ -242,7 +245,7 @@ async function main() {
       currentStatus: 'RESOLVED',
     },
     {
-      ticketNumber: 'TXT-2026-001237',
+      ticketNumber: 'TKT-2026-001237',
       requesterId: req2Id,
       ownerId: staff2Id,
       categoryId: catAccount,
@@ -254,7 +257,7 @@ async function main() {
       currentStatus: 'CLOSED',
     },
     {
-      ticketNumber: 'TXT-2026-001238',
+      ticketNumber: 'TKT-2026-001238',
       requesterId: req3Id,
       ownerId: null,
       categoryId: catSoftware,
@@ -266,7 +269,7 @@ async function main() {
       currentStatus: 'REOPENED',
     },
     {
-      ticketNumber: 'TXT-2026-001239',
+      ticketNumber: 'TKT-2026-001239',
       requesterId: req4Id,
       ownerId: null,
       categoryId: catAccount,
@@ -296,7 +299,7 @@ async function main() {
     });
 
     // Seed Sample Public Comments & Internal Notes for first ticket (idempotent)
-    if (t.ticketNumber === 'TXT-2026-001234') {
+    if (t.ticketNumber === 'TKT-2026-001234') {
       await prisma.publicComment.deleteMany({ where: { ticketId: ticket.id } });
       await prisma.internalNote.deleteMany({ where: { ticketId: ticket.id } });
 

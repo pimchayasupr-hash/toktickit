@@ -1,6 +1,19 @@
 import { test, expect } from '@playwright/test';
+import { PrismaClient } from '../../server/node_modules/@prisma/client';
+
+const prisma = new PrismaClient();
 
 test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
+  test.afterAll(async () => {
+    // E2E hygiene: Clean up sample internal notes created by test
+    await prisma.internalNote.deleteMany({
+      where: {
+        content: 'Playwright E2E Internal Note verification.',
+      },
+    });
+    await prisma.$disconnect();
+  });
+
   test('E2E-02: IT Staff queue search, claim ticket, update status & notes', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
@@ -15,10 +28,10 @@ test.describe('Lab 3 E2E - IT Staff Ticket Queue & Detail Flow', () => {
     // Search for ticket
     await page.fill('input[placeholder*="Search"]', 'battery');
     await page.click('button:has-text("Search")');
-    await expect(page.getByText('Laptop battery drains quickly')).toBeVisible();
+    await expect(page.locator('.tkt-table').getByText('Laptop battery drains quickly')).toBeVisible();
 
     // Open detail
-    await page.click('button:has-text("Open Detail")');
+    await page.locator('.tkt-table tr').filter({ hasText: 'Laptop battery drains quickly' }).getByRole('button', { name: 'Open Detail' }).click();
     await expect(page.getByRole('heading', { name: 'Laptop battery drains quickly' })).toBeVisible();
 
     // Post internal note
