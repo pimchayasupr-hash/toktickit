@@ -50,6 +50,8 @@ describe('Lab 3 - Seed Idempotency Test Suite (A6)', () => {
     const seededUserCount1 = await prisma.user.count({
       where: { email: { in: SEEDED_USER_EMAILS } },
     });
+    const categoryCount1 = await prisma.category.count();
+    const systemCount1 = await prisma.relatedSystem.count();
     const seededTicketCount1 = await prisma.ticket.count({
       where: { ticketNumber: { in: SEEDED_TICKET_NUMBERS } },
     });
@@ -60,6 +62,8 @@ describe('Lab 3 - Seed Idempotency Test Suite (A6)', () => {
     const seededUserCount2 = await prisma.user.count({
       where: { email: { in: SEEDED_USER_EMAILS } },
     });
+    const categoryCount2 = await prisma.category.count();
+    const systemCount2 = await prisma.relatedSystem.count();
     const seededTicketCount2 = await prisma.ticket.count({
       where: { ticketNumber: { in: SEEDED_TICKET_NUMBERS } },
     });
@@ -67,6 +71,8 @@ describe('Lab 3 - Seed Idempotency Test Suite (A6)', () => {
     // Assert counts are identical and equal canonical seed counts
     expect(seededUserCount1).toBe(10);
     expect(seededUserCount2).toBe(seededUserCount1);
+    expect(categoryCount2).toBe(categoryCount1);
+    expect(systemCount2).toBe(systemCount1);
     expect(seededTicketCount1).toBe(18);
     expect(seededTicketCount2).toBe(18);
     expect(seededTicketCount2).toBe(seededTicketCount1);
