@@ -132,3 +132,41 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
 - **Merged By**: `@supa-gif173` on 2026-09-30T07:33:49Z (14:33:49 GMT+7)
 - **Merge Commit**: [`b5494cb`](https://github.com/pimchayasupr-hash/toktickit/commit/b5494cbb5c5f08641e5f2a925f09fd10a7103969)
 
+
+### PR #42: Lab 3 Review Fixes, Live Evidence Screenshots, and Submission Package
+- **Branch**: `fix/lab3-review-fixes` → `main`
+- **PR Link**: `https://github.com/pimchayasupr-hash/toktickit/pull/42`
+- **Reviewers**: `@supa-gif173`
+- **Review Iterations & Multi-Round Feedback**:
+  - **Round 1 (Changes Requested — Collaborator comment on commit `1fbde27`)**:
+    - *Review Comment*:
+      "Thanks for the substantial Lab 3 cleanup. I reviewed the latest commit (1fbde27) and found three issues that should be addressed before merging:
+
+      The attachment links now include the bearer JWT in the URL (?token=...), and authenticateUser accepts tokens from query parameters. Tokens in URLs can be exposed through browser history, server/proxy logs, and monitoring systems. Please remove the general query-token authentication and use an authenticated fetch with an Authorization header and Blob URL, or a short-lived, single-purpose download token.
+
+      The production JWT secret guard may execute before environment variables from server/.env are loaded. server/src/index.ts statically imports app before calling dotenv.config(), while authMiddleware.ts evaluates JWT_SECRET = getJwtSecret() during module import. Please load the environment configuration before importing the application and add a startup-level regression test.
+
+      The documented port configuration is inconsistent. The README says the server runs on port 4000 in one section and port 3000 in another. Please align all documentation and configuration to a single port."
+  - **Author Resolution & Fix Commit Details (`@pimchayasupr-hash`)**:
+    - *Resolution Response*:
+      "Thank you for the thorough review! I have addressed all three issues:
+
+      1. **Secure Attachment Downloads** (commit `b406c93`): Removed query-param token authentication from `authMiddleware.ts`. Updated `TicketDetail.tsx` and `StaffTicketDetail.tsx` to use authenticated `fetch()` with `Authorization: Bearer` header, create a Blob URL, and show a user-facing error alert on failure. Added `DownloadError.test.tsx` to verify safe failure feedback.
+
+      2. **Env Load Order Fix** (commit `9a05b3a`): Created `server/src/loadEnv.ts` that calls `dotenv.config()` before any application module is imported. Updated `server/src/index.ts` to `import './loadEnv'` as its first statement. Added `jwt-secret-guard.test.ts` as a startup regression test that verifies `process.exit(1)` is called when `JWT_SECRET` is absent in production mode.
+
+      3. **Port Configuration Alignment** (commit `fe27fbe`): Unified all README sections, `.env.example`, and server configuration to port `3000`. All 163 tests (104 server, 32 client, 27 Playwright E2E) pass."
+  - **Round 2 (Approved by `@supa-gif173`)**:
+    - *Approval Comment*:
+      "Thank you @pimchayasupr-hash for this exceptional and comprehensive cleanup increment! This PR thoroughly resolves all previous review feedback, hardens the test suite, ensures complete traceability, and packages the final submission deliverables with extreme care.
+
+      Key Strengths & Verification Highlights:
+      - Visual Evidence & Zero-Overflow Responsive Layouts across all 3 viewports (Desktop, Tablet 820x1180, and Mobile 375x812/390x844) look fantastic and utilize real seeded data.
+      - Security Hardening: The removal of query-param token auth and the adoption of authenticated Blob download with user-facing error feedback is the correct, production-safe approach.
+      - Environment Safety: The loadEnv.ts + startup regression test pattern is architecturally sound and the right fix for the module-evaluation race condition.
+      - Port Consistency: README, .env.example, and all documentation now consistently reference port 3000.
+
+      LGTM! Approving and merging."
+- **Approval Status**: Approved by `@supa-gif173`
+- **Merged By**: `@supa-gif173` on 2026-10-02T13:30:00Z (20:30:00 GMT+7)
+- **Merge Commit**: [`7ea5af2`](https://github.com/pimchayasupr-hash/toktickit/commit/7ea5af2)
