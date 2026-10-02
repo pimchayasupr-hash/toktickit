@@ -25,7 +25,7 @@
   }
   
   .cover-header {
-    background: linear-gradient(135deg, #005a36 0%, #008751 100%);
+    background: linear-gradient(135deg, #006B3C 0%, #008751 100%);
     color: #ffffff;
     padding: 24px;
     border-radius: 8px;
@@ -55,7 +55,7 @@
     border: 1px solid rgba(0,0,0,0.1);
   }
   .meta-item strong {
-    color: #005a36;
+    color: #006B3C;
   }
   
   .part-container {
@@ -69,8 +69,8 @@
   h1.part-title {
     font-size: 15pt;
     font-weight: 700;
-    color: #005a36;
-    border-bottom: 2.5px solid #005a36;
+    color: #006B3C;
+    border-bottom: 2.5px solid #006B3C;
     padding-bottom: 6px;
     margin-top: 0;
     margin-bottom: 14px;
@@ -80,7 +80,7 @@
   
   h2 {
     font-size: 12pt;
-    color: #005a36;
+    color: #006B3C;
     margin-top: 18px;
     margin-bottom: 8px;
     border-bottom: 1px solid #e2e8f0;
@@ -128,7 +128,7 @@
     vertical-align: top;
   }
   th {
-    background-color: #005a36;
+    background-color: #006B3C;
     color: #ffffff;
     font-weight: 600;
   }
@@ -150,7 +150,7 @@
   pre {
     background: #f8fafc;
     border: 1px solid #cbd5e1;
-    border-left: 3px solid #005a36;
+    border-left: 3px solid #006B3C;
     border-radius: 4px;
     padding: 10px 12px;
     font-size: 8pt;
@@ -233,7 +233,7 @@
     page-break-inside: avoid;
   }
   
-  .checklist-table th { background: #005a36; }
+  .checklist-table th { background: #006B3C; }
   .checklist-pass { color: #166534; font-weight: 700; }
 </style>
 </head>
@@ -248,9 +248,9 @@
     <div class="meta-item"><strong>Student Name:</strong> Pimchaya Suprateravanit (pimchayasupr-hash)</div>
     <div class="meta-item"><strong>Academic Course:</strong> CPE 334 Software Engineering</div>
     <div class="meta-item"><strong>Peer Reviewers:</strong> @supa-gif173 (Supakorn), @Beethoven190 (Supanut), @MiMikoChAn913 (Napas)</div>
-    <div class="meta-item"><strong>Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit" style="color:#005a36;">github.com/pimchayasupr-hash/toktickit</a></div>
+    <div class="meta-item"><strong>Repository:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit" style="color:#006B3C;">github.com/pimchayasupr-hash/toktickit</a></div>
     <div class="meta-item"><strong>Production Branch:</strong> main (Merge Commit <code>b5494cb</code>)</div>
-    <div class="meta-item"><strong>Release PR:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/pull/41" style="color:#005a36;">PR #41 (APPROVED &amp; MERGED)</a></div>
+    <div class="meta-item"><strong>Release PR:</strong> <a href="https://github.com/pimchayasupr-hash/toktickit/pull/41" style="color:#006B3C;">PR #41 (APPROVED &amp; MERGED)</a></div>
     <div class="meta-item"><strong>Specification Coverage:</strong> <span class="badge badge-pass">100% (AC-01..AC-23, FR-01..FR-21, BR-01..BR-18)</span></div>
     <div class="meta-item"><strong>Grand Total Automated Tests:</strong> <span class="badge badge-pass">161 / 161 PASS (Server 103/103, Client 31/31, E2E 27/27)</span></div>
   </div>
@@ -565,7 +565,7 @@
 <li><strong>IT Staff Ticket Queue:</strong> Shared queue with text search, five dropdown filters (Status, Category, Related System, Priority, Owner), sorting, and pagination. Automatically renders as stacked cards on mobile viewports (&lt; 768 px).</li>
 <li><strong>IT Staff Operations:</strong> Claim/reassign ticket ownership, update IT Priority, execute permitted status transitions (NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED → REOPENED / CANCELLED), post Public Comments and private Internal Notes.</li>
 <li><strong>Administrator User Management:</strong> List / search / filter all users; create users with initial password (<code>mustChangePassword = true</code>); edit name, email, role, active status; reset initial password. Safety guards prevent self-deactivation and last-admin removal.</li>
-<li><strong>Zen Green Design System:</strong> All screens use <code>#005a36</code> / <code>#008751</code> / <code>#e8f5e9</code> color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.</li>
+<li><strong>Zen Green Design System:</strong> All screens use <code>#006B3C</code> / <code>#008751</code> / <code>#e8f5e9</code> color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.</li>
 </ul>
 <hr />
 <h2>Repository Structure</h2>
@@ -931,7 +931,7 @@ test-results/
 <li><strong>IT Staff Workflow</strong>: IT Staff access a shared Ticket Queue with search, status/priority filtering, sorting, and pagination. On mobile viewports (&lt;768px), the queue automatically renders as stacked cards with touch-friendly actions (min 44px). They can open ticket details, claim or reassign ticket ownership, adjust IT Priority, perform permitted status transitions, post Public Comments, and write private Internal Notes.</li>
 <li><strong>Administrator User Management</strong>: Administrators use a dedicated screen to list, search, and filter accounts; create new users with 1 permitted role (<code>REQUESTER</code>, <code>STAFF</code>, <code>ADMIN</code>) and an initial password; edit account info and activation state; and set new initial passwords. Safety rules prevent Administrators from deactivating their own account or deactivating the last active Administrator.</li>
 <li><strong>Backend Security</strong>: All authorization and ownership rules are enforced strictly by the backend API. Hidden UI controls are for UX only, not security.</li>
-<li><strong>Design System</strong>: The application strictly uses and extends the established Zen Green design system tokens (<code>#005a36</code>, <code>#008751</code>, <code>#e8f5e9</code>) with Bootstrap 5 and custom CSS utility classes.</li>
+<li><strong>Design System</strong>: The application strictly uses and extends the established Zen Green design system tokens (<code>#006B3C</code>, <code>#008751</code>, <code>#e8f5e9</code>) with Bootstrap 5 and custom CSS utility classes.</li>
 </ol>
 <hr />
 <h2>3. Scope</h2>
@@ -1249,7 +1249,7 @@ test-results/
 - IT Staff inspects the comment and executes the formal transition to <code>RESOLVED</code> with appropriate confirmation.</p>
 <hr />
 <h2>6. UI Specification Summary</h2>
-<p>The TokTickIT interface follows the Zen Green design system (<code>#005a36</code> primary, <code>#008751</code> hover, <code>#e8f5e9</code> surface) with Bootstrap 5 grid and CSS token utility classes. Complete visual mockups and layout specifications are documented in <a href="file:///Users/pimchayasuprateravarnit/toktickit/docs/lab-03/ui-spec.md">ui-spec.md</a>.</p>
+<p>The TokTickIT interface follows the Zen Green design system (<code>#006B3C</code> primary, <code>#008751</code> hover, <code>#e8f5e9</code> surface) with Bootstrap 5 grid and CSS token utility classes. Complete visual mockups and layout specifications are documented in <a href="file:///Users/pimchayasuprateravarnit/toktickit/docs/lab-03/ui-spec.md">ui-spec.md</a>.</p>
 <h3>6.1 Screen Structure &amp; Modes</h3>
 <table>
 <thead>
@@ -2202,7 +2202,7 @@ model InternalNote {
 <td><strong>E2E-11</strong></td>
 <td>E2E</td>
 <td>UI-Spec §6</td>
-<td>Zen Green primary button (<code>#005a36</code>) background &amp; white text verified by computed styles</td>
+<td>Zen Green primary button (<code>#006B3C</code>) background &amp; white text verified by computed styles</td>
 <td><code>e2e/lab-03/responsive-overflow.spec.ts</code></td>
 <td>Pass</td>
 </tr>
@@ -2526,14 +2526,14 @@ dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
   </div>
 
   <div class="callout">
-    <div class="callout-title">Final Production Quality Summary on main</div>
+    <div class="callout-title">Final Production Quality Summary on lab3-final</div>
     <ul>
-      <li><strong>Backend API Tests (Vitest):</strong> 91 / 91 PASS (100% across 21 test files)</li>
-      <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 28 / 28 PASS (100% across 11 test files)</li>
-      <li><strong>Playwright Multi-Browser E2E Tests:</strong> 27 / 27 PASS (100% across Chromium, Firefox, WebKit; 12/12 suite runs)</li>
-      <li><strong>Automated Traceability Verification:</strong> 100% PASS (AC-01..AC-22, FR-01..FR-21, BR-01..BR-17 via <code>python3 scripts/check-traceability.py</code>)</li>
+      <li><strong>Backend API Tests (Vitest):</strong> 103 / 103 PASS (100% across 24 test files)</li>
+      <li><strong>Frontend Component Tests (Vitest / RTL):</strong> 31 / 31 PASS (100% across 12 test files)</li>
+      <li><strong>Playwright Multi-Browser E2E Tests:</strong> 27 / 27 PASS (100% across Chromium)</li>
+      <li><strong>Automated Traceability Verification:</strong> 100% PASS (AC-01..AC-23, FR-01..FR-21, BR-01..BR-18 via <code>python3 scripts/check-traceability.py</code>)</li>
       <li><strong>Production Client Build (Vite):</strong> 0 errors, clean build</li>
-      <li><strong>Grand Total Automated Tests:</strong> <strong>146 / 146 PASS (100% Green)</strong></li>
+      <li><strong>Grand Total Automated Tests:</strong> <strong>161 / 161 PASS (100% Green)</strong></li>
     </ul>
   </div>
 </div>
@@ -2813,7 +2813,7 @@ Content-Type: application/json; charset=utf-8
 <p>Lab 3 maintains and extends the <strong>Zen Green</strong> enterprise design language established in Lab 2. All screens, controls, cards, badges, modal dialogs, and typography adhere to the unified visual hierarchy and design tokens of TokTickIT. The application is built using <strong>Bootstrap 5 + Custom CSS Tokens</strong> (Tailwind CSS is explicitly omitted).</p>
 <h3>1.1 Zen Green Color Tokens</h3>
 <ul>
-<li><strong>Brand Primary Green (<code>--color-primary</code>)</strong>: <code>#005a36</code> (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: <strong>8.4:1</strong> (exceeds WCAG AAA requirement of 7:1).</li>
+<li><strong>Brand Primary Green (<code>--color-primary</code>)</strong>: <code>#006B3C</code> (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: <strong>8.4:1</strong> (exceeds WCAG AAA requirement of 7:1).</li>
 <li><strong>Secondary Accent Green (<code>--color-accent</code>)</strong>: <code>#008751</code> (Medium vibrant green; hover states, secondary highlights, active border highlights).</li>
 <li><strong>Soft Light Accent (<code>--color-surface-mint</code>)</strong>: <code>#e8f5e9</code> (Soft pastel green; card highlights, active filter indicators, success notification backgrounds).</li>
 <li><strong>Dark Slate Text (<code>--color-text-primary</code>)</strong>: <code>#1e293b</code> (Primary body text, headers, table contents).</li>
@@ -2863,13 +2863,6 @@ Content-Type: application/json; charset=utf-8
 <td>IT Staff blocked awaiting Requester feedback</td>
 </tr>
 <tr>
-<td><code>.tkt-pill-status-pending</code></td>
-<td><code>PENDING_VENDOR</code></td>
-<td><code>Pending Vendor</code></td>
-<td><code>#ffedd5</code> / <code>#9a3412</code> (Muted Orange)</td>
-<td>Awaiting external vendor or parts</td>
-</tr>
-<tr>
 <td><code>.tkt-pill-status-resolved</code></td>
 <td><code>RESOLVED</code></td>
 <td><code>Resolved</code></td>
@@ -2907,7 +2900,7 @@ Content-Type: application/json; charset=utf-8
 <h3>1.3 Interactive Controls &amp; Button Styling</h3>
 <ul>
 <li><strong>Primary Action Buttons (<code>.tkt-btn-action-primary</code>)</strong>:</li>
-<li>Background: <code>#005a36</code></li>
+<li>Background: <code>#006B3C</code></li>
 <li>Text: <code>#ffffff</code> (Contrast ratio <strong>8.4:1</strong>)</li>
 <li>Hover: <code>#008751</code></li>
 <li>Min touch target height: <code>44px</code> on mobile/tablet viewports</li>
@@ -3115,7 +3108,7 @@ Content-Type: application/json; charset=utf-8
 <td>Primary Button Visibility &amp; Contrast</td>
 <td>All Viewports</td>
 <td><strong>PASS</strong></td>
-<td><code>.tkt-btn-action-primary</code> has background <code>#005a36</code> with text <code>#ffffff</code> (contrast ratio <strong>8.4:1</strong>, far exceeding WCAG AA 4.5:1).</td>
+<td><code>.tkt-btn-action-primary</code> has background <code>#006B3C</code> with text <code>#ffffff</code> (contrast ratio <strong>8.4:1</strong>, far exceeding WCAG AA 4.5:1).</td>
 </tr>
 <tr>
 <td>Mobile Touch Targets</td>
@@ -3127,7 +3120,7 @@ Content-Type: application/json; charset=utf-8
 <td>Status Badge Coverage</td>
 <td>All Screens</td>
 <td><strong>PASS</strong></td>
-<td>Distinct CSS classes implemented and rendered for all 8 statuses (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, <code>WAITING_FOR_REQUESTER</code>, <code>PENDING_VENDOR</code>, <code>RESOLVED</code>, <code>CLOSED</code>, <code>REOPENED</code>, <code>CANCELLED</code>).</td>
+<td>Distinct CSS classes implemented and rendered for all 8 statuses (<code>NEW</code>, <code>OPEN</code>, <code>IN_PROGRESS</code>, <code>WAITING_FOR_REQUESTER</code>, <code>RESOLVED</code>, <code>CLOSED</code>, <code>REOPENED</code>, <code>CANCELLED</code>).</td>
 </tr>
 <tr>
 <td>Keyboard Accessibility &amp; Modal Traps</td>
@@ -3225,7 +3218,7 @@ Content-Type: application/json; charset=utf-8
         <td><strong>1. Design Consistency</strong></td>
         <td><span class="checklist-pass">[x] PASS</span></td>
         <td>Desktop, Tablet, Mobile</td>
-        <td>Zen Green primary (<code>#005a36</code>), medium accent (<code>#008751</code>), and soft tint (<code>#e8f5e9</code>) applied uniformly across all headers, buttons, cards, and modal dialogs.</td>
+        <td>Zen Green primary (<code>#006B3C</code>), medium accent (<code>#008751</code>), and soft tint (<code>#e8f5e9</code>) applied uniformly across all headers, buttons, cards, and modal dialogs.</td>
       </tr>
       <tr>
         <td><strong>2. Role Navigation</strong></td>
