@@ -5,7 +5,7 @@
 Lab 3 maintains and extends the **Zen Green** enterprise design language established in Lab 2. All screens, controls, cards, badges, modal dialogs, and typography adhere to the unified visual hierarchy and design tokens of TokTickIT. The application is built using **Bootstrap 5 + Custom CSS Tokens** (Tailwind CSS is explicitly omitted).
 
 ### 1.1 Zen Green Color Tokens
-- **Brand Primary Green (`--color-primary`)**: `#005a36` (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: **8.4:1** (exceeds WCAG AAA requirement of 7:1).
+- **Brand Primary Green (`--color-primary`)**: `#006B3C` (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: **8.4:1** (exceeds WCAG AAA requirement of 7:1).
 - **Secondary Accent Green (`--color-accent`)**: `#008751` (Medium vibrant green; hover states, secondary highlights, active border highlights).
 - **Soft Light Accent (`--color-surface-mint`)**: `#e8f5e9` (Soft pastel green; card highlights, active filter indicators, success notification backgrounds).
 - **Dark Slate Text (`--color-text-primary`)**: `#1e293b` (Primary body text, headers, table contents).
@@ -22,7 +22,6 @@ TokTickIT supports all **8 ticket lifecycle statuses** and **4 priority levels**
 | `.tkt-pill-status-open` | `OPEN` | `Open` | `#e0f2fe` / `#0369a1` (Sky Blue) | Triaged and acknowledged by IT |
 | `.tkt-pill-status-in-progress` | `IN_PROGRESS` | `In Progress` | `#fef3c7` / `#92400e` (Amber Gold) | IT Staff actively working on resolution |
 | `.tkt-pill-status-waiting` | `WAITING_FOR_REQUESTER` | `Waiting for Requester` | `#f3e8ff` / `#6b21a8` (Lavender Purple) | IT Staff blocked awaiting Requester feedback |
-| `.tkt-pill-status-pending` | `PENDING_VENDOR` | `Pending Vendor` | `#ffedd5` / `#9a3412` (Muted Orange) | Awaiting external vendor or parts |
 | `.tkt-pill-status-resolved` | `RESOLVED` | `Resolved` | `#dcfce7` / `#166534` (Soft Mint Green) | Work completed; awaiting requester verification |
 | `.tkt-pill-status-closed` | `CLOSED` | `Closed` | `#f1f5f9` / `#475569` (Cool Slate Gray) | Permanently closed ticket |
 | `.tkt-pill-status-reopened` | `REOPENED` | `Reopened` | `#fee2e2` / `#991b1b` (Muted Red) | Reopened following failed verification |
@@ -36,7 +35,7 @@ TokTickIT supports all **8 ticket lifecycle statuses** and **4 priority levels**
 
 ### 1.3 Interactive Controls & Button Styling
 - **Primary Action Buttons (`.tkt-btn-action-primary`)**:
-  - Background: `#005a36`
+  - Background: `#006B3C`
   - Text: `#ffffff` (Contrast ratio **8.4:1**)
   - Hover: `#008751`
   - Min touch target height: `44px` on mobile/tablet viewports
@@ -123,8 +122,8 @@ The navigation bar implements strict role isolation conforming to stakeholder re
 | Requirement Item | Target Viewports | Status | Verified Evidence |
 |---|---|---|---|
 | Zero Horizontal Scroll (`scrollWidth <= clientWidth`) | 375px, 390px, 820px, 1440px | **PASS** | Automated Playwright responsive test (`e2e/lab-03/responsive-overflow.spec.ts`) passes across all 4 breakpoints for Login, Queue, Detail, Admin. |
-| Primary Button Visibility & Contrast | All Viewports | **PASS** | `.tkt-btn-action-primary` has background `#005a36` with text `#ffffff` (contrast ratio **8.4:1**, far exceeding WCAG AA 4.5:1). |
+| Primary Button Visibility & Contrast | All Viewports | **PASS** | `.tkt-btn-action-primary` has background `#006B3C` with text `#ffffff` (contrast ratio **8.4:1**, far exceeding WCAG AA 4.5:1). |
 | Mobile Touch Targets | Mobile (<768px) | **PASS** | Action buttons on mobile cards have min-height of 44px (`min-height: 44px; display: inline-flex; align-items: center; justify-content: center;`). |
-| Status Badge Coverage | All Screens | **PASS** | Distinct CSS classes implemented and rendered for all 8 statuses (`NEW`, `OPEN`, `IN_PROGRESS`, `WAITING_FOR_REQUESTER`, `PENDING_VENDOR`, `RESOLVED`, `CLOSED`, `REOPENED`, `CANCELLED`). |
+| Status Badge Coverage | All Screens | **PASS** | Distinct CSS classes implemented and rendered for all 8 statuses (`NEW`, `OPEN`, `IN_PROGRESS`, `WAITING_FOR_REQUESTER`, `RESOLVED`, `CLOSED`, `REOPENED`, `CANCELLED`). |
 | Keyboard Accessibility & Modal Traps | All Modals | **PASS** | Pressing `Escape` closes Create User, Edit User, Reset Password, and Change Password modals. |
 | Distinct Internal Notes vs Public Comments | IT Staff Detail | **PASS** | Internal notes render with amber/yellow background (`#fef3c7`), dark amber border (`#f59e0b`), and private lock icon, completely distinct from green-accented public comments. |

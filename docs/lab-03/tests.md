@@ -37,10 +37,12 @@ The Lab 3 test suite provides 100% traceability across all Functional Requiremen
 | **API-17** | API | AC-17, FR-17 | Admin search users by name/email & filter by role | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-17b** | API | FR-19 | Admin update user name and role succeeds | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
 | **API-18** | API | AC-18, FR-20 | Admin reset initial password forces password change flag | `server/tests/lab-03/users-admin.api.test.ts` | Pass |
-| **API-19** | API | AC-02, BR-02, BR-06 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-19** | API | AC-23, FR-02, BR-06, BR-18 | Password change rejects weak passwords (missing uppercase, lowercase, digit, or special character) | `server/tests/lab-03/auth.api.test.ts` | Pass |
 | **API-20** | API | AC-02, FR-02, FR-04, BR-02 | Protected endpoint with `mustChangePassword=true` blocks all operations except /auth/me, /change-password, /logout | `server/tests/lab-03/auth.api.test.ts` | Pass |
 | **API-21** | API | AC-03, FR-01, BR-01 | Inactive account blocks login even with correct password | `server/tests/lab-03/auth.api.test.ts` | Pass |
 | **API-22** | API | AC-02, FR-02, BR-02 | Password change rejects empty, missing, or incorrect `currentPassword` | `server/tests/lab-03/auth.api.test.ts` | Pass |
+| **API-23** | API | AC-06, FR-11, BR-07 | STAFF login fetches /api/staff/assignees successfully and reassigns ticket for real | `server/tests/lab-03/staff-ticket-detail.api.test.ts` | Pass |
+| **API-24** | API | AC-05, FR-09, FR-10 | Staff Queue filters by search AND priority simultaneously without overwriting OR conditions | `server/tests/lab-03/staff-queue.api.test.ts` | Pass |
 | **API-25** | API | AC-19, FR-08, BR-05 | Requester "Problem Appears Resolved" appends system public comment without changing status | `server/tests/lab-03/comments-notes.api.test.ts` | Pass |
 | **UT-01** | Unit | BR-02, BR-06 | Password validator rejects passwords < 8 chars | `server/tests/lab-03/unit.test.ts` | Pass |
 | **UT-02** | Unit | BR-02, BR-06 | Password validator enforces uppercase, lowercase, digit, special char requirements | `server/tests/lab-03/unit.test.ts` | Pass |
@@ -449,19 +451,19 @@ Running 9 tests using 1 worker
   9 passed (20.0s)
 ```
 
-### 5. Final Quality Summary (lab3-review-fixes milestone: 90+28+27=145)
+### 5. Final Quality Summary (lab3-final: 103+31+27=161)
 - **Client TypeScript / Vite Build**: PASS (0 errors)
-- **Backend API Tests (Server Vitest)**: 90 / 90 PASS in 21 test files (100%)
-- **Frontend Component Tests (Client Vitest)**: 28 / 28 PASS in 11 test files (100%)
+- **Backend API Tests (Server Vitest)**: 103 / 103 PASS in 24 test files (100%)
+- **Frontend Component Tests (Client Vitest)**: 31 / 31 PASS in 12 test files (100%)
 - **End-to-End Playwright Tests (Chromium)**: 27 / 27 PASS (100%)
-- **Grand Total Automated Tests**: **145 / 145 PASS (100% Green)**
+- **Grand Total Automated Tests**: **161 / 161 PASS (100% Green)**
 
 ### 5. Final Quality Summary (Pre-PR #41)
 - **Client TypeScript / Vite Build**: PASS (0 errors, 824ms)
-- **Backend API Tests**: 56 / 56 PASS (100%)
-- **Frontend Component Tests**: 13 / 13 PASS (100%)
-- **End-to-End Multi-Browser Tests**: 9 / 9 PASS (100%)
-- **Grand Total Automated Tests**: **78 / 78 PASS (100% Green)**
+- **Backend API Tests**: 56 passed (100%)
+- **Frontend Component Tests**: 13 passed (100%)
+- **End-to-End Multi-Browser Tests**: 9 passed (100%)
+- **Grand Total Automated Tests**: **78 passed (100% Green)**
 
 ---
 
@@ -496,8 +498,8 @@ npm --prefix client test -- --run
 ```
 
 ### 3. Final Production Quality Summary on `main`
-- **Backend API Tests**: **60 / 60 PASS (100%)**
-- **Frontend Component Tests**: **13 / 13 PASS (100%)**
-- **Playwright Multi-Browser E2E Tests**: **9 / 9 PASS (100%)**
-- **Grand Total Automated Tests**: **82 / 82 PASS (100% Green)**
+- **Backend API Tests**: **60 passed (100%)**
+- **Frontend Component Tests**: **13 passed (100%)**
+- **Playwright Multi-Browser E2E Tests**: **9 passed (100%)**
+- **Grand Total Automated Tests**: **82 passed (100% Green)**
 

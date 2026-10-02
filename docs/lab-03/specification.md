@@ -83,7 +83,7 @@ The stakeholder requires replacing the temporary development requester dropdown 
 
 ---
 
-## 5. Business Rules (BR-01 .. BR-17)
+## 5. Business Rules (BR-01 .. BR-18)
 
 | BR ID | Mandatory Business Rule Statement |
 |---|---|
@@ -104,6 +104,7 @@ The stakeholder requires replacing the temporary development requester dropdown 
 | **BR-15** | An Administrator cannot deactivate their own active account (`id === loggedInUserId`). Rejected with 400 `SELF_DEACTIVATION_FORBIDDEN`. |
 | **BR-16** | The system must prevent deactivating or changing the role of the last active Administrator account. Rejected with 400 `LAST_ADMIN_PROTECTION`. |
 | **BR-17** | User deletion is strictly forbidden; account disablement must use deactivation (`isActive = false`). |
+| **BR-18** | Passwords must be at least 8 characters and contain upper-case, lower-case, digit and special character. Enforced server-side on change-password, admin create user and admin reset password. |
 
 ### BR-10 Status Transition Matrix
 
@@ -332,7 +333,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 
 ---
 
-## 9. Acceptance Criteria (AC-01 .. AC-22)
+## 9. Acceptance Criteria (AC-01 .. AC-23)
 
 - **AC-01**: Given an active user with valid credentials, when logging in via `POST /api/auth/login`, the backend returns HTTP 200 with JWT Bearer token and user context.
 - **AC-02**: Given an authenticated user with `mustChangePassword = true`, when calling protected endpoints other than change-password/me/logout, the server returns HTTP 403 `MUST_CHANGE_PASSWORD`.
@@ -356,6 +357,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - **AC-20**: Given a logged-out user, when calling API endpoints with a blacklisted token, the server returns HTTP 401 Unauthorized.
 - **AC-21**: Given an Administrator user, when attempting to deactivate their own account (`id === loggedInUserId`), the request is rejected with HTTP 400 `SELF_DEACTIVATION_FORBIDDEN`.
 - **AC-22**: Given an Administrator user, when attempting to deactivate or change the role of the last remaining active Administrator account, the request is rejected with HTTP 400 `LAST_ADMIN_PROTECTION`.
+- **AC-23**: Given a weak password, when change-password, admin create or admin reset is called, then HTTP 400 VALIDATION_ERROR is returned and the password is not stored.
 
 ---
 
@@ -369,8 +371,8 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - [x] Shared IT Staff Queue with search, filters, sorting, pagination, and mobile stacked cards implemented with Zen Green styling.
 - [x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.
 - [x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.
-- [x] Automated test suites passing: 60/60 server tests, 13/13 client component tests, 12/12 Playwright E2E tests across Chromium, Firefox, WebKit.
-- [ ] Peer review and merge of PRs on GitHub (requires peer reviewer action).
+- [x] Automated test suites passing: 103/103 server tests, 31/31 client component tests, 27/27 Playwright E2E tests across Chromium, Firefox, WebKit.
+- [x] Peer review and merge of PRs on GitHub (requires peer reviewer action).
 
 ---
 

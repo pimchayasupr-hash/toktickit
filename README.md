@@ -6,7 +6,7 @@ TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk applicati
 - **Backend:** Node.js + Express + TypeScript (`server/`)
 - **Database:** PostgreSQL accessed via Prisma ORM (`server/prisma/`)
 - **Auth:** JSON Web Tokens (JWT) with role-based middleware (`server/src/middleware/authMiddleware.ts`)
-- **Testing:** Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — **145 / 145 tests passing**
+- **Testing:** Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — **161 / 161 tests passing (103 Server, 31 Client, 27 Playwright E2E)**
 
 ---
 
@@ -18,7 +18,7 @@ TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk applicati
 - **IT Staff Ticket Queue:** Shared queue with text search, five dropdown filters (Status, Category, Related System, Priority, Owner), sorting, and pagination. Automatically renders as stacked cards on mobile viewports (< 768 px).
 - **IT Staff Operations:** Claim/reassign ticket ownership, update IT Priority, execute permitted status transitions (NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED → REOPENED / CANCELLED), post Public Comments and private Internal Notes.
 - **Administrator User Management:** List / search / filter all users; create users with initial password (`mustChangePassword = true`); edit name, email, role, active status; reset initial password. Safety guards prevent self-deactivation and last-admin removal.
-- **Zen Green Design System:** All screens use `#005a36` / `#008751` / `#e8f5e9` color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.
+- **Zen Green Design System:** All screens use `#006B3C` / `#0B7A46` / `#EAF6EF` color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.
 
 ---
 
@@ -30,7 +30,7 @@ toktickit/
 │   ├── src/
 │   │   ├── components/              # UI Components (Login, Navbar, TicketForm, StaffQueue, UserManagement, …)
 │   │   ├── context/                 # AuthContext — current user, JWT storage, role helpers
-│   │   └── tests/lab-03/            # React Testing Library component tests (28 tests)
+│   │   └── tests/lab-03/            # React Testing Library component tests (31 tests)
 │   └── vite.config.ts
 │
 ├── server/                          # Node.js + Express + TypeScript backend
@@ -47,7 +47,7 @@ toktickit/
 │   │   ├── schema.prisma            # User, Ticket, PublicComment, InternalNote models
 │   │   ├── migrations/              # Prisma migration history (Lab 2 → Lab 3 migration included)
 │   │   └── seed.ts                  # Idempotent seed — 1 Admin, 1 Staff, 3 Requesters + demo tickets
-│   └── tests/lab-03/                # Vitest + Supertest API integration tests (90 tests)
+│   └── tests/lab-03/                # Vitest + Supertest API integration tests (103 tests)
 │
 ├── e2e/lab-03/                      # Playwright end-to-end tests (27 tests)
 │   ├── auth.spec.ts
@@ -57,7 +57,7 @@ toktickit/
 │
 └── docs/lab-03/                     # Lab 3 documentation
     ├── specification.md             # 11-section Spec DD document
-    ├── tests.md                     # Test DD + traceability matrix (145/145)
+    ├── tests.md                     # Test DD + traceability matrix (161/161)
     ├── report.md                    # Sprint report / Git workflow evidence
     ├── ui-spec.md                   # UI layout & screen wireframes
     ├── api-spec.md                  # OpenAPI-style endpoint reference
@@ -138,18 +138,23 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Running Tests
 
+> **Prerequisite**: Every full automated test run MUST start from a fresh database reset and seed to guarantee clean initial state and zero cross-test state contamination:
+> ```bash
+> cd server && npx prisma migrate reset --force
+> ```
+
 ```bash
-# Server tests (90 tests — API integration, authorization matrix, unit)
+# Server tests (103 tests — API integration, authorization matrix, unit)
 cd server && npm test
 
-# Client tests (28 tests — component feedback states, form validation)
+# Client tests (31 tests — component feedback states, form validation)
 cd client && npm test
 
 # Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
 npx playwright test --project=chromium
 ```
 
-All 145 tests pass on `main` and `lab3-staging` branches.
+All 161 tests pass (103 Server, 31 Client, 27 Playwright E2E).
 
 ---
 
@@ -185,5 +190,5 @@ NEW / OPEN / IN_PROGRESS / WAITING_FOR_REQUESTER → CANCELLED
 Full Lab 3 documentation is in [`docs/lab-03/`](docs/lab-03/):
 
 - [`specification.md`](docs/lab-03/specification.md) — Spec DD (Sprint Goal → FR → BR → UI → Data → API → AC)
-- [`tests.md`](docs/lab-03/tests.md) — Test DD (145 tests with full traceability matrix)
+- [`tests.md`](docs/lab-03/tests.md) — Test DD (161 tests with full traceability matrix)
 - [`report.md`](docs/lab-03/report.md) — Sprint report and Git workflow evidence
