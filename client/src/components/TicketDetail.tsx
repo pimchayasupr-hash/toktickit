@@ -170,6 +170,28 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
     }
   };
 
+  const handleDownloadAttachment = async (attachment: Attachment) => {
+    try {
+      const res = await fetch(`/api/attachments/${attachment.id}/download`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error('Failed to download file.');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.originalFilename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Download failed');
+    }
+  };
+
   if (isLoading) {
     return (
       <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }} data-testid="ticket-detail-loading">
@@ -403,14 +425,13 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                   activeAttachments.map((a) => (
                     <div key={a.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                       <div>
-                        <a
-                          href={`/api/attachments/${a.id}/download`}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ color: '#005a36', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none' }}
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadAttachment(a)}
+                          style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                         >
                           📎 {a.originalFilename}
-                        </a>
+                        </button>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                           ({(a.sizeBytes / 1024).toFixed(1)} KB)
                         </span>
