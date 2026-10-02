@@ -1,3 +1,6 @@
+// PRECONDITION: this test assumes a freshly reset database (npx prisma migrate reset --force)
+// Running it against a database with pre-existing or extra data WILL cause false failures.
+
 import { describe, it, expect, afterAll } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { seedDatabase } from '../../prisma/seed';

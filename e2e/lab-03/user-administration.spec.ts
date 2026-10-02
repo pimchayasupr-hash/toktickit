@@ -92,7 +92,7 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
   });
   test.afterAll(async () => {
     // Clean up users created during E2E tests to avoid polluting the database
-    const { PrismaClient } = await import('../../server/node_modules/@prisma/client');
+    const { PrismaClient } = require('../../server/node_modules/@prisma/client');
     const prisma = new PrismaClient();
     try {
       const users = await prisma.user.findMany({
