@@ -107,24 +107,53 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
       });
       const userIds = users.map((u) => u.id);
       if (userIds.length > 0) {
-        // FK-safe deletion order
+        // 1. For tickets OWNED by a test user: set ownerId = null (do not delete)
+        await prisma.ticket.updateMany({
+          where: { ownerId: { in: userIds } },
+          data: { ownerId: null },
+        });
+
+        // 2. Delete only tickets whose requesterId is a test user (never seeded tickets)
+        const ticketsToDelete = await prisma.ticket.findMany({
+          where: {
+            requesterId: { in: userIds },
+            ticketNumber: {
+              notIn: [
+                'TKT-2026-001234', 'TKT-2026-001233', 'TKT-2026-001232', 'TKT-2026-001231',
+                'TKT-2026-001230', 'TKT-2026-001229', 'TKT-2026-001228', 'TKT-2026-001227',
+                'TKT-2026-001226', 'TKT-2026-001225', 'TKT-2026-001224', 'TKT-2026-001223',
+                'TKT-2026-001222', 'TKT-2026-001221', 'TKT-2026-001220', 'TKT-2026-001219',
+                'TKT-2026-001218', 'TKT-2026-001217',
+              ],
+            },
+          },
+          select: { id: true },
+        });
+        const ticketIdsToDelete = ticketsToDelete.map((t) => t.id);
+        if (ticketIdsToDelete.length > 0) {
+          await prisma.attachment.deleteMany({
+            where: { ticketId: { in: ticketIdsToDelete } },
+          });
+          await prisma.publicComment.deleteMany({
+            where: { ticketId: { in: ticketIdsToDelete } },
+          });
+          await prisma.internalNote.deleteMany({
+            where: { ticketId: { in: ticketIdsToDelete } },
+          });
+          await prisma.ticket.deleteMany({
+            where: { id: { in: ticketIdsToDelete } },
+          });
+        }
+
+        // 3. Delete comments/notes authored by test users on other tickets
         await prisma.internalNote.deleteMany({
           where: { authorId: { in: userIds } },
         });
         await prisma.publicComment.deleteMany({
           where: { authorId: { in: userIds } },
         });
-        await prisma.attachment.deleteMany({
-          where: { uploadedById: { in: userIds } },
-        });
-        await prisma.ticket.deleteMany({
-          where: {
-            OR: [
-              { ownerId: { in: userIds } },
-              { assignedStaffId: { in: userIds } },
-            ],
-          },
-        });
+
+        // 4. Finally delete the test users
         await prisma.user.deleteMany({
           where: { id: { in: userIds } },
         });
