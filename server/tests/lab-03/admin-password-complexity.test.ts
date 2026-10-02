@@ -18,15 +18,39 @@ describe('Lab 3 - Admin Password Complexity (BR-Security, AC-02)', () => {
 
   afterAll(async () => {
     try {
-      if (createdUserIds.length > 0) {
+      const users = await prisma.user.findMany({
+        where: {
+          OR: [
+            { id: { in: createdUserIds } },
+            { email: { startsWith: 'pwd.complexity.' } },
+          ],
+        },
+        select: { id: true },
+      });
+      const userIds = users.map((u) => u.id);
+      if (userIds.length > 0) {
+        // FK-safe deletion order
+        await prisma.internalNote.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.publicComment.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.attachment.deleteMany({
+          where: { uploadedById: { in: userIds } },
+        });
+        await prisma.ticket.deleteMany({
+          where: {
+            OR: [
+              { ownerId: { in: userIds } },
+              { assignedStaffId: { in: userIds } },
+            ],
+          },
+        });
         await prisma.user.deleteMany({
-          where: { id: { in: createdUserIds } },
+          where: { id: { in: userIds } },
         });
       }
-      // Also clean up any lingering test accounts with this run's prefix
-      await prisma.user.deleteMany({
-        where: { email: { startsWith: 'pwd.complexity.' } },
-      });
     } finally {
       await prisma.$disconnect();
     }

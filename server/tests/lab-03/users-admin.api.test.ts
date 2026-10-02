@@ -167,13 +167,34 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
     try {
-      await prisma.user.deleteMany({
-        where: {
-          email: { startsWith: 'test.staff.' },
-        },
+      const users = await prisma.user.findMany({
+        where: { email: { startsWith: 'test.staff.' } },
+        select: { id: true },
       });
-    } catch (e) {
-      console.error('Error cleaning up test.staff users:', e);
+      const userIds = users.map((u) => u.id);
+      if (userIds.length > 0) {
+        // FK-safe deletion order
+        await prisma.internalNote.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.publicComment.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.attachment.deleteMany({
+          where: { uploadedById: { in: userIds } },
+        });
+        await prisma.ticket.deleteMany({
+          where: {
+            OR: [
+              { ownerId: { in: userIds } },
+              { assignedStaffId: { in: userIds } },
+            ],
+          },
+        });
+        await prisma.user.deleteMany({
+          where: { id: { in: userIds } },
+        });
+      }
     } finally {
       await prisma.$disconnect();
     }

@@ -95,7 +95,7 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
     const { PrismaClient } = await import('../../server/node_modules/@prisma/client');
     const prisma = new PrismaClient();
     try {
-      await prisma.user.deleteMany({
+      const users = await prisma.user.findMany({
         where: {
           OR: [
             { email: { startsWith: 'e2e.staff.' } },
@@ -103,9 +103,32 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
             { email: { startsWith: 'test.staff.' } },
           ],
         },
+        select: { id: true },
       });
-    } catch (e) {
-      console.error('Error cleaning up E2E users:', e);
+      const userIds = users.map((u) => u.id);
+      if (userIds.length > 0) {
+        // FK-safe deletion order
+        await prisma.internalNote.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.publicComment.deleteMany({
+          where: { authorId: { in: userIds } },
+        });
+        await prisma.attachment.deleteMany({
+          where: { uploadedById: { in: userIds } },
+        });
+        await prisma.ticket.deleteMany({
+          where: {
+            OR: [
+              { ownerId: { in: userIds } },
+              { assignedStaffId: { in: userIds } },
+            ],
+          },
+        });
+        await prisma.user.deleteMany({
+          where: { id: { in: userIds } },
+        });
+      }
     } finally {
       await prisma.$disconnect();
     }
