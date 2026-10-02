@@ -1,0 +1,387 @@
+=== 1. CLIENT BUILD ===
+
+> client@0.0.0 build
+> tsc -b && vite build
+
+vite v8.2.1 building client environment for production...
+[2Ktransforming...✓ 29 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:  0.29 kB
+dist/assets/index-CE8A7XIf.css  246.11 kB │ gzip: 34.73 kB
+dist/assets/index-CbJdoMfs.js   279.88 kB │ gzip: 75.87 kB
+
+✓ built in 165ms
+
+=== 2. SERVER VITEST ===
+
+> server@1.0.0 test
+> vitest run --run
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.10 /Users/pimchayasuprateravarnit/toktickit/server
+
+ ✓ tests/lab-02/create-ticket.api.test.ts (2 tests) 367ms
+ ✓ tests/lab-02/create-ticket.test.ts (2 tests) 434ms
+     ✓ POST /api/tickets creates a new ticket and generates official ticketNumber  330ms
+ ✓ tests/lab-03/comments-notes.api.test.ts (2 tests) 499ms
+ ✓ tests/lab-03/staff-ticket-detail.api.test.ts (4 tests) 712ms
+ ✓ tests/lab-02/my-tickets.api.test.ts (2 tests) 90ms
+ ✓ tests/lab-02/unit.test.ts (4 tests) 40ms
+ ✓ tests/lab-02/ticket-detail.api.test.ts (5 tests) 228ms
+ ✓ tests/lab-03/users-admin.api.test.ts (6 tests) 1082ms
+     ✓ Admin create user and reset initial password  374ms
+ ✓ tests/lab-03/authorization.api.test.ts (6 tests) 1121ms
+ ✓ tests/lab-02/reference-apis.test.ts (2 tests) 89ms
+ ✓ tests/lab-03/staff-queue.api.test.ts (3 tests) 579ms
+ ✓ tests/lab-02/requesters.test.ts (1 test) 65ms
+ ✓ tests/lab-01/categories.test.ts (1 test) 53ms
+ ✓ tests/lab-02/my-tickets.test.ts (2 tests) 493ms
+     ✓ GET /api/tickets returns paginated tickets for active development requester  391ms
+ ✓ tests/lab-01/health.test.ts (1 test) 16ms
+ ✓ tests/lab-02/attachments.api.test.ts (5 tests) 344ms
+     ✓ Setup: Create a test ticket for Issue 5 tests  311ms
+ ✓ tests/lab-03/unit.test.ts (5 tests) 3ms
+ ✓ tests/lab-02/ticket-detail-attachments.test.ts (5 tests) 89ms
+ ✓ tests/lab-03/auth.api.test.ts (9 tests) 1894ms
+     ✓ API-04: Mandatory password change updates password and clears flag  639ms
+     ✓ API-21 (Regression): User with mustChangePassword = true is blocked on protected endpoints but can call /api/auth/change-password, /api/auth/me, /api/auth/logout  540ms
+
+ Test Files  19 passed (19)
+      Tests  67 passed (67)
+   Start at  10:07:25
+   Duration  2.38s (transform 539ms, setup 0ms, import 4.17s, tests 8.20s, environment 1ms)
+
+
+=== 3. CLIENT VITEST ===
+
+> client@0.0.0 test
+> vitest run --run
+
+
+ RUN  v4.1.10 /Users/pimchayasuprateravarnit/toktickit/client
+
+ ✓ src/tests/lab-03/Login.test.tsx (1 test) 137ms
+stderr | src/tests/lab-02/MyTickets.test.tsx > MyTickets Component Tests (Section 12) > renders MyTickets component container
+An update to MyTickets inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to MyTickets inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to MyTickets inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-02/MyTickets.test.tsx (1 test) 147ms
+stderr | src/tests/lab-03/StaffTicketQueue.test.tsx > Lab 3 UI - StaffTicketQueue Component > UI-03: Staff Ticket Queue renders search bar, filters, and loading indicator
+An update to StaffTicketQueue inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to StaffTicketQueue inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-03/StaffTicketQueue.test.tsx (1 test) 272ms
+stderr | src/tests/lab-03/UserManagement.test.tsx > Lab 3 UI - UserManagement Component > UI-06b: Pressing Escape closes open modal in User Management
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-03/ChangePassword.test.tsx (2 tests) 316ms
+stderr | src/tests/lab-03/UserManagement.test.tsx > Lab 3 UI - UserManagement Component > UI-06b: Pressing Escape closes open modal in User Management
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to UserManagement inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-03/UserManagement.test.tsx (2 tests) 356ms
+ ✓ src/App.test.tsx (1 test) 229ms
+ ✓ src/tests/lab02.test.tsx (3 tests) 499ms
+ ✓ src/tests/lab-02/AttachmentSection.test.tsx (1 test) 2ms
+stderr | src/tests/lab-03/StaffTicketDetail.test.tsx > Lab 3 UI - StaffTicketDetail Component > UI-04: Staff Ticket Detail renders loading state initially
+An update to StaffTicketDetail inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to StaffTicketDetail inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | src/tests/lab-02/RequesterTicketDetail.test.tsx > RequesterTicketDetail Component Tests (Section 12) > renders TicketDetail component container
+An update to TicketDetail inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TicketDetail inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to TicketDetail inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-03/StaffTicketDetail.test.tsx (1 test) 53ms
+ ✓ src/tests/lab-02/RequesterTicketDetail.test.tsx (1 test) 48ms
+stderr | src/tests/lab-02/CreateTicket.test.tsx > CreateTicket Component Tests (Section 12) > renders Create Ticket component container
+Failed to load reference data: [TypeError: Failed to parse URL from /api/categories] {
+  [cause]: TypeError: Invalid URL
+      at new URL (node:internal/url:819:25)
+      at new URL (file:///Users/pimchayasuprateravarnit/toktickit/client/node_modules/vitest/dist/chunks/index.DC7d2Pf8.js:557:2)
+      at new Request (node:internal/deps/undici/undici:11063:25)
+      at fetch (node:internal/deps/undici/undici:11988:25)
+      at fetch (node:internal/deps/undici/undici:16555:10)
+      at fetch (node:internal/bootstrap/web/exposed-window-or-worker:83:12)
+      at fetchReferenceData (/Users/pimchayasuprateravarnit/toktickit/client/src/components/CreateTicket.tsx:37:11)
+      at /Users/pimchayasuprateravarnit/toktickit/client/src/components/CreateTicket.tsx:57:5
+      at Object.react_stack_bottom_frame (/Users/pimchayasuprateravarnit/toktickit/client/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (/Users/pimchayasuprateravarnit/toktickit/client/node_modules/react-dom/cjs/react-dom-client.development.js:874:13) {
+    code: 'ERR_INVALID_URL',
+    input: '/api/categories'
+  }
+}
+An update to CreateTicket inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ ✓ src/tests/lab-02/CreateTicket.test.tsx (1 test) 23ms
+
+ Test Files  11 passed (11)
+      Tests  15 passed (15)
+   Start at  10:07:27
+   Duration  2.32s (transform 925ms, setup 1.01s, import 1.75s, tests 2.08s, environment 8.13s)
+
+
+=== 4. PLAYWRIGHT E2E ===
+
+Running 12 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/lab-02/requester-ticket-flow.spec.ts:13:7 › Lab 2: Requester Ticket E2E Flow › should select requester, create a ticket, and see it in My Tickets (823ms)
+  ✓   2 [chromium] › e2e/lab-03/authentication.spec.ts:4:7 › Lab 3 E2E - Authentication & Mandatory Password Change › E2E-01: Login, mandatory initial password change, and logout flow (546ms)
+  ✓   3 [chromium] › e2e/lab-03/staff-ticket-flow.spec.ts:17:7 › Lab 3 E2E - IT Staff Ticket Queue & Detail Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes (2.0s)
+  ✓   4 [chromium] › e2e/lab-03/user-administration.spec.ts:17:7 › Lab 3 E2E - Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check (757ms)
+  ✓   5 [firefox] › e2e/lab-02/requester-ticket-flow.spec.ts:13:7 › Lab 2: Requester Ticket E2E Flow › should select requester, create a ticket, and see it in My Tickets (1.7s)
+  ✓   6 [firefox] › e2e/lab-03/authentication.spec.ts:4:7 › Lab 3 E2E - Authentication & Mandatory Password Change › E2E-01: Login, mandatory initial password change, and logout flow (847ms)
+  ✓   7 [firefox] › e2e/lab-03/staff-ticket-flow.spec.ts:17:7 › Lab 3 E2E - IT Staff Ticket Queue & Detail Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes (944ms)
+  ✓   8 [firefox] › e2e/lab-03/user-administration.spec.ts:17:7 › Lab 3 E2E - Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check (924ms)
+  ✓   9 [webkit] › e2e/lab-02/requester-ticket-flow.spec.ts:13:7 › Lab 2: Requester Ticket E2E Flow › should select requester, create a ticket, and see it in My Tickets (1.4s)
+  ✓  10 [webkit] › e2e/lab-03/authentication.spec.ts:4:7 › Lab 3 E2E - Authentication & Mandatory Password Change › E2E-01: Login, mandatory initial password change, and logout flow (816ms)
+  ✓  11 [webkit] › e2e/lab-03/staff-ticket-flow.spec.ts:17:7 › Lab 3 E2E - IT Staff Ticket Queue & Detail Flow › E2E-02: IT Staff queue search, claim ticket, update status & notes (749ms)
+  ✓  12 [webkit] › e2e/lab-03/user-administration.spec.ts:17:7 › Lab 3 E2E - Administrator User Management Flow › E2E-03: Admin login, create user, search, and safety rules check (886ms)
+
+  12 passed (15.1s)
+
+To open last HTML report run:
+
+  npx playwright show-report
+
