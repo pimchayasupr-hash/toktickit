@@ -6,3 +6,6 @@ dist/
 server/uploads/
 playwright-report/
 test-results/
+
+# Preflight run artifacts (regenerated each run)
+docs/lab-03/evidence/preflight-*.txt
