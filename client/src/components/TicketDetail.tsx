@@ -195,7 +195,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   if (isLoading) {
     return (
       <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }} data-testid="ticket-detail-loading">
-        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket details...</p>
       </div>
     );
@@ -241,7 +241,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               readOnly
               value={ticket.ticketNumber}
               className="tkt-input"
-              style={{ backgroundColor: '#f8fafc', color: '#005a36', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
+              style={{ backgroundColor: '#F5F7F6', color: '#006B3C', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
             />
           </div>
 
@@ -356,7 +356,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             onClick={handleProblemResolved}
             disabled={resolvingState}
             className="tkt-btn-primary"
-            style={{ width: 'auto', backgroundColor: '#eaf6ef', color: '#005a36', border: '1px solid #bbf7d0', boxShadow: 'none' }}
+            style={{ width: 'auto', backgroundColor: '#EAF6EF', color: '#006B3C', border: '1px solid #D7E0DB', boxShadow: 'none' }}
           >
             <span>✓</span> {resolvingState ? 'Submitting...' : 'Problem Appears Resolved'}
           </button>

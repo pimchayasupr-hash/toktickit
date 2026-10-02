@@ -292,7 +292,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
 
       {loading ? (
         <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
           <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket queue...</p>
         </div>
       ) : tickets.length === 0 ? (
@@ -347,7 +347,7 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
                     <button
                       onClick={() => onSelectTicket(t.id)}
                       className="tkt-btn-filters"
-                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', backgroundColor: '#eaf6ef', color: '#005a36', borderColor: '#bbf7d0' }}
+                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', backgroundColor: '#EAF6EF', color: '#006B3C', borderColor: '#D7E0DB' }}
                     >
                       Open Detail
                     </button>

@@ -257,7 +257,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
   if (loading) {
     return (
       <div style={{ maxWidth: '1080px', margin: '3rem auto', textAlign: 'center' }}>
-        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #005a36', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <div style={{ display: 'inline-block', width: '32px', height: '32px', border: '4px solid #006B3C', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: '#64748b' }}>Loading ticket detail...</p>
       </div>
     );
@@ -311,7 +311,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
               readOnly
               value={ticket.ticketNumber}
               className="tkt-input"
-              style={{ backgroundColor: '#f8fafc', color: '#005a36', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
+              style={{ backgroundColor: '#F5F7F6', color: '#006B3C', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace' }}
             />
           </div>
 

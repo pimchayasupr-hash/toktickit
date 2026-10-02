@@ -210,7 +210,7 @@ export const UserManagement: React.FC = () => {
         </div>
         <button
           onClick={() => { resetCreateForm(); setShowCreateModal(true); }}
-          className="px-4 py-2.5 bg-[#005a36] hover:bg-[#008751] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
+          className="px-4 py-2.5 bg-[#006B3C] hover:bg-[#0B7A46] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors flex items-center justify-center gap-2"
         >
           <span>➕</span> Create New User
         </button>
@@ -383,7 +383,7 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="submit"
                   disabled={modalSubmitting}
-                  className="px-4 py-1.5 bg-[#005a36] text-white rounded font-semibold disabled:opacity-50"
+                  className="px-4 py-1.5 bg-[#006B3C] text-white rounded font-semibold disabled:opacity-50"
                 >
                   {modalSubmitting ? 'Saving...' : 'Save User'}
                 </button>
@@ -458,7 +458,7 @@ export const UserManagement: React.FC = () => {
                 <button
                   type="submit"
                   disabled={modalSubmitting}
-                  className="px-4 py-1.5 bg-[#005a36] text-white rounded font-semibold disabled:opacity-50"
+                  className="px-4 py-1.5 bg-[#006B3C] text-white rounded font-semibold disabled:opacity-50"
                 >
                   {modalSubmitting ? 'Updating...' : 'Update Account'}
                 </button>

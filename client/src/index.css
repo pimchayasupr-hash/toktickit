@@ -1,40 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
 
 :root {
-  /* TokTickIT Zen Green Palette */
-  --brand-green-primary: #005a36;
-  --brand-green-hover: #007a4a;
-  --brand-green-dark: #004227;
-  --brand-green-light: #e8f5ed;
-  --brand-green-border: #bfe5cf;
-  --brand-green-accent: #10b981;
+  /* TokTickIT Zen Green Palette (Lab 2 Canonical Design Tokens) */
+  --brand-green-primary: #006B3C;
+  --brand-green-hover: #0B7A46;
+  --brand-green-dark: #004D2B;
+  --brand-green-light: #EAF6EF;
+  --brand-green-border: #D7E0DB;
+  --brand-green-accent: #0B7A46;
 
-  --bg-page: #f8fafc;
+  --bg-page: #F5F7F6;
   --bg-card: #ffffff;
-  --border-subtle: #e2e8f0;
-  --border-focus: #005a36;
+  --border-subtle: #D7E0DB;
+  --border-focus: #006B3C;
 
-  --text-main: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-main: #18352A;
+  --text-secondary: #5B6B64;
+  --text-muted: #7A8580;
 
   --badge-high-bg: #fee2e2;
-  --badge-high-text: #b91c1c;
+  --badge-high-text: #A32020;
   --badge-med-bg: #fef3c7;
-  --badge-med-text: #b45309;
-  --badge-low-bg: #dcfce7;
-  --badge-low-text: #15803d;
+  --badge-med-text: #A96500;
+  --badge-low-bg: #EAF6EF;
+  --badge-low-text: #0B7A46;
 
-  --badge-status-progress-bg: #dcfce7;
-  --badge-status-progress-text: #166534;
+  --badge-status-progress-bg: #EAF6EF;
+  --badge-status-progress-text: #006B3C;
   --badge-status-open-bg: #dbeafe;
   --badge-status-open-text: #1d4ed8;
-  --badge-status-pending-bg: #ffedd5;
-  --badge-status-pending-text: #c2410c;
-  --badge-status-resolved-bg: #d1fae5;
-  --badge-status-resolved-text: #065f46;
+  --badge-status-pending-bg: #FFF7E8;
+  --badge-status-pending-text: #A96500;
+  --badge-status-resolved-bg: #EAF6EF;
+  --badge-status-resolved-text: #0B7A46;
   --badge-status-closed-bg: #f1f5f9;
-  --badge-status-closed-text: #475569;
+  --badge-status-closed-text: #5B6B64;
 
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color: var(--text-main);
