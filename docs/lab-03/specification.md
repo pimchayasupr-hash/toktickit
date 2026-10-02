@@ -372,7 +372,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - [x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.
 - [x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.
 - [x] Automated test suites passing: 103/103 server tests, 31/31 client component tests, 27/27 Playwright E2E tests across Chromium, Firefox, WebKit.
-- [x] Peer review and merge of PRs on GitHub (requires peer reviewer action).
+- Peer review and merge: see reviewer.md
 
 ---
 
