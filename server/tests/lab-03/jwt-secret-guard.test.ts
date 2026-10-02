@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { getJwtSecret } from '../../src/middleware/authMiddleware';
+import { execSync } from 'child_process';
+import path from 'path';
 
 describe('Lab 3 - JWT_SECRET Production Guard (BR-Security, AC-03)', () => {
   it('throws a fatal error at startup when NODE_ENV=production and JWT_SECRET is unset', () => {
@@ -32,5 +34,20 @@ describe('Lab 3 - JWT_SECRET Production Guard (BR-Security, AC-03)', () => {
     const secret = getJwtSecret({ NODE_ENV: 'test' });
     expect(typeof secret).toBe('string');
     expect(secret.length).toBeGreaterThan(0);
+  });
+
+  it('loads environment variables before app initialization so production startup succeeds with JWT_SECRET', () => {
+    const cwd = path.resolve(__dirname, '../../');
+    const cmd = './node_modules/.bin/tsx -e "import \\"./src/loadEnv\\"; import \\"./src/app\\"; console.log(\\"STARTUP_SUCCESS\\");"';
+    const result = execSync(cmd, {
+      cwd,
+      env: {
+        ...process.env,
+        NODE_ENV: 'production',
+        JWT_SECRET: 'test-production-secret-min-32-chars-key-2026',
+      },
+      encoding: 'utf-8',
+    });
+    expect(result).toContain('STARTUP_SUCCESS');
   });
 });
