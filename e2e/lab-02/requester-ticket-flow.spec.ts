@@ -50,4 +50,20 @@ test.describe('Lab 2: Requester Ticket E2E Flow', () => {
     // 6. ไปที่หน้า My Tickets หรือหน้ารายละเอียด แล้วเช็กว่ามีตั๋วที่เพิ่งสร้างแสดงอยู่
     await expect(page.getByText('Playwright E2E Test Ticket')).toBeVisible();
   });
+  test.afterAll(async () => {
+    // Clean up ticket created during E2E test
+    const { PrismaClient } = await import('../../server/node_modules/@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      await prisma.ticket.deleteMany({
+        where: {
+          summary: 'Playwright E2E Test Ticket',
+        },
+      });
+    } catch (e) {
+      console.error('Error cleaning up E2E ticket:', e);
+    } finally {
+      await prisma.$disconnect();
+    }
+  });
 });

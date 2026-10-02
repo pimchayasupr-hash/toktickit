@@ -90,4 +90,24 @@ test.describe('Lab 3 E2E - Administrator User Management Flow', () => {
     await expect(page.getByRole('alert')).toBeVisible();
     await expect(page.getByText(/cannot deactivate your own Administrator account/i)).toBeVisible();
   });
+  test.afterAll(async () => {
+    // Clean up users created during E2E tests to avoid polluting the database
+    const { PrismaClient } = await import('../../server/node_modules/@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      await prisma.user.deleteMany({
+        where: {
+          OR: [
+            { email: { startsWith: 'e2e.staff.' } },
+            { email: { startsWith: 'first.login.' } },
+            { email: { startsWith: 'test.staff.' } },
+          ],
+        },
+      });
+    } catch (e) {
+      console.error('Error cleaning up E2E users:', e);
+    } finally {
+      await prisma.$disconnect();
+    }
+  });
 });

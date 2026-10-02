@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../src/app';
 
@@ -162,6 +162,21 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     expect(res.status).toBe(200);
     expect(res.body.users.length).toBeGreaterThan(0);
     expect(res.body.users[0].name).toContain('Jennifer');
+  });
+  afterAll(async () => {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      await prisma.user.deleteMany({
+        where: {
+          email: { startsWith: 'test.staff.' },
+        },
+      });
+    } catch (e) {
+      console.error('Error cleaning up test.staff users:', e);
+    } finally {
+      await prisma.$disconnect();
+    }
   });
 });
 
