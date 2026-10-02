@@ -12,7 +12,7 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
   for (const vp of VIEWPORTS) {
     test(`Zero horizontal overflow on Login screen at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+      await page.goto('http://localhost:5173');
 
       await expect(page.getByText('Sign in to your account')).toBeVisible();
 
@@ -24,7 +24,7 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
 
     test(`Zero horizontal overflow on IT Staff Queue at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+      await page.goto('http://localhost:5173');
 
       await expect(page.getByText('Sign in to your account')).toBeVisible();
       // Login as Staff
@@ -49,7 +49,7 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
 
     test(`Zero horizontal overflow on IT Staff Ticket Detail at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+      await page.goto('http://localhost:5173');
 
       await expect(page.getByText('Sign in to your account')).toBeVisible();
       // Login as Staff
@@ -73,7 +73,7 @@ test.describe('Lab 3 Responsive & Accessibility Suite (Handout §10 & Part A/C)'
 
     test(`Zero horizontal overflow on Admin User Management at ${vp.name}`, async ({ page }) => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+      await page.goto('http://localhost:5173');
 
       await expect(page.getByText('Sign in to your account')).toBeVisible();
       // Login as Admin
