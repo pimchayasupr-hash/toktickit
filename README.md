@@ -119,16 +119,16 @@ Default seeded accounts (local-development only):
 
 | Role | Email | Status | Initial Password | Notes |
 |---|---|---|---|---|
-| Admin | `admin@university.ac.th` | Active | `Password123!` | Initial password, `mustChangePassword = true` |
-| Staff | `staff1@university.ac.th` | Active | `Password123!` | Initial password, `mustChangePassword = true` |
-| Staff | `staff2@university.ac.th` | Active | `Password123!` | Initial password, `mustChangePassword = true` |
-| Staff | `staff3@university.ac.th` | Active | `Password123!` | Initial password, `mustChangePassword = true` |
-| Staff | `staff.inactive@university.ac.th` | Inactive | `Password123!` | Inactive staff account (`isActive = false`) |
-| Requester | `alice.smith@university.ac.th` | Active | `Password123!` | Migrated Requester, `mustChangePassword = true` |
-| Requester | `bob.johnson@university.ac.th` | Active | `Password123!` | Migrated Requester, `mustChangePassword = true` |
-| Requester | `carol.williams@university.ac.th` | Active | `Password123!` | Migrated Requester, `mustChangePassword = true` |
-| Requester | `david.brown@university.ac.th` | Active | `Password123!` | Migrated Requester, `mustChangePassword = true` |
-| Requester | `inactive.requester@university.ac.th` | Inactive | `Password123!` | Inactive requester account (`isActive = false`) |
+| Admin | `admin@toktickit.com` | Active | `Password123!` | Initial password, `mustChangePassword = false` |
+| Staff | `michael.staff@toktickit.com` | Active | `Password123!` | Initial password, `mustChangePassword = false` |
+| Staff | `sarah.staff@toktickit.com` | Active | `Password123!` | Initial password, `mustChangePassword = false` |
+| Staff | `david.staff@toktickit.com` | Active | `Password123!` | Initial password, `mustChangePassword = false` |
+| Staff | `kevin.inactive@toktickit.com` | Inactive | `Password123!` | Inactive staff account (`isActive = false`) |
+| Requester | `jennifer.anderson@example.com` | Active | `Password123!` | Migrated Requester, `mustChangePassword = false` |
+| Requester | `michael.brown@example.com` | Active | `Password123!` | Migrated Requester, `mustChangePassword = false` |
+| Requester | `sarah.jenkins@example.com` | Active | `Password123!` | Migrated Requester, `mustChangePassword = false` |
+| Requester | `david.kim@example.com` | Active | `Password123!` | Migrated Requester, `mustChangePassword = false` |
+| Requester | `alex.turner@example.com` | Inactive | `Password123!` | Inactive requester account (`isActive = false`) |
 
 > **Note on "Forgot your password?":** Self-service password reset / email-based reset is explicitly excluded by the Lab 3 handout scope. Password resets are handled by Administrators through the User Management panel (`/admin/users`).
 
