@@ -376,7 +376,7 @@ Detailed endpoint schemas and payload examples are documented in [api-spec.md](f
 - [x] IT Staff Ticket Detail with claim/reassign, IT Priority, permitted status workflow, public comments, and distinct internal notes working.
 - [x] Administrator User Management screen implemented with full search, role filter, create user, edit account, reset password, and safety rules.
 - [x] Automated tests pass on the final branch: server 67/67, client 15/15, Playwright 12/12 (Chromium, Firefox, WebKit; 4/4 unique E2E specs). Total 94/94. (From docs/lab-03/evidence/final-run-2026-10-02.txt.)
-- [x] Peer review and merge by a reviewer other than the author: PR #42 (fix/lab3-consistency -> lab3-staging) open and awaiting peer review (reviewer: @supa-gif173 or @Beethoven190). PR #43 (lab3-staging -> main) to follow.
+- Peer review: see reviewer.md for peer review evidence and merge history.
 
 ---
 
