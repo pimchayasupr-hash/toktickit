@@ -64,8 +64,14 @@ export const UserManagement: React.FC = () => {
     e.preventDefault();
     setModalError(null);
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     if (!createName || !createEmail || !createInitialPassword) {
       setModalError('Please fill out all required fields.');
+      return;
+    }
+
+    if (!passwordRegex.test(createInitialPassword)) {
+      setModalError('Initial password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.');
       return;
     }
 
@@ -137,8 +143,9 @@ export const UserManagement: React.FC = () => {
     if (!resettingUser) return;
     setModalError(null);
 
-    if (!newInitialPassword || newInitialPassword.length < 8) {
-      setModalError('Initial password must be at least 8 characters long.');
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!newInitialPassword || !passwordRegex.test(newInitialPassword)) {
+      setModalError('Initial password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.');
       return;
     }
 

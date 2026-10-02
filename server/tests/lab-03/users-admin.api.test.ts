@@ -89,4 +89,42 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     expect(resetRes.status).toBe(200);
     expect(resetRes.body.user.mustChangePassword).toBe(true);
   });
+
+  it('API-25 (BR-18, AC-23): Admin create user with weak password returns 400 VALIDATION_ERROR', async () => {
+    const token = await getAdminToken();
+
+    const weakPasswords = ['short1!', 'NoDigitsHere!', 'nolowercase123!', 'NOUPPERCASE123!', 'NoSpecialChar123'];
+
+    for (const weak of weakPasswords) {
+      const res = await request(app)
+        .post('/api/admin/users')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'Weak Pass Test',
+          email: `weak.${Date.now()}.${Math.random()}@toktickit.com`,
+          role: 'REQUESTER',
+          initialPassword: weak,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    }
+  });
+
+  it('API-25b (BR-18, AC-23): Admin reset password with weak password returns 400 VALIDATION_ERROR', async () => {
+    const token = await getAdminToken();
+
+    // Reset password of user 1 with weak passwords
+    const weakPasswords = ['short1!', 'NoDigitsHere!', 'nolowercase123!', 'NOUPPERCASE123!', 'NoSpecialChar123'];
+
+    for (const weak of weakPasswords) {
+      const res = await request(app)
+        .post('/api/admin/users/1/reset-password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ initialPassword: weak });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    }
+  });
 });
