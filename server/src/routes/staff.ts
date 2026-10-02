@@ -49,7 +49,7 @@ router.get('/tickets', async (req: AuthRequest, res: Response): Promise<void> =>
 
     const andConditions: any[] = [];
 
-    const VALID_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'PENDING_VENDOR', 'RESOLVED', 'CLOSED', 'REOPENED', 'CANCELLED'];
+    const VALID_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CLOSED', 'REOPENED', 'CANCELLED'];
     if (status && typeof status === 'string' && status.trim() !== '') {
       if (!VALID_STATUSES.includes(status.trim())) {
         res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Invalid status filter value.' } });
