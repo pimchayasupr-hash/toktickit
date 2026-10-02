@@ -449,10 +449,55 @@ Running 9 tests using 1 worker
   9 passed (20.0s)
 ```
 
-### 5. Final Quality Summary
+### 5. Final Quality Summary (lab3-review-fixes milestone: 90+28+27=145)
 - **Client TypeScript / Vite Build**: PASS (0 errors)
 - **Backend API Tests (Server Vitest)**: 90 / 90 PASS in 21 test files (100%)
 - **Frontend Component Tests (Client Vitest)**: 28 / 28 PASS in 11 test files (100%)
 - **End-to-End Playwright Tests (Chromium)**: 27 / 27 PASS (100%)
 - **Grand Total Automated Tests**: **145 / 145 PASS (100% Green)**
+
+### 5. Final Quality Summary (Pre-PR #41)
+- **Client TypeScript / Vite Build**: PASS (0 errors, 824ms)
+- **Backend API Tests**: 56 / 56 PASS (100%)
+- **Frontend Component Tests**: 13 / 13 PASS (100%)
+- **End-to-End Multi-Browser Tests**: 9 / 9 PASS (100%)
+- **Grand Total Automated Tests**: **78 / 78 PASS (100% Green)**
+
+---
+
+## 8. Final Release Verification on `main` (Merge Commit `b5494cb`, Head `ee630ab`)
+
+Following the peer approval by `@MiMikoChAn913` and `@supa-gif173` and the merge of PR #41 into `main` by `@supa-gif173` on 2026-09-30 (Merge Commit `b5494cb`), the full test suite was re-verified on `main` to confirm the regression fixes (`API-21` to `API-24`):
+
+### 1. Server API Vitest Suite (with Regression Tests API-21 to API-24)
+```bash
+npm --prefix server test -- --run
+```
+```text
+ Test Files  18 passed (18)
+      Tests  60 passed (60)
+   Duration  3.32s (transform 876ms, setup 0ms, import 6.83s, tests 8.98s, environment 4ms)
+```
+
+**New Regression Coverage Included in 60 Tests:**
+- `API-21`: Server-side `requirePasswordChangeCheck` enforcement on protected endpoints
+- `API-22`: `POST /api/auth/change-password` strict current password requirement and hash validation
+- `API-23`: `GET /api/staff/assignees` endpoint accessibility for `STAFF` users and successful ticket reassignment
+- `API-24`: Staff ticket queue simultaneous `search` and `priority` filtering combined with `AND`
+
+### 2. Client Component Vitest Suite
+```bash
+npm --prefix client test -- --run
+```
+```text
+ Test Files  11 passed (11)
+      Tests  13 passed (13)
+   Duration  1.80s (transform 718ms, setup 1.06s, import 1.27s, tests 1.43s, environment 6.18s)
+```
+
+### 3. Final Production Quality Summary on `main`
+- **Backend API Tests**: **60 / 60 PASS (100%)**
+- **Frontend Component Tests**: **13 / 13 PASS (100%)**
+- **Playwright Multi-Browser E2E Tests**: **9 / 9 PASS (100%)**
+- **Grand Total Automated Tests**: **82 / 82 PASS (100% Green)**
 
