@@ -168,7 +168,7 @@ describe('Lab 3 - Administrator User Management API Suite', () => {
     const prisma = new PrismaClient();
     try {
       const users = await prisma.user.findMany({
-        where: { email: { startsWith: 'test.staff.' } },
+        where: { OR: [{ email: { startsWith: 'test.staff.' } }, { email: { startsWith: 'role.change.' } }] },
         select: { id: true },
       });
       const userIds = users.map((u) => u.id);
