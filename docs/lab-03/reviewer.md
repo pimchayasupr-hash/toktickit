@@ -82,7 +82,7 @@ This log tracks all Pull Requests created, reviewed, and merged during Sprint 3,
       1. Fixed Brand Typo: Corrected `TikTockIT` -> `TokTickIT` in `client/src/App.tsx` navigation bar and verified across components.
       2. Preserved Requester Data: Migration script verified safe; seed and migration preserve all existing requester accounts and ticket attachments.
       3. Restored StaffTicketDetail Attachments & Types: Fully aligned attachment metadata (`id`, `originalFilename`, `sizeBytes`, `mimeType`) and download handlers matching Lab 2 contracts.
-      4. Verified Status/Priority Badges & Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56/56, client Vitest 13/13, Playwright 12/12)."
+      4. Verified Status/Priority Badges & Test Suite: Verified badge CSS tokens across all statuses and confirmed 100% test suite passing (build, server Vitest 56 passed, client Vitest 13 passed, Playwright 12 passed)."
   - **Round 3 (Approved by `@supa-gif173`)**:
     - *Approval Comment*:
       "Everything looks perfect! All feedback from both rounds has been addressed thoroughly:
