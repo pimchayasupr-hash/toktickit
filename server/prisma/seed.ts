@@ -34,7 +34,7 @@ const USERS = [
     mustChangePassword: false,
   },
   {
-    name: 'Alex Turner (Inactive)',
+    name: 'Alex Turner',
     email: 'alex.turner@example.com',
     role: Role.REQUESTER,
     isActive: false,
@@ -43,28 +43,28 @@ const USERS = [
 
   // IT Staff (Active >= 3, Inactive >= 1)
   {
-    name: 'Michael Henderson (IT Support)',
+    name: 'Michael Henderson',
     email: 'michael.staff@toktickit.com',
     role: Role.STAFF,
     isActive: true,
     mustChangePassword: false,
   },
   {
-    name: 'Sarah Johnson (IT Admin)',
+    name: 'Sarah Johnson',
     email: 'sarah.staff@toktickit.com',
     role: Role.STAFF,
     isActive: true,
     mustChangePassword: false,
   },
   {
-    name: 'David Lee (Network Tech)',
+    name: 'David Lee',
     email: 'david.staff@toktickit.com',
     role: Role.STAFF,
     isActive: true,
     mustChangePassword: false,
   },
   {
-    name: 'Kevin Patel (Inactive Staff)',
+    name: 'Kevin Patel',
     email: 'kevin.inactive@toktickit.com',
     role: Role.STAFF,
     isActive: false,
@@ -73,7 +73,7 @@ const USERS = [
 
   // Administrator (Active >= 1)
   {
-    name: 'John Smith (Admin)',
+    name: 'John Smith',
     email: 'admin@toktickit.com',
     role: Role.ADMIN,
     isActive: true,

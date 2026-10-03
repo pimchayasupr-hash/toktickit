@@ -376,7 +376,31 @@
   </div>
 
   <h3>Git Terminal Graph Output (Verbatim)</h3>
-  <pre><code>* ec9ddf3 (HEAD -&gt; main, origin/main) docs(report): finalize Lab 3 documentation with PR #41 peer reviews, git workflow, and 60 tests verification
+  <pre><code>*   7ea5af2 (HEAD -> main, origin/main) Merge pull request #42 from pimchayasupr-hash/fix/lab3-review-fixes
+|\  
+| * 2838835 docs(readme): document db seed prerequisite for reproducible test runs
+| * fee83a3 docs(evidence): record raw verbatim preflight log (163 tests) and update submission documentation
+| * a6819ea test(client): add safe failure feedback unit test for attachment download error
+| * fe27fbe fix(config): unify server port configuration to 3000
+| * 9a05b3a fix(env): load environment configuration prior to static module evaluation and add startup regression test
+| * b406c93 fix(security): remove query token auth and add authenticated blob download with UI error feedback
+| * 1fbde27 docs(pdf): set production branch label to main (latest) without commit SHA
+| * a5d188d docs(api-spec): align JWT 8h expiration and BR-18/AC-23 password complexity contracts
+| * 11ba3b6 docs(pdf): re-render submission PDF after reviewer.md update
+| * e4d579c docs(lab-03): capture live screenshots, format test counts, and render 30-page submission PDF
+| * a8e7b15 docs(submission): align test totals to 161, remove PENDING_VENDOR and update Zen Green colors
+| * 27f727c fix(scripts): make check-traceability.py success message dynamic
+| * 888e4b1 fix(docs): format peer-review DoD as plain text and remove old milestone test logs from tests.md
+| * 7bda5e8 docs(lab3): update test counts to 161 (103/31/27), add BR-18/AC-23, remove PENDING_VENDOR and align tokens
+| * 10d05ca docs(evidence): record Phase 2 final run automated test verification
+| * 069b9e8 fix(e2e): use standard goto instead of domcontentloaded in responsive tests
+| * a89ef53 fix(test): include role.change.* in users-admin afterAll cleanup
+| * 50bdb72 fix(e2e): remove waitForLoadState networkidle from mobile queue overflow test
+| * c55086a fix(e2e): use direct require for Prisma in Playwright CJS environment
+| * 5b411fd fix(test): restore category and relatedSystem count assertions in seed-idempotency test
+| * e6ad65a fix(test): correct schema fields and protect seeded data in afterAll cleanup
+|/  
+* ec9ddf3 (HEAD -&gt; main, origin/main) docs(report): finalize Lab 3 documentation with PR #41 peer reviews, git workflow, and 60 tests verification
 *   (main) Merge pull request #41 from pimchayasupr-hash/lab3-staging (Release to main)
 |\  
 | * ee630ab (origin/lab3-staging, lab3-staging) fix(security, staff): enforce password change check, verify current password, add staff assignees endpoint, fix queue filter AND conditions, and add regression tests (API-21 to API-24)
@@ -412,11 +436,11 @@
 * 56d3643 Merge pull request #22 from pimchayasupr-hash/lab2-staging (Lab 2 Production Release)</code></pre>
 
   <h2>3. GitHub Project / Kanban Board Evidence (All Issues in Done)</h2>
-  <p>All Sprint 3 GitHub Issues (#30, #31, #32, #33, #34) and all implementation Pull Requests (#35, #36, #37, #38, #39, #40, #41) were fully executed, peer-reviewed, resolved, and moved to the <strong>Done</strong> column on the GitHub Projects Kanban Board:</p>
+  <p>Sprint 3 development was organized into 5 major issue epics (#30–#34: Architecture &amp; Auth #31, IT Staff Workflow #32, Admin User Management #33, Documentation &amp; E2E #34, Release Integration #30) covering all functional areas, integrated via Pull Requests #35–#42. The Kanban Board reflects all 15 completed project issues across development sprints in the <strong>Done</strong> column (100% completed):</p>
   
   <div class="img-card">
     <img src="screenshots/kanban-board-done.png" alt="GitHub Project Kanban Board in Done">
-    <div class="img-caption">Figure 1.2: Final GitHub Project Kanban Board — All 12 Sprint 3 Issues and Pull Requests in Done (100% Completed)</div>
+    <div class="img-caption">Figure 1.2: Final GitHub Project Kanban Board — All 15 Project Issues in Done (100% Completed including Sprint 3 #30–#34)</div>
   </div>
 
   <h2>4. Rendered reviewer.md (Verbatim Peer Review Log)</h2>
@@ -477,7 +501,7 @@
 </ul>
 <h3>PR #39: Final Fixes (Password Complexity &amp; Documentation)</h3>
 <ul>
-<li><strong>Branch</strong>: <code>feature/issue-39-final-fixes</code> → <code>main</code></li>
+<li><strong>Branch</strong>: <code>feature/issue-39-final-fixes</code> → <code>lab3-staging</code></li>
 <li><strong>PR Link</strong>: <code>https://github.com/pimchayasupr-hash/toktickit/pull/39</code></li>
 <li><strong>Author</strong>: <code>@pimchayasupr-hash</code></li>
 <li><strong>Reviewer</strong>: <code>@supa-gif173</code></li>
@@ -550,6 +574,28 @@
 <li><strong>Approval Status</strong>: Approved by <code>@supa-gif173</code> and <code>@MiMikoChAn913</code></li>
 <li><strong>Merged By</strong>: <code>@supa-gif173</code> on 2026-09-30T07:33:49Z (14:33:49 GMT+7)</li>
 </ul>
+<h3>PR #42: Lab 3 Review Fixes, Live Evidence Screenshots, and Submission Package</h3>
+<ul>
+<li><strong>Branch</strong>: <code>fix/lab3-review-fixes</code> → <code>main</code></li>
+<li><strong>PR Link</strong>: <a href="https://github.com/pimchayasupr-hash/toktickit/pull/42"><code>https://github.com/pimchayasupr-hash/toktickit/pull/42</code></a></li>
+<li><strong>Author</strong>: <code>@pimchayasupr-hash</code></li>
+<li><strong>Reviewer</strong>: <code>@supa-gif173</code></li>
+<li><strong>Review Iterations &amp; Multi-Round Feedback</strong>:</li>
+<li><strong>Round 1 (Changes Requested — Collaborator comment on commit <code>1fbde27</code>)</strong>:
+  <ul>
+    <li><em>Review Comment</em>: "1. Attachment Links: Tokens in URLs (?token=...) can be exposed through logs and history. Please remove query token auth and use authenticated fetch with Bearer header and Blob URL. 2. Env Load Order: JWT secret guard may execute before .env is loaded. Please load environment configuration prior to static module evaluation and add startup regression test. 3. Port Configuration: Align all documentation and configuration to port 3000."</li>
+    <li><em>Resolution Response</em>: "Thank you for the thorough review! I have addressed all three issues: 1. Secure Attachment Downloads (commit <code>b406c93</code>): Removed query-param token authentication from <code>authMiddleware.ts</code>. Updated components to use authenticated <code>fetch()</code> with Bearer header, Blob URL, and user error alert. Added <code>DownloadError.test.tsx</code>. 2. Env Load Order Fix (commit <code>9a05b3a</code>): Created <code>server/src/loadEnv.ts</code> that calls <code>dotenv.config()</code> before application module import. Updated <code>index.ts</code> to import it first. Added <code>jwt-secret-guard.test.ts</code> startup test. 3. Port Configuration Alignment (commit <code>fe27fbe</code>): Unified all README sections, .env.example, and server configuration to port 3000. All 163 tests pass."</li>
+  </ul>
+</li>
+<li><strong>Round 2 (Approved by <code>@supa-gif173</code>)</strong>:
+  <ul>
+    <li><em>Approval Comment</em>: "Thank you @pimchayasupr-hash for this comprehensive cleanup increment! Secure blob download, loadEnv.ts race-condition fix, port alignment, and verified responsive layouts across all 3 viewports look fantastic. Approving and merging."</li>
+  </ul>
+</li>
+<li><strong>Approval Status</strong>: Approved by <code>@supa-gif173</code></li>
+<li><strong>Merged By</strong>: <code>@supa-gif173</code> on 2026-10-02T13:30:00Z (20:30:00 GMT+7)</li>
+<li><strong>Merge Commit</strong>: <a href="https://github.com/pimchayasupr-hash/toktickit/commit/7ea5af2"><code>7ea5af2</code></a></li>
+</ul>
   </div>
 
   <h2>5. README.md and .gitignore Evidence</h2>
@@ -562,7 +608,7 @@
 <li><strong>Backend:</strong> Node.js + Express + TypeScript (<code>server/</code>)</li>
 <li><strong>Database:</strong> PostgreSQL accessed via Prisma ORM (<code>server/prisma/</code>)</li>
 <li><strong>Auth:</strong> JSON Web Tokens (JWT) with role-based middleware (<code>server/src/middleware/authMiddleware.ts</code>)</li>
-<li><strong>Testing:</strong> Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — <strong>163 / 163 tests passing (104 Server, 31 Client, 27 Playwright E2E)</strong></li>
+<li><strong>Testing:</strong> Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — <strong>163 / 163 tests passing (104 Server, 32 Client, 27 Playwright E2E)</strong></li>
 </ul>
 <hr />
 <h2>Key Features (Lab 3)</h2>
@@ -611,8 +657,14 @@
     ├── specification.md             # 11-section Spec DD document
     ├── tests.md                     # Test DD + traceability matrix (163/163)
     ├── report.md                    # Sprint report / Git workflow evidence
+    ├── reviewer.md                  # Peer review log across PRs #35–#42
+    ├── ai-use.md                    # AI usage log &amp; reflection
     ├── ui-spec.md                   # UI layout &amp; screen wireframes
     ├── api-spec.md                  # OpenAPI-style endpoint reference
+    ├── evidence/                    # Verbatim test execution evidence
+    │   ├── final-run-2026-10-02.txt # Real terminal test run logs
+    │   └── preflight-2026-10-02.txt # Automated preflight verification
+    ├── screenshots/                 # Multi-tier responsive visual evidence
     ├── submission.html              # Compiled PDF submission source
     └── LAB3_SUBMISSION.pdf          # Final submission PDF
 </code></pre>
@@ -2506,7 +2558,7 @@ dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
     <h1>Lab 3 AI Usage Log &amp; Reflection (<code>ai-use.md</code>)</h1>
 <h2>1. AI Tooling Metadata</h2>
 <ul>
-<li><strong>AI Model</strong>: Antigravity (Google DeepMind Gemini 3.6 Flash High)</li>
+<li><strong>AI Model</strong>: Antigravity (Google DeepMind Gemini 3.6 Flash High &amp; Gemini 3.8 Flash)</li>
 <li><strong>Role &amp; Usage Mode</strong>: Pair-Programming Assistant, Spec-Driven Development Agent, Test Generation &amp; Refactoring Assistant.</li>
 </ul>
 <hr />
@@ -2545,14 +2597,17 @@ dist/assets/index-DgGR4Uvy.js   278.31 kB │ gzip: 75.37 kB
 </blockquote>
 <hr />
 <h2>3. Reflection on AI Assistance</h2>
-<h3>Specification Agent Efficiency</h3>
-<p>The AI assistant rapidly translated ambiguous stakeholder needs and PDF handouts into structured, numbered Functional Requirements, Business Rules, and Acceptance Criteria. Having the spec created <em>before</em> coding prevented architectural debt and ensured client-server contract alignment.</p>
-<h3>Coding &amp; Refactoring Value</h3>
-<p>Using AI for pair programming accelerated repetitive boilerplate creation (such as Express routers, Prisma queries, and React form state handlers) while allowing human focus on critical business rules:
-- <strong>Server Authorization</strong>: Rigorously enforcing RBAC at the Express middleware layer rather than trusting client state.
-- <strong>Data Integrity</strong>: Ensuring idempotent database seeding and preserving foreign key references from Lab 2.
-- <strong>Safety Rule Enforcements</strong>: Preventing admin self-lockout or last-admin deactivation.</p>
-<p>Overall, leveraging the AI agent within a strict Spec DD and Test DD workflow resulted in high code quality, complete test coverage, and smooth incremental software engineering.</p>
+<h3>Living Specification &amp; Iteration Evolution</h3>
+<p>Initial exploratory scaffolding and API route prototyping were created alongside contract drafting during sprint setup. The formal 11-section engineering specification was anchored in PR #43. As implementation progressed and peer reviews were conducted, the specification was actively maintained as a living engineering contract rather than a static document: Acceptance Criteria (AC-21, AC-22 for Admin deactivation guards, and AC-23 / BR-18 for password complexity) and test cases (API-21 to API-24) were systematically appended in response to review discoveries.</p>
+
+<h3>Critical AI Limitations, Errors, and Review Discoveries</h3>
+<p>While AI dramatically accelerated route scaffolding, Prisma queries, and React UI layout, independent peer reviews exposed multiple critical omissions and false positives where AI code fell short:</p>
+<ul>
+  <li><strong>Premature Claim of Security Enforcement:</strong> The AI initially implemented client-only password complexity validation and erroneously claimed compliance, leaving the backend open. Peer review on PR #36 flagged this gap, which was remediated in commit <code>ee630ab</code> and PR #39 by adding server-side regex validation and automated tests.</li>
+  <li><strong>Environment Initialization Race Condition:</strong> The AI structured <code>server/src/index.ts</code> to import <code>app</code> before invoking <code>dotenv.config()</code>, causing <code>authMiddleware.ts</code> to evaluate <code>JWT_SECRET</code> prematurely. This was caught during PR #42 review, resolved via <code>server/src/loadEnv.ts</code>, and protected by a startup-level regression test (<code>jwt-secret-guard.test.ts</code>).</li>
+  <li><strong>Insecure Query-Token Downloads:</strong> The AI initially generated attachment download links passing bearer tokens in query parameters (<code>?token=...</code>). Reviewers correctly identified log and browser history leakage risks, prompting refactoring to authenticated <code>fetch()</code> with <code>Authorization: Bearer</code> headers and Blob URLs with user-facing failure alerts.</li>
+</ul>
+<p>These experiences demonstrated that AI assistance accelerates authoring but requires rigorous human peer review, contract verification, and automated regression testing to achieve true production reliability.</p>
   </div>
 </div>
 
@@ -2763,7 +2818,7 @@ Content-Type: application/json; charset=utf-8
 <p>Lab 3 maintains and extends the <strong>Zen Green</strong> enterprise design language established in Lab 2. All screens, controls, cards, badges, modal dialogs, and typography adhere to the unified visual hierarchy and design tokens of TokTickIT. The application is built using <strong>Bootstrap 5 + Custom CSS Tokens</strong> (Tailwind CSS is explicitly omitted).</p>
 <h3>1.1 Zen Green Color Tokens</h3>
 <ul>
-<li><strong>Brand Primary Green (<code>--color-primary</code>)</strong>: <code>#006B3C</code> (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: <strong>8.4:1</strong> (exceeds WCAG AAA requirement of 7:1).</li>
+<li><strong>Brand Primary Green (<code>--color-primary</code>)</strong>: <code>#006B3C</code> (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: <strong>6.6:1</strong> (passes WCAG AA 4.5:1 for standard text and WCAG AAA 3:1 for large text / UI components).</li>
 <li><strong>Secondary Accent Green (<code>--color-accent</code>)</strong>: <code>#008751</code> (Medium vibrant green; hover states, secondary highlights, active border highlights).</li>
 <li><strong>Soft Light Accent (<code>--color-surface-mint</code>)</strong>: <code>#e8f5e9</code> (Soft pastel green; card highlights, active filter indicators, success notification backgrounds).</li>
 <li><strong>Dark Slate Text (<code>--color-text-primary</code>)</strong>: <code>#1e293b</code> (Primary body text, headers, table contents).</li>
@@ -2851,7 +2906,7 @@ Content-Type: application/json; charset=utf-8
 <ul>
 <li><strong>Primary Action Buttons (<code>.tkt-btn-action-primary</code>)</strong>:</li>
 <li>Background: <code>#006B3C</code></li>
-<li>Text: <code>#ffffff</code> (Contrast ratio <strong>8.4:1</strong>)</li>
+<li>Text: <code>#ffffff</code> (Contrast ratio <strong>6.6:1</strong> — passes WCAG AA 4.5:1)</li>
 <li>Hover: <code>#008751</code></li>
 <li>Min touch target height: <code>44px</code> on mobile/tablet viewports</li>
 <li>Focus: Outline with <code>rgba(0, 90, 54, 0.4)</code> halo</li>
@@ -3058,7 +3113,7 @@ Content-Type: application/json; charset=utf-8
 <td>Primary Button Visibility &amp; Contrast</td>
 <td>All Viewports</td>
 <td><strong>PASS</strong></td>
-<td><code>.tkt-btn-action-primary</code> has background <code>#006B3C</code> with text <code>#ffffff</code> (contrast ratio <strong>8.4:1</strong>, far exceeding WCAG AA 4.5:1).</td>
+<td><code>.tkt-btn-action-primary</code> has background <code>#006B3C</code> with text <code>#ffffff</code> (contrast ratio <strong>6.6:1</strong>, exceeding WCAG AA 4.5:1).</td>
 </tr>
 <tr>
 <td>Mobile Touch Targets</td>

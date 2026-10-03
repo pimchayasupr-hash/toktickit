@@ -1,7 +1,7 @@
 # Lab 3 AI Usage Log & Reflection (`ai-use.md`)
 
 ## 1. AI Tooling Metadata
-- **AI Model**: Antigravity (Google DeepMind Gemini 3.6 Flash High)
+- **AI Model**: Antigravity (Google DeepMind Gemini 3.6 Flash High & Gemini 3.8 Flash)
 - **Role & Usage Mode**: Pair-Programming Assistant, Spec-Driven Development Agent, Test Generation & Refactoring Assistant.
 
 ---
@@ -36,13 +36,14 @@
 
 ## 3. Reflection on AI Assistance
 
-### Specification Agent Efficiency
-The AI assistant rapidly translated ambiguous stakeholder needs and PDF handouts into structured, numbered Functional Requirements, Business Rules, and Acceptance Criteria. Having the spec created *before* coding prevented architectural debt and ensured client-server contract alignment.
+### Living Specification & Iteration Evolution
+Initial exploratory scaffolding and API route prototyping were created alongside contract drafting during sprint setup. The formal 11-section engineering specification was anchored in PR #43. As implementation progressed and peer reviews were conducted, the specification was actively maintained as a living engineering contract rather than a static document: Acceptance Criteria (AC-21, AC-22 for Admin deactivation guards, and AC-23 / BR-18 for password complexity) and test cases (API-21 to API-24) were systematically appended in response to review discoveries.
 
-### Coding & Refactoring Value
-Using AI for pair programming accelerated repetitive boilerplate creation (such as Express routers, Prisma queries, and React form state handlers) while allowing human focus on critical business rules:
-- **Server Authorization**: Rigorously enforcing RBAC at the Express middleware layer rather than trusting client state.
-- **Data Integrity**: Ensuring idempotent database seeding and preserving foreign key references from Lab 2.
-- **Safety Rule Enforcements**: Preventing admin self-lockout or last-admin deactivation.
+### Critical AI Limitations, Errors, and Review Discoveries
+While AI dramatically accelerated route scaffolding, Prisma queries, and React UI layout, independent peer reviews exposed multiple critical omissions and false positives where AI code fell short:
 
-Overall, leveraging the AI agent within a strict Spec DD and Test DD workflow resulted in high code quality, complete test coverage, and smooth incremental software engineering.
+- **Premature Claim of Security Enforcement:** The AI initially implemented client-only password complexity validation and erroneously claimed compliance, leaving the backend open. Peer review on PR #36 flagged this gap, which was remediated in commit `ee630ab` and PR #39 by adding server-side regex validation and automated tests.
+- **Environment Initialization Race Condition:** The AI structured `server/src/index.ts` to import `app` before invoking `dotenv.config()`, causing `authMiddleware.ts` to evaluate `JWT_SECRET` prematurely. This was caught during PR #42 review, resolved via `server/src/loadEnv.ts`, and protected by a startup-level regression test (`jwt-secret-guard.test.ts`).
+- **Insecure Query-Token Downloads:** The AI initially generated attachment download links passing bearer tokens in query parameters (`?token=...`). Reviewers correctly identified log and browser history leakage risks, prompting refactoring to authenticated `fetch()` with `Authorization: Bearer` headers and Blob URLs with user-facing failure alerts.
+
+These experiences demonstrated that AI assistance accelerates authoring but requires rigorous human peer review, contract verification, and automated regression testing to achieve true production reliability.

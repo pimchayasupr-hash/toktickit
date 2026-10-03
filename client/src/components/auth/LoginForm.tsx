@@ -116,15 +116,7 @@ export const LoginForm: React.FC = () => {
               </button>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
-              <a
-                href="#forgot-password"
-                onClick={(e) => { e.preventDefault(); alert('Please contact your IT administrator to reset your password.'); }}
-                style={{ fontSize: '0.8rem', color: 'var(--color-primary-green)', textDecoration: 'none', fontWeight: 500 }}
-              >
-                Forgot your password?
-              </a>
-            </div>
+
           </form>
         </div>
       </div>

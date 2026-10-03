@@ -46,7 +46,7 @@ toktickit/
 │   ├── prisma/
 │   │   ├── schema.prisma            # User, Ticket, PublicComment, InternalNote models
 │   │   ├── migrations/              # Prisma migration history (Lab 2 → Lab 3 migration included)
-│   │   └── seed.ts                  # Idempotent seed — 1 Admin, 1 Staff, 3 Requesters + demo tickets
+│   │   └── seed.ts                  # Idempotent seed — 1 Admin, 4 Staff (3 active, 1 inactive), 5 Requesters (4 active, 1 inactive) + 18 tickets
 │   └── tests/lab-03/                # Vitest + Supertest API integration tests (104 tests)
 │
 ├── e2e/lab-03/                      # Playwright end-to-end tests (27 tests)
@@ -59,8 +59,14 @@ toktickit/
     ├── specification.md             # 11-section Spec DD document
     ├── tests.md                     # Test DD + traceability matrix (163/163)
     ├── report.md                    # Sprint report / Git workflow evidence
+    ├── reviewer.md                  # Peer review log across PRs #35–#42
+    ├── ai-use.md                    # AI usage log & reflection
     ├── ui-spec.md                   # UI layout & screen wireframes
     ├── api-spec.md                  # OpenAPI-style endpoint reference
+    ├── evidence/                    # Verbatim test execution evidence
+    │   ├── final-run-2026-10-02.txt # Real terminal test run logs
+    │   └── preflight-2026-10-02.txt # Automated preflight verification
+    ├── screenshots/                 # Multi-tier responsive visual evidence
     ├── submission.html              # Compiled PDF submission source
     └── LAB3_SUBMISSION.pdf          # Final submission PDF
 ```
@@ -112,15 +118,22 @@ cd server && npx prisma migrate deploy
 npx prisma db seed
 ```
 
-Default seeded accounts:
+Default seeded accounts (password for all seeded accounts is `Password123!`):
 
-| Role | Email | Initial Password |
-|---|---|---|
-| Admin | `admin@toktickit.local` | `Admin@1234` |
-| Staff | `staff@toktickit.local` | `Staff@1234` |
-| Requester | `requester@toktickit.local` | `Req@1234` |
+| Role | Email | Status | Initial Password | First Login Action |
+|---|---|---|---|---|
+| Admin | `admin@toktickit.com` | Active | `Password123!` | Ready (`mustChangePassword: false`) |
+| IT Staff | `michael.staff@toktickit.com` | Active | `Password123!` | Ready (`mustChangePassword: false`) |
+| IT Staff | `sarah.staff@toktickit.com` | Active | `Password123!` | Ready (`mustChangePassword: false`) |
+| IT Staff | `david.staff@toktickit.com` | Active | `Password123!` | Ready (`mustChangePassword: false`) |
+| IT Staff (Inactive) | `kevin.inactive@toktickit.com` | Inactive | `Password123!` | Inactive / Blocked |
+| Requester | `jennifer.anderson@example.com` | Active | `Password123!` | Must change password (`mustChangePassword: true`) |
+| Requester | `michael.brown@example.com` | Active | `Password123!` | Must change password (`mustChangePassword: true`) |
+| Requester | `sarah.jenkins@example.com` | Active | `Password123!` | Must change password (`mustChangePassword: true`) |
+| Requester | `david.kim@example.com` | Active | `Password123!` | Must change password (`mustChangePassword: true`) |
+| Requester (Inactive) | `alex.turner@example.com` | Inactive | `Password123!` | Inactive / Blocked |
 
-> All seeded users have `mustChangePassword = true` — a password change is required on first login.
+> Seeded Requesters have `mustChangePassword = true` to verify the mandatory initial-password change gate upon first login.
 
 ### Running
 

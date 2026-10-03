@@ -5,7 +5,7 @@
 Lab 3 maintains and extends the **Zen Green** enterprise design language established in Lab 2. All screens, controls, cards, badges, modal dialogs, and typography adhere to the unified visual hierarchy and design tokens of TokTickIT. The application is built using **Bootstrap 5 + Custom CSS Tokens** (Tailwind CSS is explicitly omitted).
 
 ### 1.1 Zen Green Color Tokens
-- **Brand Primary Green (`--color-primary`)**: `#006B3C` (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: **8.4:1** (exceeds WCAG AAA requirement of 7:1).
+- **Brand Primary Green (`--color-primary`)**: `#006B3C` (Deep forest green; header navigation background, primary action buttons, focused controls, key accents). Contrast ratio against white: **6.6:1** (passes WCAG AA 4.5:1 for standard text and WCAG AAA 3:1 for large text / UI components).
 - **Secondary Accent Green (`--color-accent`)**: `#008751` (Medium vibrant green; hover states, secondary highlights, active border highlights).
 - **Soft Light Accent (`--color-surface-mint`)**: `#e8f5e9` (Soft pastel green; card highlights, active filter indicators, success notification backgrounds).
 - **Dark Slate Text (`--color-text-primary`)**: `#1e293b` (Primary body text, headers, table contents).
@@ -36,7 +36,7 @@ TokTickIT supports all **8 ticket lifecycle statuses** and **4 priority levels**
 ### 1.3 Interactive Controls & Button Styling
 - **Primary Action Buttons (`.tkt-btn-action-primary`)**:
   - Background: `#006B3C`
-  - Text: `#ffffff` (Contrast ratio **8.4:1**)
+  - Text: `#ffffff` (Contrast ratio **6.6:1** — passes WCAG AA 4.5:1)
   - Hover: `#008751`
   - Min touch target height: `44px` on mobile/tablet viewports
   - Focus: Outline with `rgba(0, 90, 54, 0.4)` halo
@@ -122,7 +122,7 @@ The navigation bar implements strict role isolation conforming to stakeholder re
 | Requirement Item | Target Viewports | Status | Verified Evidence |
 |---|---|---|---|
 | Zero Horizontal Scroll (`scrollWidth <= clientWidth`) | 375px, 390px, 820px, 1440px | **PASS** | Automated Playwright responsive test (`e2e/lab-03/responsive-overflow.spec.ts`) passes across all 4 breakpoints for Login, Queue, Detail, Admin. |
-| Primary Button Visibility & Contrast | All Viewports | **PASS** | `.tkt-btn-action-primary` has background `#006B3C` with text `#ffffff` (contrast ratio **8.4:1**, far exceeding WCAG AA 4.5:1). |
+| Primary Button Visibility & Contrast | All Viewports | **PASS** | `.tkt-btn-action-primary` has background `#006B3C` with text `#ffffff` (contrast ratio **6.6:1**, exceeding WCAG AA 4.5:1). |
 | Mobile Touch Targets | Mobile (<768px) | **PASS** | Action buttons on mobile cards have min-height of 44px (`min-height: 44px; display: inline-flex; align-items: center; justify-content: center;`). |
 | Status Badge Coverage | All Screens | **PASS** | Distinct CSS classes implemented and rendered for all 8 statuses (`NEW`, `OPEN`, `IN_PROGRESS`, `WAITING_FOR_REQUESTER`, `RESOLVED`, `CLOSED`, `REOPENED`, `CANCELLED`). |
 | Keyboard Accessibility & Modal Traps | All Modals | **PASS** | Pressing `Escape` closes Create User, Edit User, Reset Password, and Change Password modals. |
