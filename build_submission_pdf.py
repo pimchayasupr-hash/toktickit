@@ -1087,13 +1087,13 @@ const fs = require('fs');
     printBackground: true,
     margin: {{
       top: '16mm',
-      bottom: '16mm',
+      bottom: '22mm',
       left: '14mm',
       right: '14mm'
     }},
     displayHeaderFooter: true,
-    headerTemplate: '<div style="font-size: 8pt; color: #64748b; font-family: -apple-system, sans-serif; width: 100%; text-align: right; padding-right: 14mm;">CPE 334 — TokTickIT Lab 3 Engineering Submission</div>',
-    footerTemplate: '<div style="font-size: 8pt; color: #64748b; font-family: -apple-system, sans-serif; width: 100%; text-align: center;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
+    headerTemplate: '<div style="font-size: 8pt; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; width: 100%; text-align: right; padding: 0 14mm; box-sizing: border-box;">CPE 334 — TokTickIT Lab 3 Engineering Submission</div>',
+    footerTemplate: '<div style="font-size: 8.5pt; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; width: 100%; text-align: center; padding: 4px 0; box-sizing: border-box;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></div>'
   }});
   
   await browser.close();
