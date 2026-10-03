@@ -52,12 +52,12 @@ async function loginAs(page, email, password) {
   if (!data.token) {
     throw new Error(`Failed to login as ${email}: ${JSON.stringify(data)}`);
   }
-  await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://localhost:5175', { waitUntil: 'domcontentloaded' });
   await page.evaluate((tok) => {
     localStorage.clear();
     localStorage.setItem('toktickit_token', tok);
   }, data.token);
-  await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:5175', { waitUntil: 'networkidle' });
 }
 
 async function run() {
@@ -68,7 +68,7 @@ async function run() {
   console.log('1. Capturing Login views...');
   {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await page.goto('http://localhost:5173', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:5175', { waitUntil: 'networkidle' });
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'networkidle' });
     await page.waitForSelector('input[type="email"]');
@@ -108,7 +108,7 @@ async function run() {
       });
     });
 
-    await page.goto('http://localhost:5173', { waitUntil: 'domcontentloaded' });
+    await page.goto('http://localhost:5175', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       localStorage.setItem('toktickit_token', 'mock_token');
     });
