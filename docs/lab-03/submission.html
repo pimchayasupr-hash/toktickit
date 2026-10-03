@@ -628,7 +628,7 @@
 │   ├── src/
 │   │   ├── components/              # UI Components (Login, Navbar, TicketForm, StaffQueue, UserManagement, …)
 │   │   ├── context/                 # AuthContext — current user, JWT storage, role helpers
-│   │   └── tests/lab-03/            # React Testing Library component tests (28 tests)
+│   │   └── tests/lab-03/            # React Testing Library component tests (32 tests)
 │   └── vite.config.ts
 │
 ├── server/                          # Node.js + Express + TypeScript backend
@@ -746,7 +746,7 @@ cd client &amp;&amp; npm run dev
 <pre><code class="language-bash"># Server tests (90 tests — API integration, authorization matrix, unit)
 cd server &amp;&amp; npm test
 
-# Client tests (28 tests — component feedback states, form validation)
+# Client tests (32 tests — component feedback states, form validation)
 cd client &amp;&amp; npm test
 
 # Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
@@ -1829,7 +1829,7 @@ model InternalNote {
   <div class="rendered-markdown">
     <h1>Lab 3 Test Engineering &amp; Traceability Plan</h1>
 <h2>1. Test Strategy &amp; Coverage Scope</h2>
-<p>The Lab 3 test suite provides 100% traceability across all Functional Requirements (FR), Business Rules (BR), Acceptance Criteria (AC-01..AC-22), and the complete Role × Endpoint Authorization Matrix.</p>
+<p>The Lab 3 test suite provides 100% traceability across all Functional Requirements (FR), Business Rules (BR), Acceptance Criteria (AC-01..AC-23), and the complete Role × Endpoint Authorization Matrix.</p>
 <h3>Test Layers</h3>
 <ol>
 <li><strong>Server API Tests (<code>server/tests/lab-03/</code>)</strong>: Supertest API endpoints verifying authentication, authorization headers, matrix permissions, validation status codes, Prisma data isolation, and safety rules.</li>
@@ -2294,16 +2294,16 @@ model InternalNote {
 </table>
 <h3>2.1 Automated Traceability Verification Output (<code>python3 scripts/check-traceability.py</code>)</h3>
 <pre><code class="language-text">=== Specification Definition Audit ===
-Defined Acceptance Criteria: 22 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22)
+Defined Acceptance Criteria: 23 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-23)
 Defined Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
-Defined Business Rules:      17 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17)
+Defined Business Rules:      18 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17, BR-18)
 
 === Traceability Matrix Coverage Audit ===
-Referenced Acceptance Criteria: 22 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22)
+Referenced Acceptance Criteria: 23 (AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16, AC-17, AC-18, AC-19, AC-20, AC-21, AC-22, AC-23)
 Referenced Functional Reqs:     21 (FR-01, FR-02, FR-03, FR-04, FR-05, FR-06, FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15, FR-16, FR-17, FR-18, FR-19, FR-20, FR-21)
-Referenced Business Rules:      17 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17)
+Referenced Business Rules:      18 (BR-01, BR-02, BR-03, BR-04, BR-05, BR-06, BR-07, BR-08, BR-09, BR-10, BR-11, BR-12, BR-13, BR-14, BR-15, BR-16, BR-17, BR-18)
 
-✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-22), FUNCTIONAL REQUIREMENTS (FR-01..FR-21), AND BUSINESS RULES (BR-01..BR-17) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.
+✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-23), FUNCTIONAL REQUIREMENTS (FR-01..FR-21), AND BUSINESS RULES (BR-01..BR-18) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.
 </code></pre>
 <hr />
 <h2>3. Automated Test Execution Commands</h2>
