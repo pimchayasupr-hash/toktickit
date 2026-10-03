@@ -5,7 +5,7 @@ import base64
 import markdown
 import subprocess
 
-BASE_DIR = "/Users/pimchayasuprateravarnit/toktickit"
+BASE_DIR = "/Users/pimchayasuprateravarnit/tk-final"
 DOCS_DIR = os.path.join(BASE_DIR, "docs", "lab-03")
 ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts", "lab-03", "screenshots")
 OUTPUT_HTML = os.path.join(DOCS_DIR, "submission.html")
