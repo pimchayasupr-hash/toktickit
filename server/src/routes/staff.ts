@@ -174,6 +174,10 @@ router.get('/tickets/:id', async (req: AuthRequest, res: Response): Promise<void
           include: { author: { select: { id: true, name: true, role: true } } },
           orderBy: { createdAt: 'asc' },
         },
+        actionsTaken: {
+          include: { performedBy: { select: { id: true, name: true, email: true } } },
+          orderBy: [{ actionDateTime: 'asc' }, { createdAt: 'asc' }],
+        },
       },
     });
 
@@ -297,11 +301,23 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
 router.patch('/tickets/:id/status', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const ticketId = parseId(req.params.id);
-    const { status } = req.body;
+    const { status, version } = req.body;
 
     const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
     if (!ticket) {
       res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
+      return;
+    }
+
+    // BR-14: Concurrency control check
+    if (version !== undefined && typeof version === 'number' && ticket.version !== version) {
+      res.status(409).json({
+        error: {
+          code: 'CONCURRENCY_CONFLICT',
+          message: 'Ticket has been updated by another user. Please reload the latest data.',
+          currentTicket: ticket,
+        },
+      });
       return;
     }
 
@@ -319,9 +335,53 @@ router.patch('/tickets/:id/status', async (req: AuthRequest, res: Response): Pro
       return;
     }
 
+    // BR-13: Resolution Gate check when transitioning to RESOLVED
+    if (status === 'RESOLVED') {
+      if (!ticket.ownerId) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: An IT Staff owner must be assigned to the ticket before resolving.',
+            field: 'ownerId',
+          },
+        });
+        return;
+      }
+
+      const actions = await prisma.actionTaken.findMany({
+        where: { ticketId },
+      });
+
+      if (actions.length === 0) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: At least one Action Taken must be recorded before resolving.',
+            field: 'actionsTaken',
+          },
+        });
+        return;
+      }
+
+      const hasActionWithResult = actions.some((a) => a.result && a.result.trim().length > 0);
+      if (!hasActionWithResult) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: At least one Action Taken must have a non-empty result before resolving.',
+            field: 'result',
+          },
+        });
+        return;
+      }
+    }
+
     const updatedTicket = await prisma.ticket.update({
       where: { id: ticketId },
-      data: { currentStatus: status },
+      data: {
+        currentStatus: status,
+        version: { increment: 1 },
+      },
     });
 
     res.status(200).json({ ticket: updatedTicket });

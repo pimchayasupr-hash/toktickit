@@ -30,3 +30,13 @@ export function isValidTransition(fromStatus: string, toStatus: string): boolean
   if (!allowed) return false;
   return allowed.includes(toStatus);
 }
+
+export function sanitizeHtml(input: string): string {
+  if (!input || typeof input !== 'string') return input;
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}

@@ -6,6 +6,8 @@ import authRouter from './routes/auth';
 import staffRouter from './routes/staff';
 import commentsNotesRouter from './routes/comments-notes';
 import adminUsersRouter from './routes/admin-users';
+import actionsTakenRouter from './routes/actions-taken';
+import dashboardRouter from './routes/dashboard';
 import { authenticateUser, requirePasswordChangeCheck, AuthRequest } from './middleware/authMiddleware';
 import { generateTicketNumber } from './utils/ticketUtils';
 import { upload } from './middleware/uploadMiddleware';
@@ -84,7 +86,13 @@ app.use('/api', commentsNotesRouter);
 // 6. Admin User Management Router
 app.use('/api/admin', adminUsersRouter);
 
-// 7. Requester Ticket Operations (Authenticated)
+// 7. Actions Taken Router
+app.use('/api', actionsTakenRouter);
+
+// 8. Dashboards Router
+app.use('/api/dashboard', dashboardRouter);
+
+// 9. Requester Ticket Operations (Authenticated)
 
 // Create Ticket
 app.post('/api/tickets', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {

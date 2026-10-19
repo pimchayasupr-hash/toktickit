@@ -11,51 +11,93 @@ describe('Lab 4 - Ticket Workflow & Resolution Gate API Test Suite', () => {
     return res.body.token;
   };
 
+  const getRequesterToken = async () => {
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'jennifer.anderson@example.com',
+      password: 'Password123!',
+    });
+    return res.body.token;
+  };
+
   it('TEST-WFK-02: Transition to RESOLVED on unassigned ticket is blocked by Resolution Gate', async () => {
-    const token = await getStaffToken();
-    const queueRes = await request(app)
-      .get('/api/staff/tickets')
-      .set('Authorization', `Bearer ${token}`);
+    const staffToken = await getStaffToken();
+    const reqToken = await getRequesterToken();
 
-    // Find an unassigned ticket or unassign one
-    const unassignedTicket = queueRes.body.tickets.find((t: any) => t.ownerId === null);
-    expect(unassignedTicket).toBeDefined();
+    // Create a dedicated ticket with no owner
+    const createRes = await request(app)
+      .post('/api/tickets')
+      .set('Authorization', `Bearer ${reqToken}`)
+      .send({
+        categoryId: 1,
+        relatedSystemId: 1,
+        summary: 'Resolution gate unassigned test ticket',
+        description: 'Testing that unassigned ticket cannot be resolved.',
+        requestedPriority: 'MEDIUM',
+      });
+    const ticket = createRes.body.ticket;
 
+    // Transition from NEW to OPEN (permitted matrix transition)
+    const openRes = await request(app)
+      .patch(`/api/staff/tickets/${ticket.id}/status`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({ status: 'OPEN', version: ticket.version || 1 });
+
+    const openTicket = openRes.body.ticket;
+
+    // Attempt to transition unassigned ticket from OPEN to RESOLVED
     const res = await request(app)
-      .patch(`/api/staff/tickets/${unassignedTicket.id}/status`)
-      .set('Authorization', `Bearer ${token}`)
+      .patch(`/api/staff/tickets/${openTicket.id}/status`)
+      .set('Authorization', `Bearer ${staffToken}`)
       .send({
         status: 'RESOLVED',
-        version: unassignedTicket.version || 1,
+        version: openTicket.version,
       });
 
-    // Must be blocked by resolution gate
+    // Must be blocked by resolution gate (OWNER_REQUIRED)
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('RESOLUTION_GATE_FAILED');
   });
 
   it('TEST-WFK-03: Transition to RESOLVED with zero actions is blocked by Resolution Gate', async () => {
-    const token = await getStaffToken();
-    const queueRes = await request(app)
-      .get('/api/staff/tickets')
-      .set('Authorization', `Bearer ${token}`);
+    const staffToken = await getStaffToken();
+    const reqToken = await getRequesterToken();
 
-    // Claim a ticket with no actions
-    const ticket = queueRes.body.tickets[0];
+    // Create a dedicated ticket
+    const createRes = await request(app)
+      .post('/api/tickets')
+      .set('Authorization', `Bearer ${reqToken}`)
+      .send({
+        categoryId: 1,
+        relatedSystemId: 1,
+        summary: 'Resolution gate zero actions test ticket',
+        description: 'Testing that ticket with no actions taken cannot be resolved.',
+        requestedPriority: 'MEDIUM',
+      });
+    const ticket = createRes.body.ticket;
 
-    // Ensure it is assigned
-    await request(app)
+    // Claim the ticket so ownerId is set
+    const claimRes = await request(app)
       .patch(`/api/staff/tickets/${ticket.id}/claim`)
-      .set('Authorization', `Bearer ${token}`);
+      .set('Authorization', `Bearer ${staffToken}`);
 
-    const res = await request(app)
+    // Move from NEW to IN_PROGRESS (permitted matrix transition)
+    const progressRes = await request(app)
       .patch(`/api/staff/tickets/${ticket.id}/status`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({ status: 'IN_PROGRESS', version: claimRes.body.ticket.version });
+
+    const inProgressTicket = progressRes.body.ticket;
+
+    // Attempt to transition from IN_PROGRESS to RESOLVED with zero actions taken
+    const res = await request(app)
+      .patch(`/api/staff/tickets/${inProgressTicket.id}/status`)
+      .set('Authorization', `Bearer ${staffToken}`)
       .send({
         status: 'RESOLVED',
-        version: ticket.version || 1,
+        version: inProgressTicket.version,
       });
 
+    // Must be blocked by resolution gate (ACTION_TAKEN_REQUIRED)
     expect(res.status).toBe(422);
     expect(res.body.error.code).toBe('RESOLUTION_GATE_FAILED');
   });
