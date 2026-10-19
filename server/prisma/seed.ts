@@ -34,6 +34,13 @@ const USERS = [
     mustChangePassword: false,
   },
   {
+    name: 'Emily White (Zero Tickets)',
+    email: 'emily.zero@example.com',
+    role: Role.REQUESTER,
+    isActive: true,
+    mustChangePassword: false,
+  },
+  {
     name: 'Alex Turner (Inactive)',
     email: 'alex.turner@example.com',
     role: Role.REQUESTER,
@@ -455,6 +462,108 @@ export async function seedDatabase() {
         if (!existing) {
           await prisma.internalNote.create({ data: n });
         }
+      }
+    }
+
+    // 7. Seed Idempotent Actions Taken (Lab 4)
+    if (t.ticketNumber === 'TKT-2026-001222') {
+      const existing = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Re-keyed IPsec' } },
+      });
+      if (!existing) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 24),
+            description: 'Re-keyed IPsec tunnel session and replaced VPN profile certificates on client machine.',
+            result: 'Tunnel re-connected with 0% packet loss and 14ms latency.',
+            performedById: staffSarah,
+            createdById: staffSarah,
+            followUpRequired: false,
+            version: 1,
+          },
+        });
+      }
+    }
+
+    if (t.ticketNumber === 'TKT-2026-001228') {
+      const existing = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Cleaned thermal paste' } },
+      });
+      if (!existing) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 48),
+            description: 'Cleaned thermal paste and reseated CPU heatsink to address thermal throttling.',
+            result: 'Core temperature reduced from 98°C to 45°C under sustained load.',
+            performedById: staffMichael,
+            createdById: staffMichael,
+            followUpRequired: false,
+            version: 1,
+          },
+        });
+      }
+    }
+
+    if (t.ticketNumber === 'TKT-2026-001234') {
+      const existingAction1 = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Apple Hardware Diagnostics' } },
+      });
+      if (!existingAction1) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 12),
+            description: 'Executed Apple Hardware Diagnostics (AHD) battery cycle inspection.',
+            result: 'Detected cycle count 1,240; cell voltage imbalance on bank 2.',
+            performedById: staffMichael,
+            createdById: staffMichael,
+            followUpRequired: true,
+            followUpNote: 'Coordinate with parts inventory for replacement battery pack.',
+            attachmentNotes: 'Diagnostics log saved at /var/log/battery-diag-001234.log',
+            version: 1,
+          },
+        });
+      }
+
+      const existingAction2 = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Installed new OEM battery' } },
+      });
+      if (!existingAction2) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 4),
+            description: 'Installed new OEM battery pack and calibrated power management controller.',
+            result: 'Battery condition returned to Normal (100% health capacity).',
+            performedById: staffDavid, // Varied performer (different from ticket owner staffMichael)
+            createdById: staffDavid,
+            followUpRequired: false,
+            version: 1,
+          },
+        });
+      }
+    }
+
+    if (t.ticketNumber === 'TKT-2026-001217') {
+      const existing = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'push notification delivery logs' } },
+      });
+      if (!existing) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 6),
+            description: 'Inspected push notification delivery logs on Duo MFA gateway.',
+            result: 'Identified APNs token mismatch for mobile device; cleared stale push registration.',
+            performedById: staffDavid,
+            createdById: staffDavid,
+            followUpRequired: true,
+            followUpNote: 'Verify push prompt delivery with user during morning shift.',
+            version: 1,
+          },
+        });
       }
     }
   }
