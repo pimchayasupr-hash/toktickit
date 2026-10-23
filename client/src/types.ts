@@ -66,6 +66,26 @@ export interface InternalNote {
   };
 }
 
+export interface ActionTaken {
+  id: number;
+  ticketId: number;
+  actionDateTime: string;
+  description: string;
+  result?: string | null;
+  performedById: number;
+  performedBy: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  followUpRequired: boolean;
+  followUpNote?: string | null;
+  attachmentNotes?: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Ticket {
   id: number;
   ticketNumber: string;
@@ -79,6 +99,7 @@ export interface Ticket {
   requestedPriority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   itPriority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | null;
   currentStatus: string;
+  version: number;
   createdAt: string;
   updatedAt: string;
   category: Category;
@@ -88,6 +109,9 @@ export interface Ticket {
   attachments?: Attachment[];
   publicComments?: PublicComment[];
   internalNotes?: InternalNote[];
+  actionsTaken?: ActionTaken[];
+  actionsCount?: number;
+  hasActionWithResult?: boolean;
 }
 
 export interface Pagination {
@@ -96,3 +120,4 @@ export interface Pagination {
   total: number;
   totalPages: number;
 }
+

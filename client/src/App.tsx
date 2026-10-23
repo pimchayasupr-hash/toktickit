@@ -9,6 +9,8 @@ import { TicketDetail } from './components/TicketDetail';
 import { StaffTicketQueue } from './components/staff/StaffTicketQueue';
 import { StaffTicketDetail } from './components/staff/StaffTicketDetail';
 import { UserManagement } from './components/admin/UserManagement';
+import { RequesterDashboard } from './components/requester/RequesterDashboard';
+import { StaffDashboard } from './components/staff/StaffDashboard';
 
 const MainAppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -63,6 +65,26 @@ const MainAppContent: React.FC = () => {
           ) : (
             <StaffTicketDetail ticketId={selectedTicketId} onBack={() => setSelectedTicketId(null)} />
           )
+        ) : (effectiveTab === 'dashboard' || (effectiveTab === 'default' && user.role === 'REQUESTER')) && user.role === 'REQUESTER' ? (
+          <RequesterDashboard
+            onNavigate={(tab, tId) => {
+              if (typeof tId === 'number') {
+                setSelectedTicketId(tId);
+              } else {
+                setActiveTab(tab);
+              }
+            }}
+          />
+        ) : (effectiveTab === 'dashboard' || (effectiveTab === 'default' && (user.role === 'STAFF' || user.role === 'ADMIN'))) && (user.role === 'STAFF' || user.role === 'ADMIN') ? (
+          <StaffDashboard
+            onNavigate={(tab, tIdOrFilter) => {
+              if (typeof tIdOrFilter === 'number') {
+                setSelectedTicketId(tIdOrFilter);
+              } else {
+                setActiveTab(tab);
+              }
+            }}
+          />
         ) : effectiveTab === 'my-tickets' && user.role === 'REQUESTER' ? (
           <MyTickets
             onSelectTicket={(id) => setSelectedTicketId(id)}

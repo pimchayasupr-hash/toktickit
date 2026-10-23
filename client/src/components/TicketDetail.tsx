@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import type { Ticket, Attachment } from '../types';
 import { PublicCommentsSection } from './comments/PublicCommentsSection';
+import { ActionsTakenSection } from './staff/ActionsTakenSection';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -437,6 +438,12 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             <span>💬</span> Public Comments ({publicComments.length})
           </button>
           <button
+            onClick={() => setActiveTab('actions')}
+            className={`tkt-tab-nav-btn ${activeTab === 'actions' ? 'active' : ''}`}
+          >
+            <span>🛠️</span> Actions Taken
+          </button>
+          <button
             onClick={() => setActiveTab('attachments')}
             className={`tkt-tab-nav-btn ${activeTab === 'attachments' ? 'active' : ''}`}
           >
@@ -450,6 +457,11 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               ticketId={ticket.id}
               comments={publicComments}
               onCommentAdded={fetchTicketDetail}
+            />
+          ) : activeTab === 'actions' ? (
+            <ActionsTakenSection
+              ticketId={ticket.id}
+              isReadOnly={true}
             />
           ) : (
             <div>

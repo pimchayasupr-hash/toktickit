@@ -3,6 +3,7 @@ import type { Ticket, User, Attachment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { PublicCommentsSection } from '../comments/PublicCommentsSection';
 import { InternalNotesSection } from '../comments/InternalNotesSection';
+import { ActionsTakenSection } from './ActionsTakenSection';
 
 interface StaffTicketDetailProps {
   ticketId: number;
@@ -171,7 +172,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, version: ticket?.version }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -479,6 +480,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           />
         </div>
       </div>
+
+      {/* Actions Taken Section for Staff */}
+      <ActionsTakenSection
+        ticketId={ticket.id}
+        isReadOnly={false}
+        onActionsUpdated={fetchTicketDetail}
+      />
 
       {/* Attachments Section for Staff */}
       <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>

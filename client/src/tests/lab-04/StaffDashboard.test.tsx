@@ -81,8 +81,8 @@ describe('Lab 4 UI - StaffDashboard Component', () => {
     await waitFor(() => {
       expect(screen.getByText(/Unassigned/i)).toBeDefined();
       expect(screen.getByText(/My Assigned/i)).toBeDefined();
-      expect(screen.getByText(/4/)).toBeDefined(); // Unassigned count
-      expect(screen.getByText(/6/)).toBeDefined(); // My Assigned count
+      expect(screen.getAllByText(/4/)[0]).toBeDefined(); // Unassigned count
+      expect(screen.getAllByText(/6/)[0]).toBeDefined(); // My Assigned count
     });
   });
 

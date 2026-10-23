@@ -40,6 +40,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           {user.role === 'REQUESTER' && (
             <>
               <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`tkt-nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+              >
+                <span>📊</span> Dashboard
+              </button>
+              <button
                 onClick={() => setActiveTab('my-tickets')}
                 className={`tkt-nav-tab ${
                   activeTab === 'my-tickets' || activeTab === 'default' ? 'active' : ''
@@ -57,25 +63,47 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           )}
 
           {user.role === 'STAFF' && (
-            <button
-              onClick={() => setActiveTab('staff-queue')}
-              className={`tkt-nav-tab ${
-                activeTab === 'staff-queue' || activeTab === 'default' ? 'active' : ''
-              }`}
-            >
-              <span>📄</span> Ticket Queue
-            </button>
+            <>
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`tkt-nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+              >
+                <span>📊</span> Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('staff-queue')}
+                className={`tkt-nav-tab ${
+                  activeTab === 'staff-queue' || activeTab === 'default' ? 'active' : ''
+                }`}
+              >
+                <span>📄</span> Ticket Queue
+              </button>
+            </>
           )}
 
           {user.role === 'ADMIN' && (
-            <button
-              onClick={() => setActiveTab('user-management')}
-              className={`tkt-nav-tab ${
-                activeTab === 'user-management' || activeTab === 'default' ? 'active' : ''
-              }`}
-            >
-              <span>👥</span> User Management
-            </button>
+            <>
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`tkt-nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+              >
+                <span>📊</span> Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('staff-queue')}
+                className={`tkt-nav-tab ${activeTab === 'staff-queue' ? 'active' : ''}`}
+              >
+                <span>📄</span> Ticket Queue
+              </button>
+              <button
+                onClick={() => setActiveTab('user-management')}
+                className={`tkt-nav-tab ${
+                  activeTab === 'user-management' || activeTab === 'default' ? 'active' : ''
+                }`}
+              >
+                <span>👥</span> User Management
+              </button>
+            </>
           )}
         </nav>
 
