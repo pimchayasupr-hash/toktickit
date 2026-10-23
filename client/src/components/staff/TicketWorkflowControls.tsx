@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   NEW: ['OPEN', 'IN_PROGRESS', 'CANCELLED'],
@@ -29,7 +28,6 @@ export const TicketWorkflowControls: React.FC<TicketWorkflowProps> = ({
   ticket,
   onStatusChanged,
 }) => {
-  const { user } = useAuth();
   const allowedTransitions = VALID_TRANSITIONS[ticket.currentStatus] || [];
   const [selectedStatus, setSelectedStatus] = useState<string>(
     allowedTransitions[0] || ''
@@ -68,7 +66,7 @@ export const TicketWorkflowControls: React.FC<TicketWorkflowProps> = ({
 
     setUpdating(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
       const res = await fetch(`/api/staff/tickets/${ticket.id}/status`, {
         method: 'PATCH',
         headers: {

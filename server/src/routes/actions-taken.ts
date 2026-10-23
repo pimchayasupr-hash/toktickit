@@ -11,9 +11,9 @@ const parseId = (idParam: any): number => {
   return parseInt(raw, 10);
 };
 
-// 1. GET /api/tickets/:ticketId/actions-taken
+// 1. GET /api/tickets/:ticketId/actions-taken (or /actions)
 router.get(
-  '/tickets/:ticketId/actions-taken',
+  ['/tickets/:ticketId/actions-taken', '/tickets/:ticketId/actions'],
   authenticateUser,
   requirePasswordChangeCheck,
   async (req: AuthRequest, res: Response): Promise<void> => {
@@ -63,9 +63,9 @@ router.get(
   }
 );
 
-// 2. POST /api/tickets/:ticketId/actions-taken
+// 2. POST /api/tickets/:ticketId/actions-taken (or /actions)
 router.post(
-  '/tickets/:ticketId/actions-taken',
+  ['/tickets/:ticketId/actions-taken', '/tickets/:ticketId/actions'],
   authenticateUser,
   requirePasswordChangeCheck,
   async (req: AuthRequest, res: Response): Promise<void> => {
@@ -317,9 +317,9 @@ router.get(
   }
 );
 
-// 4. PATCH /api/tickets/:ticketId/actions-taken/:actionId
+// 4. PATCH /api/tickets/:ticketId/actions-taken/:actionId (and aliases)
 router.patch(
-  '/tickets/:ticketId/actions-taken/:actionId',
+  ['/tickets/:ticketId/actions-taken/:actionId', '/tickets/:ticketId/actions/:actionId', '/actions/:actionId'],
   authenticateUser,
   requirePasswordChangeCheck,
   async (req: AuthRequest, res: Response): Promise<void> => {
@@ -329,16 +329,21 @@ router.patch(
         return;
       }
 
-      const ticketId = parseId(req.params.ticketId);
+      const ticketId = req.params.ticketId ? parseId(req.params.ticketId) : undefined;
       const actionId = parseId(req.params.actionId);
 
-      if (isNaN(ticketId) || isNaN(actionId)) {
+      if ((req.params.ticketId && isNaN(ticketId!)) || isNaN(actionId)) {
         res.status(400).json({ error: { code: 'INVALID_ID', message: 'Invalid ID parameters.' } });
         return;
       }
 
+      const whereClause: any = { id: actionId };
+      if (ticketId !== undefined) {
+        whereClause.ticketId = ticketId;
+      }
+
       const action = await prisma.actionTaken.findFirst({
-        where: { id: actionId, ticketId },
+        where: whereClause,
       });
 
       if (!action) {
@@ -444,7 +449,7 @@ router.patch(
 
 // 5. DELETE /api/tickets/:ticketId/actions-taken/:actionId -> 405 (BR-10 append-only)
 router.delete(
-  '/tickets/:ticketId/actions-taken/:actionId',
+  ['/tickets/:ticketId/actions-taken/:actionId', '/tickets/:ticketId/actions/:actionId', '/actions/:actionId'],
   authenticateUser,
   (_req: AuthRequest, res: Response): void => {
     res.status(405).json({

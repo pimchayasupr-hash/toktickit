@@ -74,7 +74,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'comments' | 'attachments'>('comments');
+  const [activeTab, setActiveTab] = useState<'comments' | 'actions' | 'attachments'>('comments');
 
   // File Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

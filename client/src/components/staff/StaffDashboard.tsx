@@ -58,7 +58,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
       const res = await fetch('/api/dashboard/staff', {
         headers: {
           'Content-Type': 'application/json',

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { ActionTaken } from '../../types';
+import type { ActionTaken } from '../../types';
 
 interface ActionsTakenSectionProps {
   ticketId: number;
   isReadOnly?: boolean;
   onActionsUpdated?: () => void;
 }
+
+const getLocalDatetimeString = (date = new Date()) => {
+  const d = new Date(date);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
 
 export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   ticketId,
@@ -21,9 +27,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   // Form State
   const [showForm, setShowForm] = useState<boolean>(false);
   const [editingActionId, setEditingActionId] = useState<number | null>(null);
-  const [actionDateTime, setActionDateTime] = useState<string>(
-    new Date().toISOString().slice(0, 16)
-  );
+  const [actionDateTime, setActionDateTime] = useState<string>(getLocalDatetimeString());
   const [description, setDescription] = useState<string>('');
   const [result, setResult] = useState<string>('');
   const [followUpRequired, setFollowUpRequired] = useState<boolean>(false);
@@ -37,7 +41,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
       const res = await fetch(`/api/tickets/${ticketId}/actions-taken`, {
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +69,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const resetForm = () => {
     setShowForm(false);
     setEditingActionId(null);
-    setActionDateTime(new Date().toISOString().slice(0, 16));
+    setActionDateTime(getLocalDatetimeString());
     setDescription('');
     setResult('');
     setFollowUpRequired(false);
@@ -83,7 +87,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const handleOpenEditForm = (action: ActionTaken) => {
     resetForm();
     setEditingActionId(action.id);
-    setActionDateTime(new Date(action.actionDateTime).toISOString().slice(0, 16));
+    setActionDateTime(getLocalDatetimeString(new Date(action.actionDateTime)));
     setDescription(action.description);
     setResult(action.result || '');
     setFollowUpRequired(action.followUpRequired);
@@ -113,7 +117,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
       const payload: any = {
         actionDateTime: new Date(actionDateTime).toISOString(),
         description: description.trim(),
@@ -129,7 +133,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
         const targetAction = actions.find((a) => a.id === editingActionId);
         payload.version = targetAction?.version || 1;
 
-        res = await fetch(`/api/actions/${editingActionId}`, {
+        res = await fetch(`/api/tickets/${ticketId}/actions-taken/${editingActionId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -138,7 +142,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
           body: JSON.stringify(payload),
         });
       } else {
-        res = await fetch(`/api/tickets/${ticketId}/actions`, {
+        res = await fetch(`/api/tickets/${ticketId}/actions-taken`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -398,7 +402,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
             return (
               <div
                 key={act.id}
-                className="border border-slate-200 rounded-xl p-4 bg-white hover:border-emerald-200 transition"
+                className="tkt-action-card border border-slate-200 rounded-xl p-4 bg-white hover:border-emerald-200 transition"
               >
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
