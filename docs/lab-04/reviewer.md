@@ -20,7 +20,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
 - **Title**: `feat(lab4): Actions Taken subsystem, role dashboards, resolution gate, and optimistic concurrency`
 - **Branch**: `feature/lab4-hardening` $\rightarrow$ `lab4-staging` (stacked: `lab4/spec` → `lab4/tests` → `feature/lab4-db-schema` → `feature/lab4-backend` → `feature/lab4-frontend` → `feature/lab4-hardening`)
 - **Linked Issues**: #44, #45, #46, #47, #48, #49, #50, #51, #52, #53 (#54 is closed by PR #2)
-- **PR Link**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. https://github.com/pimchayasupr-hash/toktickit/pull/XX]`
+- **PR Link**: https://github.com/pimchayasupr-hash/toktickit/pull/55
 - **Author**: `@pimchayasupr-hash`
 - **Reviewer**: `[TO BE FILLED BY HUMAN REVIEWER: @Beethoven190 or @supa-gif173]`
 - **Review Date**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. 2026-10-XX]`
