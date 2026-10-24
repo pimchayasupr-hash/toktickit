@@ -18,7 +18,8 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
 
 ### PR #1: Lab 4 Full Increment (Actions Taken, Dashboards, Resolution Gate & Concurrency)
 - **Title**: `feat(lab4): Actions Taken subsystem, role dashboards, resolution gate, and optimistic concurrency`
-- **Branch**: `feature/lab4-increment` $\rightarrow$ `lab4-staging`
+- **Branch**: `feature/lab4-hardening` $\rightarrow$ `lab4-staging` (stacked: `lab4/spec` → `lab4/tests` → `feature/lab4-db-schema` → `feature/lab4-backend` → `feature/lab4-frontend` → `feature/lab4-hardening`)
+- **Linked Issues**: #44, #45, #46, #47, #48, #49, #50, #51, #52, #53 (#54 is closed by PR #2)
 - **PR Link**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. https://github.com/pimchayasupr-hash/toktickit/pull/XX]`
 - **Author**: `@pimchayasupr-hash`
 - **Reviewer**: `[TO BE FILLED BY HUMAN REVIEWER: @Beethoven190 or @supa-gif173]`
@@ -31,7 +32,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - [ ] Optimistic concurrency returns HTTP 409 Conflict on stale updates without data loss.
   - [ ] Requester and Staff dashboards compute metrics on the backend without unbounded data leakage.
   - [ ] Zen Green design tokens, 44px touch targets, and zero horizontal scroll verified.
-  - [ ] All automated tests pass (104 server tests + 32 client tests + Lab 4 test suites).
+  - [ ] All automated tests pass (136/136 server tests + 38/38 client tests + 9/9 Lab 4 Playwright E2E).
 - **Reviewer Comments & Feedback**:
   - *Comment 1*: `[TO BE FILLED BY HUMAN REVIEWER: Technical feedback or observation from GitHub review]`
   - *Author Response*: `[TO BE FILLED: Author's technical explanation, fix, or resolution commit]`
