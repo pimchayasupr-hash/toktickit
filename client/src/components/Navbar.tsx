@@ -26,7 +26,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onClear
             handleTabClick('my-tickets');
           }}
         >
-          <span className="fs-4 me-2">🎟️</span>
           TokTickIT
         </a>
 

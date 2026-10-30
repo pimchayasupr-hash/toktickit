@@ -273,7 +273,9 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           ← Back to My Tickets
         </button>
         <div role="alert" className="tkt-alert-error" data-testid="ticket-detail-error">
-          <span>⚠️</span>
+          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <div>{error || 'Ticket not found.'}</div>
         </div>
       </div>
@@ -435,19 +437,19 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             onClick={() => setActiveTab('comments')}
             className={`tkt-tab-nav-btn ${activeTab === 'comments' ? 'active' : ''}`}
           >
-            <span>💬</span> Public Comments ({publicComments.length})
+            Public Comments ({publicComments.length})
           </button>
           <button
             onClick={() => setActiveTab('actions')}
             className={`tkt-tab-nav-btn ${activeTab === 'actions' ? 'active' : ''}`}
           >
-            <span>🛠️</span> Actions Taken
+            Actions Taken
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={`tkt-tab-nav-btn ${activeTab === 'history' ? 'active' : ''}`}
           >
-            <span>📜</span> Status History ({ticket.statusHistory?.length || 0})
+            Status History ({ticket.statusHistory?.length || 0})
           </button>
           <button
             onClick={() => setActiveTab('attachments')}
@@ -549,8 +551,11 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               </form>
 
               {downloadError && (
-                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }} role="alert">
-                  ⚠️ {downloadError}
+                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+                  <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{downloadError}</span>
                 </div>
               )}
 
