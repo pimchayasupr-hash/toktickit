@@ -511,6 +511,37 @@ export async function seedDatabase() {
     }
 
     if (t.ticketNumber === 'TKT-2026-001234') {
+      const existingHistory = await prisma.ticketStatusHistory.findFirst({
+        where: { ticketId: ticket.id },
+      });
+      if (!existingHistory) {
+        await prisma.ticketStatusHistory.createMany({
+          data: [
+            {
+              ticketId: ticket.id,
+              fromStatus: 'NEW',
+              toStatus: 'OPEN',
+              changedById: staffMichael,
+              changedAt: new Date(Date.now() - 3600000 * 24 * 2), // 2 days ago
+            },
+            {
+              ticketId: ticket.id,
+              fromStatus: 'OPEN',
+              toStatus: 'IN_PROGRESS',
+              changedById: staffMichael,
+              changedAt: new Date(Date.now() - 3600000 * 24 * 1), // 1 day ago
+            },
+            {
+              ticketId: ticket.id,
+              fromStatus: 'IN_PROGRESS',
+              toStatus: 'OPEN',
+              changedById: staffMichael,
+              changedAt: new Date(Date.now() - 3600000 * 4), // 4 hours ago
+            },
+          ],
+        });
+      }
+
       const existingAction1 = await prisma.actionTaken.findFirst({
         where: { ticketId: ticket.id, description: { contains: 'Apple Hardware Diagnostics' } },
       });
@@ -547,6 +578,46 @@ export async function seedDatabase() {
             assigneeId: staffDavid,
             status: 'COMPLETED',
             createdById: staffDavid,
+            followUpRequired: false,
+            version: 1,
+          },
+        });
+      }
+
+      const existingAction3 = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Thermal burn-in' } },
+      });
+      if (!existingAction3) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 2),
+            description: 'Thermal burn-in load test under Geekbench suite.',
+            result: null,
+            performedById: staffMichael,
+            assigneeId: staffMichael,
+            status: 'IN_PROGRESS',
+            createdById: staffMichael,
+            followUpRequired: false,
+            version: 1,
+          },
+        });
+      }
+
+      const existingAction4 = await prisma.actionTaken.findFirst({
+        where: { ticketId: ticket.id, description: { contains: 'Scheduled vendor motherboard' } },
+      });
+      if (!existingAction4) {
+        await prisma.actionTaken.create({
+          data: {
+            ticketId: ticket.id,
+            actionDateTime: new Date(Date.now() - 3600000 * 1),
+            description: 'Scheduled vendor motherboard diagnostic session (cancelled; resolved via power management calibration).',
+            result: null,
+            performedById: staffMichael,
+            assigneeId: staffMichael,
+            status: 'CANCELLED',
+            createdById: staffMichael,
             followUpRequired: false,
             version: 1,
           },

@@ -172,7 +172,8 @@ export const RequesterDashboard: React.FC<RequesterDashboardProps> = ({ onNaviga
           {attentionTickets && attentionTickets.length > 0 && (
             <button
               onClick={() => onNavigate && onNavigate('ticket-detail', attentionTickets[0].id)}
-              className="whitespace-nowrap px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition shadow-sm"
+              className="tkt-btn-attention shadow-sm"
+              aria-label={`Review ticket ${attentionTickets[0].ticketNumber} awaiting your feedback`}
             >
               Review Now &rarr;
             </button>

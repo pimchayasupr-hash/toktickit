@@ -3,10 +3,29 @@ import os
 import re
 import sys
 
+def expand_ranges(prefix, text):
+    results = set()
+    # Match single items e.g. AC-01
+    for m in re.finditer(rf"\b{prefix}-(\d{{2}})\b", text):
+        results.add(f"{prefix}-{m.group(1)}")
+    # Match ranges e.g. AC-01..AC-07 or AC-01..07
+    for m in re.finditer(rf"\b{prefix}-(\d{{2}})\.\.(?:{prefix}-)?(\d{{2}})\b", text):
+        start = int(m.group(1))
+        end = int(m.group(2))
+        for i in range(start, end + 1):
+            results.add(f"{prefix}-{i:02d}")
+    return results
+
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    spec_path = os.path.join(base_dir, "docs", "lab-03", "specification.md")
-    tests_path = os.path.join(base_dir, "docs", "lab-03", "tests.md")
+    lab = "lab-04"
+    if len(sys.argv) > 1 and sys.argv[1].startswith("lab-"):
+        lab = sys.argv[1]
+    elif len(sys.argv) > 2 and sys.argv[1] == "--lab":
+        lab = sys.argv[2]
+        
+    spec_path = os.path.join(base_dir, "docs", lab, "specification.md")
+    tests_path = os.path.join(base_dir, "docs", lab, "tests.md")
 
     if not os.path.exists(spec_path):
         print(f"ERROR: Specification not found at {spec_path}", file=sys.stderr)
@@ -32,8 +51,8 @@ def main():
     print(f"Defined Business Rules:      {len(defined_brs)} ({', '.join(sorted(defined_brs))})")
 
     # 2. Parse referenced AC, FR, BR from tests.md table
-    # Only inspect the Requirement / AC column or lines inside the traceability table
-    table_lines = [line for line in tests_text.splitlines() if line.strip().startswith("|") and ("API-" in line or "UT-" in line or "UI-" in line or "MT-" in line or "E2E-" in line)]
+    # Match any test table row (starts with | and contains TEST- or API- or UI- or E2E-)
+    table_lines = [line for line in tests_text.splitlines() if line.strip().startswith("|") and any(prefix in line for prefix in ["TEST-", "API-", "UT-", "UI-", "MT-", "E2E-"])]
     
     referenced_acs = set()
     referenced_frs = set()
@@ -44,15 +63,15 @@ def main():
         parts = [p.strip() for p in line.split("|")]
         if len(parts) >= 4:
             req_col = parts[3]
-            for ac in re.findall(r"\b(AC-\d{2})\b", req_col):
+            for ac in expand_ranges("AC", req_col):
                 referenced_acs.add(ac)
                 if ac not in defined_acs:
                     unknown_ids.add(ac)
-            for fr in re.findall(r"\b(FR-\d{2})\b", req_col):
+            for fr in expand_ranges("FR", req_col):
                 referenced_frs.add(fr)
                 if fr not in defined_frs:
                     unknown_ids.add(fr)
-            for br in re.findall(r"\b(BR-\d{2})\b", req_col):
+            for br in expand_ranges("BR", req_col):
                 referenced_brs.add(br)
                 if br not in defined_brs:
                     unknown_ids.add(br)

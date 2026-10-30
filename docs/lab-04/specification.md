@@ -144,6 +144,7 @@ The stakeholder requires advancing TokTickIT from a basic communication and tick
 | `RESOLVED` | `REOPENED` | STAFF, ADMIN, REQUESTER (own) | Confirmation dialog | Reopened for rework |
 | `CLOSED` | `REOPENED` | STAFF, ADMIN | Confirmation dialog | Reopened investigation |
 | `REOPENED` | `IN_PROGRESS` | STAFF, ADMIN | None | Work resumed |
+| `REOPENED` | `WAITING_FOR_REQUESTER` | STAFF, ADMIN | None | Information requested from requester |
 | `REOPENED` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner assigned + ≥1 Action with result | Confirmation dialog required |
 | `REOPENED` | `CANCELLED` | STAFF, ADMIN | Confirmation prompt | Terminal state |
 | `CANCELLED` | *(None - Terminal)* | None | Immutable terminal state | No transitions allowed |

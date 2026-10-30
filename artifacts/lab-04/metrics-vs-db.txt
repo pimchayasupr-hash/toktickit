@@ -1,6 +1,6 @@
 ================================================================================
 TOKTIKCIT LAB 4: DASHBOARD API METRICS VS DIRECT DATABASE QUERIES AUDIT
-Timestamp: 2026-10-30T12:53:59.002Z
+Timestamp: 2026-10-30T13:57:42.639Z
 Database: PostgreSQL local (toktickit)
 ================================================================================
 
@@ -8,19 +8,19 @@ Database: PostgreSQL local (toktickit)
 --------------------------------------------------------------------------------
 Metric Name                   API Count     Direct DB Count    Match Status
 --------------------------------------------------------------------------------
-Unassigned Queue              124           124                [x] EXACT MATCH (PASS)
-My Assigned Tickets           23            23                 [x] EXACT MATCH (PASS)
-Total Active / Open Tickets   154           154                [x] EXACT MATCH (PASS)
-Urgent Priority Attention     3             3                  [x] EXACT MATCH (PASS)
+Unassigned Queue              4             4                  [x] EXACT MATCH (PASS)
+My Assigned Tickets           5             5                  [x] EXACT MATCH (PASS)
+Total Active / Open Tickets   15            15                 [x] EXACT MATCH (PASS)
+Urgent Priority Attention     2             2                  [x] EXACT MATCH (PASS)
 --------------------------------------------------------------------------------
 
 2. REQUESTER DASHBOARD (User: jennifer.anderson@example.com, ID: 1)
 --------------------------------------------------------------------------------
 Metric Name                   API Count     Direct DB Count    Match Status
 --------------------------------------------------------------------------------
-My Open Tickets               127           127                [x] EXACT MATCH (PASS)
+My Open Tickets               4             4                  [x] EXACT MATCH (PASS)
 Waiting for My Feedback       1             1                  [x] EXACT MATCH (PASS)
-Recently Resolved Tickets     16            16                 [x] EXACT MATCH (PASS)
+Recently Resolved Tickets     0             0                  [x] EXACT MATCH (PASS)
 Closed Tickets                1             1                  [x] EXACT MATCH (PASS)
 --------------------------------------------------------------------------------
 

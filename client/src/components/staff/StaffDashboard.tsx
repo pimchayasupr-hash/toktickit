@@ -54,9 +54,12 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
+
   const fetchDashboardData = async () => {
     setLoading(true);
     setError(null);
+    setErrorStatus(null);
     try {
       const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
       const res = await fetch('/api/dashboard/staff', {
@@ -67,7 +70,14 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
       });
 
       if (!res.ok) {
-        throw new Error('Failed to load staff dashboard data.');
+        setErrorStatus(res.status);
+        if (res.status === 403) {
+          throw new Error('403 Forbidden: Access restricted to authorized IT Staff and Administrators.');
+        } else if (res.status >= 500) {
+          throw new Error('500 Internal Server Error: Failed to compute operational queue telemetry.');
+        } else {
+          throw new Error(`Error ${res.status}: Failed to load staff dashboard data.`);
+        }
       }
 
       const json = await res.json();
@@ -115,14 +125,42 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-28 bg-slate-100 border border-slate-200 rounded-xl animate-pulse"></div>
+            <div key={i} className="h-28 bg-slate-100 border border-slate-200 rounded-xl p-4 flex flex-col justify-between animate-pulse">
+              <div className="h-4 bg-slate-200 rounded w-24"></div>
+              <div className="h-8 bg-slate-300 rounded w-16"></div>
+            </div>
           ))}
+        </div>
+        <div className="h-48 bg-slate-100 border border-slate-200 rounded-xl p-6 animate-pulse mb-8 flex flex-col justify-around">
+          <div className="h-5 bg-slate-200 rounded w-48"></div>
+          <div className="h-4 bg-slate-200 rounded w-full"></div>
+          <div className="h-4 bg-slate-200 rounded w-3/4"></div>
         </div>
       </div>
     );
   }
 
   if (error || !data) {
+    if (errorStatus === 403 || error?.includes('403')) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="bg-amber-50 border-2 border-amber-500 text-amber-900 p-6 rounded-2xl shadow-sm max-w-2xl mx-auto text-center">
+            <div className="text-4xl mb-3">🔒</div>
+            <h2 className="text-lg font-bold text-amber-900 mb-2">403 Forbidden: Access Restricted</h2>
+            <p className="text-sm text-amber-800 mb-6">
+              You do not have permission to view the IT Staff Dashboard. This operational triage interface is strictly restricted to authenticated IT Staff and Administrators.
+            </p>
+            <button
+              onClick={() => onNavigate && onNavigate('requester-dashboard')}
+              className="tkt-btn-primary"
+            >
+              &larr; Return to My Support Dashboard
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 flex justify-between items-center">
@@ -348,8 +386,20 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
             </h2>
 
             {myRecentActions.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 text-sm bg-slate-50 rounded-lg">
-                No recent actions recorded yet.
+              <div className="py-8 px-4 text-center bg-emerald-50/50 border border-emerald-100 rounded-xl">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 flex items-center justify-center text-2xl">
+                  📝
+                </div>
+                <h3 className="text-sm font-bold text-slate-800 mb-1">No Recent Actions Recorded</h3>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto mb-4">
+                  You haven't logged any troubleshooting actions on active tickets yet. Claim or triage a ticket to log your first work item.
+                </p>
+                <button
+                  onClick={() => onNavigate && onNavigate('staff-queue', { filter: 'unassigned' })}
+                  className="tkt-btn-secondary text-xs"
+                >
+                  View Unassigned Queue &rarr;
+                </button>
               </div>
             ) : (
               <div className="divide-y divide-slate-100">

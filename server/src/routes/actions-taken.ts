@@ -182,7 +182,8 @@ router.post(
         return;
       }
 
-      if (parsedActionDate < new Date(ticket.createdAt)) {
+      // Allow 60 seconds tolerance for HTML datetime-local minute truncation / slight clock skew
+      if (parsedActionDate.getTime() + 60000 < new Date(ticket.createdAt).getTime()) {
         res.status(400).json({
           error: {
             code: 'VALIDATION_ERROR',

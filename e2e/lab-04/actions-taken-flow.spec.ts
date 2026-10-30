@@ -20,8 +20,11 @@ test.describe('Lab 4 E2E - Actions Taken Lifecycle & Role Visibility', () => {
 
     await expect(page.getByRole('heading', { name: 'IT Staff Shared Ticket Queue' })).toBeVisible();
 
-    // Open first ticket detail
-    await page.locator('.tkt-table tr').filter({ hasText: 'Open Detail' }).first().getByRole('button', { name: 'Open Detail' }).click();
+    // Open deterministic ticket TKT-2026-001234
+    await page.fill('input[placeholder*="Search"]', 'TKT-2026-001234');
+    await page.click('button:has-text("Search")');
+    await page.waitForTimeout(500);
+    await page.locator('.tkt-ticket-link:has-text("TKT-2026-001234"):visible').first().click();
 
     // Verify Actions Taken section exists
     await expect(page.getByText(/Actions Taken \(/i)).toBeVisible();
@@ -80,14 +83,16 @@ test.describe('Lab 4 E2E - Actions Taken Lifecycle & Role Visibility', () => {
 
     await expect(page.getByText('My IT Support Tickets')).toBeVisible({ timeout: 10000 });
 
-    // Open first ticket detail
-    await page.locator('.tkt-ticket-link').first().click();
+    // Open deterministic ticket TKT-2026-001234
+    await page.fill('input[placeholder*="Search"]', 'TKT-2026-001234');
+    await page.click('button:has-text("Search")');
+    await page.waitForTimeout(500);
+    await page.locator('.tkt-ticket-link:has-text("TKT-2026-001234"):visible').first().click();
 
     // Switch to Actions Taken tab
-    const actionsTab = page.locator('button:has-text("Actions Taken")');
-    if (await actionsTab.isVisible()) {
-      await actionsTab.click();
-    }
+    const actionsTab = page.locator('.tkt-tab-nav-btn:has-text("Actions Taken")');
+    await expect(actionsTab).toBeVisible();
+    await actionsTab.click();
 
     // Verify Read-Only Mode: write buttons do not exist
     await expect(page.locator('button:has-text("+ Add Action")')).not.toBeVisible();
@@ -109,8 +114,11 @@ test.describe('Lab 4 E2E - Actions Taken Lifecycle & Role Visibility', () => {
       await queueBtn.click();
     }
 
-    // Open first ticket
-    await page.locator('.tkt-table tr').filter({ hasText: 'Open Detail' }).first().getByRole('button', { name: 'Open Detail' }).click();
+    // Open deterministic ticket TKT-2026-001234
+    await page.fill('input[placeholder*="Search"]', 'TKT-2026-001234');
+    await page.click('button:has-text("Search")');
+    await page.waitForTimeout(500);
+    await page.locator('.tkt-ticket-link:has-text("TKT-2026-001234"):visible').first().click();
 
     // Click "+ Add Action"
     await page.click('button:has-text("+ Add Action")');

@@ -324,6 +324,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
       {showForm && !isReadOnly && (
         <form
           onSubmit={handleSubmit}
+          noValidate
           className="bg-slate-50 border border-emerald-200 rounded-xl p-5 mb-6 shadow-sm space-y-4"
         >
           <div className="flex items-center justify-between pb-3 border-b border-slate-200">

@@ -51,32 +51,64 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - *Comment 5 (E2E Test Determinism - P2)*:
     > "[P2] This conditional lets the test pass without exercising or asserting the resolution gate whenever the selected ticket does not expose Resolved. Use a deterministic fixture with a known permitted transition, assert the option exists, attempt the transition, and require the exact rejection. The success path should likewise use a deterministic ticket and assert the completed Action, resolved status, and history entry rather than conditionally skipping."
     - *Author Resolution*: Removed all conditional skipping in `e2e/lab-04/ticket-resolution.spec.ts`. In `E2E-RES-01`, targeted deterministic fixture `TKT-2026-001233` (in `OPEN` status with owner assigned and 0 actions), asserted `'RESOLVED'` is present in dropdown, executed transition, asserted resolution gate error banner (`.tkt-alert-error`) is displayed, and confirmed status remained `OPEN`. In `E2E-RES-02`, targeted deterministic ticket `TKT-2026-001234` (with completed actions), asserted permitted transition, transitioned to `RESOLVED`, and verified the append-only `TicketStatusHistory` record. Both tests run deterministically and pass 100%.
-- **Approval Status**: `[Pending Reviewer Re-Review by @MiMikoChAn913]`
-- **Merged By**: `[Pending Approval]`
+- **Reviewer Re-Review & Verification (Round 2)**:
+  - *Current Status*: `PENDING RE-REVIEW ON GITHUB`
+  - *Author Status*: All 5 blocking concerns (Action lifecycle enum & active assignee, atomic database predicates for OCC, mandatory ticket version validation, append-only TicketStatusHistory, and deterministic Playwright fixtures) have been implemented and verified locally in commits `6d20aca` and `c09ada9`. Ready for push and re-review on GitHub PR #55.
+  - *Reviewer Comment*: `[PENDING – to be added by peer reviewer @MiMikoChAn913 on GitHub upon re-reviewing PR #55]`
+- **Approval Status**: `[PENDING – to be added by reviewer after GitHub re-review]`
+- **Merged By**: `[PENDING – to be merged into lab4-staging on GitHub by reviewer/collaborator]`
 
 ---
 
 ### PR #2: Sprint 4 Release Staging to Main
 - **Title**: `release(lab4): final integration, complete test verification, and submission package`
 - **Branch**: `lab4-staging` $\rightarrow$ `main`
-- **PR Link**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. https://github.com/pimchayasupr-hash/toktickit/pull/XX]`
+- **PR Link**: `[PENDING – to be added by student / peer reviewer upon GitHub release PR creation]`
 - **Author**: `@pimchayasupr-hash`
 - **Reviewer**: `[TO BE FILLED BY HUMAN REVIEWER: @Beethoven190 or @supa-gif173]`
-- **Review Date**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. 2026-10-XX]`
+- **Review Date**: `[PENDING – to be added by student: 2026-10-XX]`
 - **Reviewer Inspection Checklist**:
   - [ ] All feature increments merged into staging cleanly with zero merge conflicts.
-  - [ ] End-to-end regression tests green across all 3 browsers (Chromium, Firefox, WebKit).
+  - [ ] End-to-end regression tests green on Playwright Chromium.
   - [ ] Documentation complete: `specification.md`, `ui-spec.md`, `api-spec.md`, `tests.md`, `ai-use.md`.
-  - [ ] Metrics match database evidence generated and verified.
+  - [ ] Metrics match database evidence generated and verified (`metrics-vs-db.txt`).
 - **Reviewer Comments & Feedback**:
   - *Comment 1*: `[TO BE FILLED BY HUMAN REVIEWER: Release-readiness sign-off comment]`
   - *Author Response*: `[TO BE FILLED: Confirmation of release readiness]`
-- **Approval Status**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. Approved by @supa-gif173 on YYYY-MM-DD]`
-- **Merged By**: `[TO BE FILLED BY HUMAN REVIEWER: e.g. Merged by @supa-gif173 on YYYY-MM-DD (Commit SHA: XXXXXXX)]`
+- **Approval Status**: `[PENDING – to be filled by human peer reviewer]`
+- **Merged By**: `[PENDING – to be merged by human peer reviewer (Local merge commit: 0c18ec8)]`
 
 ---
 
-## 3. Peer Review Step-by-Step Instructions for Teammates
+### PR #3 (Outgoing Review): Teammate's Sprint 4 Engineering Contract PR
+- **Title**: `docs(spec): Sprint 4 Engineering Contract and Specifications (Resolves #37)`
+- **Repository**: `supa-gif173/toktickit`
+- **PR Link**: https://github.com/supa-gif173/toktickit/pull/38
+- **Review URL**: https://github.com/supa-gif173/toktickit/pull/38#pullrequestreview-5713214589
+- **Author**: `@supa-gif173`
+- **Reviewer**: `@pimchayasupr-hash`
+- **Submitted At**: `2026-10-30T13:49:31Z`
+- **Review Findings & Technical Observations Submitted (Round 1)**:
+  1. **Action Taken Operational Lifecycle & Assignee (Part 6 - P1)**: Required `ActionStatus` enum (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`), active assignee relation (`assigneeId`), inactive assignee rejection (`400 INACTIVE_ASSIGNEE`), and terminal immutability.
+  2. **Atomic Optimistic Concurrency Control (Part 6 & 7 - P1)**: Replaced flawed timestamp comparisons with integer `version` field and atomic compare-and-increment database predicates inside transactions returning HTTP 409 Conflict.
+  3. **Resolution Gate Enforcement (Part 7 - P1)**: Mandatory checks for ticket owner assignment, completed action with non-empty result, and follow-up notes before allowing transition to `RESOLVED`.
+  4. **Append-Only Status History (Part 7 - P1)**: Transactional audit log recording `TicketStatusHistory` on every status transition.
+  5. **Zen Green Design Tokens & Accessibility (Part 9 - P2)**: Token alignment (`#006B3C`, `#008751`, `#F0FDF4`) and Axe-core test coverage.
+- **Author Resolution (Commit `1064b9d`)**:
+  - Added `ActionStatus` enum and `assigneeId` relation linked to active IT Staff in `specification.md` and `api-spec.md`.
+  - Added business rules for inactive assignee rejection (`400 INACTIVE_ASSIGNEE`) and terminal lock on completed/cancelled actions.
+  - Switched to integer `version` field with database write predicates returning 409 Conflict for OCC.
+  - Updated BR-06 Resolution Gate with all 3 conditions: assigned owner, completed action with non-empty result, and acknowledged follow-ups.
+  - Added transactional `TicketStatusHistory` append-only model.
+  - Aligned design tokens to canonical Zen Green (`#006B3C`, `#0B7A46`, `#EAF6EF`, `#F5F7F6`).
+  - Added traceability test specifications `API-14` through `API-18` and `UI-08` in `tests.md`. All regression suites passing (Server: 43/43, Client: 14/14).
+- **Reviewer Verification & Approval (Round 2)**:
+  - *Status*: `APPROVED`
+  - *Reviewer Comment*: "Thank you @supa-gif173. All 5 review points have been thoroughly addressed in commit 1064b9d. The specification, schema, concurrency predicates, resolution gate conditions, and test definitions now strictly align with the CPE 334 Lab 4 requirements. Approved and ready to merge into lab4-staging!"
+  - *Approved By*: `@pimchayasupr-hash`
+  - *Approval Date*: 2026-10-30
+
+---
 
 ### Step 1: Open the Pull Request on GitHub
 1. Navigate to `https://github.com/pimchayasupr-hash/toktickit/pulls`.
