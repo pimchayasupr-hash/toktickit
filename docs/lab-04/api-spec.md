@@ -46,6 +46,7 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
     {
       "id": 12,
       "ticketId": 105,
+      "status": "COMPLETED",
       "actionDateTime": "2026-10-19T14:30:00.000Z",
       "description": "Inspected VPN gateway logs and re-keyed IPsec tunnel session.",
       "result": "Tunnel re-established successfully; ping latency stable at 18ms.",
@@ -54,6 +55,12 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
         "id": 4,
         "name": "Michael Staff",
         "email": "michael.staff@toktickit.com"
+      },
+      "assigneeId": 5,
+      "assignee": {
+        "id": 5,
+        "name": "Sarah Staff",
+        "email": "sarah.staff@toktickit.com"
       },
       "followUpRequired": true,
       "followUpNote": "Monitor connection logs every 4 hours for re-key timeouts.",
@@ -74,7 +81,7 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 ---
 
 #### `POST /api/tickets/:ticketId/actions-taken`
-- **Description**: Record a new Action Taken under an active ticket.
+- **Description**: Record a new Action Taken under an active ticket with operational status lifecycle.
 - **Authorization**: `STAFF`, `ADMIN` only. (Requesters receive HTTP 403).
 - **Headers**:
   - `Authorization: Bearer <token>`
@@ -82,6 +89,8 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 - **Request Body**:
 ```json
 {
+  "status": "PENDING",
+  "assigneeId": 5,
   "actionDateTime": "2026-10-19T14:30:00.000Z",
   "description": "Inspected VPN gateway logs and re-keyed IPsec tunnel session.",
   "result": "Tunnel re-established successfully; ping latency stable at 18ms.",
@@ -91,9 +100,11 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 }
 ```
 - **Validation Rules**:
+  - `status`: Optional enum (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`). Defaults to `PENDING`.
+  - `assigneeId`: Optional integer. Must reference an active operational user with role `STAFF` or `ADMIN`. Inactive users or requesters rejected with HTTP 400 (`INACTIVE_ASSIGNEE`).
   - `actionDateTime`: Required valid ISO-8601 string. Cannot exceed `now() + 5 minutes`. Cannot precede `Ticket.createdAt`.
   - `description`: Required string, 1–2000 characters after trimming.
-  - `result`: Required string, 1–1000 characters after trimming.
+  - `result`: Optional for `PENDING` and `IN_PROGRESS`; strictly required (1–1000 characters) when `status` is `COMPLETED`.
   - `followUpRequired`: Boolean (defaults to `false`).
   - `followUpNote`: Required if `followUpRequired = true` (1–1000 characters after trimming). Cleared to `null` if `false`.
   - `attachmentNotes`: Optional plain text, max 1000 characters.
@@ -104,9 +115,11 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
   "actionTaken": {
     "id": 12,
     "ticketId": 105,
+    "status": "PENDING",
+    "assigneeId": 5,
     "actionDateTime": "2026-10-19T14:30:00.000Z",
     "description": "Inspected VPN gateway logs and re-keyed IPsec tunnel session.",
-    "result": "Tunnel re-established successfully; ping latency stable at 18ms.",
+    "result": null,
     "performedById": 4,
     "followUpRequired": true,
     "followUpNote": "Monitor connection logs every 4 hours for re-key timeouts.",
@@ -118,6 +131,7 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
     "updatedById": null
   }
 }
+```
 ```
 - **Errors**:
   - `400 Bad Request`: `VALIDATION_ERROR` (Validation rule violation or `TERMINAL_STATE_LOCKED`).
@@ -189,17 +203,17 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 }
 ```
 - **Errors**:
-  - `400 Bad Request`: `VALIDATION_ERROR` (Invalid field values or missing version).
+  - `400 Bad Request`: `VALIDATION_ERROR` (Invalid field values or invalid assignee), `TERMINAL_ACTION_LOCKED` (Action is COMPLETED or CANCELLED).
   - `403 Forbidden`: Requester role.
   - `404 Not Found`: Ticket or Action does not exist or action does not belong to ticket.
-  - `409 Conflict`: `CONCURRENCY_CONFLICT` (Supplied version does not match database version). Returns current entity.
+  - `409 Conflict`: `CONCURRENCY_CONFLICT` (Atomic database predicate `updateMany` where `id` and `version` returned 0 updated rows). Returns current entity.
 
 ---
 
 ### 2.2 Status Workflow & Resolution Gate Endpoints
 
 #### `PATCH /api/staff/tickets/:id/status` (and `PATCH /api/tickets/:id/status`)
-- **Description**: Execute a status transition with transition matrix validation, resolution gate, and optimistic concurrency check.
+- **Description**: Execute a status transition with transition matrix validation, resolution gate, atomic database compare-and-increment concurrency check, and append-only status history.
 - **Authorization**:
   - `STAFF`, `ADMIN`: Permitted all matrix transitions.
   - `REQUESTER`: Permitted to cancel (`CANCELLED`) or reopen (`REOPENED`) own tickets only.
@@ -212,14 +226,18 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 }
 ```
 - **Validation & Gate Logic**:
-  1. **Concurrency Check**: `ticket.version === body.version`. Mismatch → HTTP 409 Conflict.
-  2. **Transition Matrix**: `VALID_TRANSITIONS[ticket.currentStatus].includes(body.status)`. Mismatch → HTTP 400 `INVALID_STATUS_TRANSITION`.
+  1. **Transition Matrix**: `VALID_TRANSITIONS[ticket.currentStatus].includes(body.status)`. Mismatch → HTTP 400 `INVALID_STATUS_TRANSITION`.
+  2. **Mandatory Version Parameter**: `typeof version === 'number'`. Missing or non-numeric → HTTP 400 `VALIDATION_ERROR`.
   3. **Resolution Gate (Target = `RESOLVED`)**:
      - `ticket.ownerId !== null` (Owner required).
      - `ticket.actionsTaken.length >= 1` (At least one Action Taken).
-     - At least one `ActionTaken` has non-empty `result.trim().length > 0`.
+     - At least one `ActionTaken` has `status === 'COMPLETED'` and non-empty `result.trim().length > 0`.
      - All actions with `followUpRequired = true` have valid non-empty `followUpNote`.
      - Gate failure → HTTP 422 `RESOLUTION_GATE_FAILED`.
+  4. **Atomic Concurrency & History Transaction**:
+     - Uses `tx.ticket.updateMany({ where: { id: ticketId, version }, data: { currentStatus: status, version: version + 1 } })`.
+     - If count === 0 → Rollback transaction and return HTTP 409 Conflict (0 history rows written).
+     - If count === 1 → Atomically execute `tx.ticketStatusHistory.create` with `fromStatus`, `toStatus`, `changedById: req.user.id` (exactly 1 history row written).
 - **Response 200 OK**:
 ```json
 {
@@ -233,7 +251,41 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 }
 ```
 - **Errors**:
-  - `400 Bad Request`: `INVALID_STATUS_TRANSITION`.
+  - `400 Bad Request`: `INVALID_STATUS_TRANSITION`, `VALIDATION_ERROR` (Missing version).
+  - `409 Conflict`: `CONCURRENCY_CONFLICT` (Stale version; status unchanged, 0 history appended).
+  - `422 Unprocessable Entity`: `RESOLUTION_GATE_FAILED`.
+
+---
+
+#### `GET /api/staff/tickets/:id/status-history`
+- **Description**: Retrieve append-only history of all status changes for a ticket, ordered chronologically (`changedAt ASC, id ASC`).
+- **Authorization**: `STAFF`, `ADMIN`.
+- **Response 200 OK**:
+```json
+{
+  "history": [
+    {
+      "id": 1,
+      "ticketId": 105,
+      "fromStatus": "NEW",
+      "toStatus": "OPEN",
+      "changedById": 4,
+      "changedBy": {
+        "id": 4,
+        "name": "Michael Staff",
+        "role": "STAFF"
+      },
+      "changedAt": "2026-10-19T09:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### `GET /api/tickets/:id/status-history`
+- **Description**: Requester access to status history for tickets they own.
+- **Authorization**: `REQUESTER` (isolated to own tickets; returns 404 for others).
   - `409 Conflict`: `CONCURRENCY_CONFLICT`.
   - `422 Unprocessable Entity`: `RESOLUTION_GATE_FAILED` with detailed missing criteria.
 

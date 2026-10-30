@@ -114,14 +114,20 @@ Located on the Ticket Detail screen directly below the ticket summary and above 
 #### 2. Action Taken Card / Row Elements:
 Each entry renders in a clean card (`.tkt-action-card`):
 - **Card Header**:
-  - Left: Action Date/Time formatted in `Asia/Bangkok` (`YYYY-MM-DD HH:mm`), Performed by badge (Staff Name).
-  - Right: Follow-up badge (`Follow-up Required` in amber or `Completed` in soft mint), Edit button (Staff/Admin only).
+  - Left: Status Badge (`⏳ Pending`, `⚙ In Progress`, `✓ Completed`, `✕ Cancelled`), Action Date/Time formatted in `Asia/Bangkok` (`YYYY-MM-DD HH:mm`), Performed by badge (Performer Name), Assignee badge (`👤 Assignee: [Name]`).
+  - Right: Follow-up badge (`Follow-up Required` in amber), Terminal lock label (`(Terminal / Immutable)` for Completed and Cancelled actions), Quick Transition buttons (`Start Work`, `Complete`, `Cancel`), and Edit button (Staff/Admin only on non-terminal actions).
 - **Card Body**:
   - **Action Description**: Clearly labeled technical action text.
-  - **Action Result**: Clearly labeled outcome text in distinct bordered container.
+  - **Action Result (Conditional)**: Clearly labeled outcome text in distinct bordered container (mandatory when transitioning to `COMPLETED`).
   - **Follow-up Note (Conditional)**: Shown if `followUpRequired = true`, highlighting pending follow-up items.
   - **Attachment Notes (Conditional)**: Shown if text is present, in monospace font or distinct callout container.
 - **Audit Footer**: "Created [Timestamp] by [User]" • If edited: "Edited [Timestamp] by [User] (v[Version])".
+
+#### 2.1 Ticket Status History Timeline Card (`StaffTicketDetail.tsx` & `TicketDetail.tsx`):
+- **Card Title**: `📜 Ticket Status History ([Count])`
+- **Audit Subtitle**: `Append-Only Audit Log`
+- **Timeline Items**: Each row displays `[fromStatus] → [toStatus]`, changed by `[Performer Name] ([Role])`, and localized timestamp (`Asia/Bangkok`).
+- **Read-Only / Isolation**: Requesters view status history for their own tickets in a dedicated tab without mutation controls.
 
 #### 3. Create Mode Modal / Form:
 - **Action Date & Time**: Native datetime-local input, initialized to current time. Cannot exceed `now() + 5 minutes` and cannot precede `Ticket.createdAt`.
