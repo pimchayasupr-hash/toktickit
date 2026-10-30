@@ -258,3 +258,4 @@ Referenced Business Rules:      18 (100% Coverage)
    - เพื่อป้องกัน Race Condition บนฐานข้อมูลจริงระหว่างกระบวนการทดสอบ E2E จำเป็นต้องรันแบบเรียงลำดับ (`workers: 1`)
 3. **Database Migration Safety**:
    - ไมเกรชัน `20261030120659_lab4_action_lifecycle_and_ticket_status_history` ได้ทำการ Backfill ข้อมูลเก่าทั้งหมด 84 รายการให้เป็นสถานะ `COMPLETED` อย่างปลอดภัย โดยไม่มีการสูญหายของข้อมูลย้อนหลัง
+
