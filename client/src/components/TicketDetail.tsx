@@ -74,7 +74,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'comments' | 'actions' | 'attachments'>('comments');
+  const [activeTab, setActiveTab] = useState<'comments' | 'actions' | 'history' | 'attachments'>('comments');
 
   // File Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -444,6 +444,12 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             <span>🛠️</span> Actions Taken
           </button>
           <button
+            onClick={() => setActiveTab('history')}
+            className={`tkt-tab-nav-btn ${activeTab === 'history' ? 'active' : ''}`}
+          >
+            <span>📜</span> Status History ({ticket.statusHistory?.length || 0})
+          </button>
+          <button
             onClick={() => setActiveTab('attachments')}
             className={`tkt-tab-nav-btn ${activeTab === 'attachments' ? 'active' : ''}`}
           >
@@ -463,6 +469,54 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
               ticketId={ticket.id}
               isReadOnly={true}
             />
+          ) : activeTab === 'history' ? (
+            <div>
+              <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.75rem' }}>
+                Ticket Status History ({ticket.statusHistory?.length || 0})
+              </h4>
+              {!ticket.statusHistory || ticket.statusHistory.length === 0 ? (
+                <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                  No status transitions recorded yet. Ticket created in status {ticket.currentStatus}.
+                </p>
+              ) : (
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                  {ticket.statusHistory.map((hist) => (
+                    <div
+                      key={hist.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem 1rem',
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 600, color: '#475569' }}>{hist.fromStatus}</span>
+                        <span style={{ color: '#006B3C', fontWeight: 700 }}>→</span>
+                        <span style={{ fontWeight: 700, color: '#006B3C' }}>{hist.toStatus}</span>
+                        <span style={{ color: '#94a3b8' }}>•</span>
+                        <span style={{ color: '#334155', fontWeight: 500 }}>
+                          by {hist.changedBy?.name || 'Staff'}
+                        </span>
+                      </div>
+                      <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
+                        {new Date(hist.changedAt).toLocaleString('th-TH', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             <div>
               {/* Attachments Section */}

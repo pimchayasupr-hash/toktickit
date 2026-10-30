@@ -93,4 +93,72 @@ test.describe('Lab 4 E2E - Actions Taken Lifecycle & Role Visibility', () => {
     await expect(page.locator('button:has-text("+ Add Action")')).not.toBeVisible();
     await expect(page.locator('button:has-text("Edit")')).not.toBeVisible();
   });
+
+  test('E2E-ACT-02: Action lifecycle transitions, operational assignee, and terminal immutability', async ({ page }) => {
+    await page.goto('http://localhost:5173');
+
+    // Login as IT Staff
+    await page.fill('input[type="email"]', 'michael.staff@toktickit.com');
+    await page.fill('input[type="password"]', 'Password123!');
+    await page.click('button:has-text("Sign In")');
+
+    await expect(page.locator('.tkt-navbar')).toBeVisible();
+
+    const queueBtn = page.locator('button:has-text("Ticket Queue")');
+    if (await queueBtn.isVisible()) {
+      await queueBtn.click();
+    }
+
+    // Open first ticket
+    await page.locator('.tkt-table tr').filter({ hasText: 'Open Detail' }).first().getByRole('button', { name: 'Open Detail' }).click();
+
+    // Click "+ Add Action"
+    await page.click('button:has-text("+ Add Action")');
+
+    const timestamp = Date.now();
+    const actionDesc = `E2E Lifecycle task at ${timestamp}`;
+
+    await page.fill('#actionDescription', actionDesc);
+    // Select Status PENDING
+    await page.selectOption('#actionStatus', 'PENDING');
+    // Select Assignee Sarah if available
+    const assigneeSelect = page.locator('#actionAssignee');
+    const sarahOption = assigneeSelect.locator('option', { hasText: 'Sarah' });
+    if (await sarahOption.count() > 0) {
+      await assigneeSelect.selectOption({ label: await sarahOption.first().innerText() });
+    }
+
+    await page.click('button:has-text("Save Action")');
+
+    // Verify created card shows Pending badge
+    const card = page.locator('.tkt-action-card', { hasText: actionDesc }).first();
+    await expect(card).toBeVisible();
+    await expect(card.locator('.tkt-action-status-badge', { hasText: 'Pending' })).toBeVisible();
+
+    // Quick transition to IN_PROGRESS
+    const startWorkBtn = card.locator('button:has-text("Start Work")');
+    await expect(startWorkBtn).toBeVisible();
+    await startWorkBtn.click();
+
+    // Card now shows In Progress badge
+    await expect(card.locator('.tkt-action-status-badge', { hasText: 'In Progress' })).toBeVisible();
+
+    // Transition to COMPLETED (prompts for result in form)
+    const completeBtn = card.locator('button:has-text("Complete")');
+    await expect(completeBtn).toBeVisible();
+    await completeBtn.click();
+
+    await expect(page.locator('#actionResult')).toBeVisible();
+    await page.fill('#actionResult', `Remediation completed successfully at ${timestamp}`);
+    await page.click('button:has-text("Update Action")');
+
+    // Verify card shows Completed badge and terminal indicator
+    await expect(card.locator('.tkt-action-status-badge', { hasText: 'Completed' })).toBeVisible();
+    await expect(card.getByText(/Terminal.*Immutable/i)).toBeVisible();
+
+    // Assert Edit and transition buttons are now hidden for terminal action
+    await expect(card.locator('button:has-text("Edit")')).not.toBeVisible();
+    await expect(card.locator('button:has-text("Start Work")')).not.toBeVisible();
+    await expect(card.locator('button:has-text("Complete")')).not.toBeVisible();
+  });
 });

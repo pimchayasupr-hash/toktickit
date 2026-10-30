@@ -66,12 +66,21 @@ export interface InternalNote {
   };
 }
 
+export type ActionStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
 export interface ActionTaken {
   id: number;
   ticketId: number;
   actionDateTime: string;
   description: string;
   result?: string | null;
+  status: ActionStatus;
+  assigneeId?: number | null;
+  assignee?: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
   performedById: number;
   performedBy: {
     id: number;
@@ -84,6 +93,20 @@ export interface ActionTaken {
   version: number;
   createdAt: string;
   updatedAt?: string;
+}
+
+export interface TicketStatusHistory {
+  id: number;
+  ticketId: number;
+  fromStatus: string;
+  toStatus: string;
+  changedById: number;
+  changedBy: {
+    id: number;
+    name: string;
+    role: Role;
+  };
+  changedAt: string;
 }
 
 export interface Ticket {
@@ -110,6 +133,7 @@ export interface Ticket {
   publicComments?: PublicComment[];
   internalNotes?: InternalNote[];
   actionsTaken?: ActionTaken[];
+  statusHistory?: TicketStatusHistory[];
   actionsCount?: number;
   hasActionWithResult?: boolean;
 }

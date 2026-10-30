@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import type { ActionTaken } from '../../types';
+import type { ActionTaken, ActionStatus, User } from '../../types';
 
 interface ActionsTakenSectionProps {
   ticketId: number;
@@ -14,6 +14,36 @@ const getLocalDatetimeString = (date = new Date()) => {
   return d.toISOString().slice(0, 16);
 };
 
+const getStatusBadge = (status: ActionStatus) => {
+  switch (status) {
+    case 'COMPLETED':
+      return {
+        label: 'Completed',
+        className: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+        icon: '✓',
+      };
+    case 'IN_PROGRESS':
+      return {
+        label: 'In Progress',
+        className: 'bg-blue-100 text-blue-800 border-blue-300',
+        icon: '⚙',
+      };
+    case 'CANCELLED':
+      return {
+        label: 'Cancelled',
+        className: 'bg-rose-100 text-rose-800 border-rose-300',
+        icon: '✕',
+      };
+    case 'PENDING':
+    default:
+      return {
+        label: 'Pending',
+        className: 'bg-slate-100 text-slate-700 border-slate-300',
+        icon: '⏳',
+      };
+  }
+};
+
 export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   ticketId,
   isReadOnly = false,
@@ -21,6 +51,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 }) => {
   const { user } = useAuth();
   const [actions, setActions] = useState<ActionTaken[]>([]);
+  const [assignees, setAssignees] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +61,8 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const [actionDateTime, setActionDateTime] = useState<string>(getLocalDatetimeString());
   const [description, setDescription] = useState<string>('');
   const [result, setResult] = useState<string>('');
+  const [status, setStatus] = useState<ActionStatus>('PENDING');
+  const [assigneeId, setAssigneeId] = useState<string>('');
   const [followUpRequired, setFollowUpRequired] = useState<boolean>(false);
   const [followUpNote, setFollowUpNote] = useState<string>('');
   const [attachmentNotes, setAttachmentNotes] = useState<string>('');
@@ -62,8 +95,28 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
     }
   };
 
+  const fetchAssignees = async () => {
+    if (isReadOnly) return;
+    try {
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
+      const res = await fetch('/api/staff/assignees', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAssignees(data.assignees || data.users || []);
+      }
+    } catch {
+      // Ignore background assignee load error
+    }
+  };
+
   useEffect(() => {
     fetchActions();
+    fetchAssignees();
   }, [ticketId]);
 
   const resetForm = () => {
@@ -72,6 +125,8 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
     setActionDateTime(getLocalDatetimeString());
     setDescription('');
     setResult('');
+    setStatus('PENDING');
+    setAssigneeId('');
     setFollowUpRequired(false);
     setFollowUpNote('');
     setAttachmentNotes('');
@@ -85,15 +140,68 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   };
 
   const handleOpenEditForm = (action: ActionTaken) => {
+    if (action.status === 'COMPLETED' || action.status === 'CANCELLED') {
+      return;
+    }
     resetForm();
     setEditingActionId(action.id);
     setActionDateTime(getLocalDatetimeString(new Date(action.actionDateTime)));
     setDescription(action.description);
     setResult(action.result || '');
+    setStatus(action.status || 'PENDING');
+    setAssigneeId(action.assigneeId ? String(action.assigneeId) : '');
     setFollowUpRequired(action.followUpRequired);
     setFollowUpNote(action.followUpNote || '');
     setAttachmentNotes(action.attachmentNotes || '');
     setShowForm(true);
+  };
+
+  const handleQuickTransition = async (action: ActionTaken, nextStatus: ActionStatus) => {
+    if (action.status === 'COMPLETED' || action.status === 'CANCELLED') {
+      return;
+    }
+
+    if (nextStatus === 'COMPLETED' && (!action.result || !action.result.trim())) {
+      // Need result to complete: open edit form with status set to COMPLETED
+      handleOpenEditForm(action);
+      setStatus('COMPLETED');
+      setFormError('Result is required to complete this action. Please record the outcome below.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
+      const res = await fetch(`/api/tickets/${ticketId}/actions-taken/${action.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          version: action.version,
+          status: nextStatus,
+        }),
+      });
+
+      if (res.status === 409) {
+        alert('Conflict detected: This action was modified by another staff member. Reloading latest data.');
+        await fetchActions();
+        return;
+      }
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        alert(errJson.error?.message || 'Failed to update action status.');
+        return;
+      }
+
+      await fetchActions();
+      if (onActionsUpdated) {
+        onActionsUpdated();
+      }
+    } catch (err: any) {
+      alert(err.message || 'Error updating action status.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,6 +218,10 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
       setFormError('Action description must be at least 5 characters.');
       return;
     }
+    if (status === 'COMPLETED' && !result.trim()) {
+      setFormError('Result is required when completing an Action Taken.');
+      return;
+    }
     if (followUpRequired && !followUpNote.trim()) {
       setFormError('Follow-up note is required when follow-up is checked.');
       return;
@@ -122,6 +234,8 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
         actionDateTime: new Date(actionDateTime).toISOString(),
         description: description.trim(),
         result: result.trim() || null,
+        status,
+        assigneeId: assigneeId ? parseInt(assigneeId, 10) : null,
         followUpRequired,
         followUpNote: followUpRequired ? followUpNote.trim() : null,
         attachmentNotes: attachmentNotes.trim() || null,
@@ -185,7 +299,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
             <span>🛠️</span> Actions Taken ({actions.length})
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Chronological audit trail of diagnostic and remediation actions performed by IT Staff.
+            Formal audit trail of operational diagnostic and remediation tasks, status transitions, and assigned work.
           </p>
         </div>
 
@@ -244,22 +358,66 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
             </div>
           )}
 
-          {/* Action Date Time */}
-          <div>
-            <label
-              htmlFor="actionDateTime"
-              className="block text-xs font-bold text-slate-700 mb-1"
-            >
-              Action Date &amp; Time <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="actionDateTime"
-              type="datetime-local"
-              value={actionDateTime}
-              onChange={(e) => setActionDateTime(e.target.value)}
-              className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              required
-            />
+          {/* Row: Date Time, Status, Assignee */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label
+                htmlFor="actionDateTime"
+                className="block text-xs font-bold text-slate-700 mb-1"
+              >
+                Action Date &amp; Time <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="actionDateTime"
+                type="datetime-local"
+                value={actionDateTime}
+                onChange={(e) => setActionDateTime(e.target.value)}
+                className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="actionStatus"
+                className="block text-xs font-bold text-slate-700 mb-1"
+              >
+                Action Status <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="actionStatus"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as ActionStatus)}
+                className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
+              >
+                <option value="PENDING">⏳ Pending</option>
+                <option value="IN_PROGRESS">⚙ In Progress</option>
+                <option value="COMPLETED">✓ Completed</option>
+                {editingActionId && <option value="CANCELLED">✕ Cancelled</option>}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="actionAssignee"
+                className="block text-xs font-bold text-slate-700 mb-1"
+              >
+                Operational Assignee
+              </label>
+              <select
+                id="actionAssignee"
+                value={assigneeId}
+                onChange={(e) => setAssigneeId(e.target.value)}
+                className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="">(Unassigned / Current Staff)</option>
+                {assignees.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name} ({a.role})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Action Description */}
@@ -290,14 +448,14 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
               htmlFor="actionResult"
               className="block text-xs font-bold text-slate-700 mb-1"
             >
-              Action Result
+              Action Result {status === 'COMPLETED' && <span className="text-red-500">* (Required for Completed actions)</span>}
             </label>
             <textarea
               id="actionResult"
               rows={2}
               value={result}
               onChange={(e) => setResult(e.target.value)}
-              placeholder="Observed outcome or measurement (e.g., Rx power is -14dBm, ping latency normalized to 2ms)..."
+              placeholder={status === 'COMPLETED' ? "Observed outcome or measurement (Required to complete action)..." : "Observed outcome or measurement (Optional while pending/in-progress)..."}
               className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
             <div className="text-right text-[11px] text-slate-400 mt-0.5">
@@ -322,7 +480,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
             </label>
           </div>
 
-          {/* Follow-up Note (conditionally visible) */}
+          {/* Follow-up Note */}
           {followUpRequired && (
             <div>
               <label
@@ -395,9 +553,13 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
       ) : (
         <div className="space-y-4">
           {actions.map((act) => {
+            const isTerminal = act.status === 'COMPLETED' || act.status === 'CANCELLED';
             const canEdit =
               !isReadOnly &&
+              !isTerminal &&
               (user?.role === 'ADMIN' || (user?.role === 'STAFF' && user?.id === act.performedById));
+
+            const badge = getStatusBadge(act.status);
 
             return (
               <div
@@ -407,9 +569,31 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-800">
-                      {act.performedBy?.name || 'IT Staff'}
+                    {/* Status Badge */}
+                    <span
+                      className={`tkt-action-status-badge text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${badge.className} flex items-center gap-1`}
+                    >
+                      <span>{badge.icon}</span>
+                      <span>{badge.label}</span>
                     </span>
+
+                    <span className="text-xs text-slate-400">•</span>
+
+                    {/* Performer */}
+                    <span className="text-xs font-semibold text-slate-800">
+                      🛠️ Performed by: {act.performedBy?.name || 'IT Staff'}
+                    </span>
+
+                    {/* Assignee if present */}
+                    {act.assignee && (
+                      <>
+                        <span className="text-xs text-slate-400">•</span>
+                        <span className="text-xs text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                          👤 Assignee: {act.assignee.name}
+                        </span>
+                      </>
+                    )}
+
                     <span className="text-xs text-slate-400">•</span>
                     <span className="text-xs text-slate-500">
                       {new Date(act.actionDateTime).toLocaleString('th-TH', {
@@ -420,25 +604,62 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                         minute: '2-digit',
                       })}
                     </span>
-                    {act.followUpRequired ? (
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+
+                    {act.followUpRequired && (
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                         Follow-up Required
                       </span>
-                    ) : (
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
-                        Completed
+                    )}
+
+                    {isTerminal && (
+                      <span className="text-[10px] font-medium text-slate-400 italic">
+                        (Terminal / Immutable)
                       </span>
                     )}
                   </div>
 
-                  {canEdit && (
-                    <button
-                      onClick={() => handleOpenEditForm(act)}
-                      className="text-xs font-semibold text-emerald-700 hover:text-emerald-800"
-                    >
-                      Edit
-                    </button>
-                  )}
+                  {/* Action Controls */}
+                  <div className="flex items-center gap-2">
+                    {!isReadOnly && !isTerminal && (
+                      <>
+                        {act.status === 'PENDING' && (
+                          <button
+                            type="button"
+                            onClick={() => handleQuickTransition(act, 'IN_PROGRESS')}
+                            className="text-xs font-semibold px-2 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded border border-blue-200 transition"
+                          >
+                            ⚙ Start Work
+                          </button>
+                        )}
+                        {(act.status === 'PENDING' || act.status === 'IN_PROGRESS') && (
+                          <button
+                            type="button"
+                            onClick={() => handleQuickTransition(act, 'COMPLETED')}
+                            className="text-xs font-semibold px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded border border-emerald-200 transition"
+                          >
+                            ✓ Complete
+                          </button>
+                        )}
+                        {(act.status === 'PENDING' || act.status === 'IN_PROGRESS') && (
+                          <button
+                            type="button"
+                            onClick={() => handleQuickTransition(act, 'CANCELLED')}
+                            className="text-xs font-semibold px-2 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded border border-rose-200 transition"
+                          >
+                            ✕ Cancel
+                          </button>
+                        )}
+                        {canEdit && (
+                          <button
+                            onClick={() => handleOpenEditForm(act)}
+                            className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 underline ml-1"
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Description */}

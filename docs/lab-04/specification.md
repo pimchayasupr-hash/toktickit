@@ -324,33 +324,48 @@ Detailed request/response payloads, validation bounds, and error schemas are doc
 
 ---
 
-## 11. Assumptions and Decisions
+## 11. Assumptions, Peer Review Hardening & Architectural Decisions
 
-### 11.1 Ambiguity Resolution: Handout §Answer Part 6 ("Assignee vs Performer")
-- **Context**: The Lab 4 handout §Answer Part 6 mentions phrases such as "assign, complete, cancel, inactive-assignee rejection" in relation to actions.
-- **Resolution**: In TokTickIT's domain architecture, Tickets possess an `ownerId` representing the assigned staff member coordinating the ticket. Actions Taken do NOT have a separate "assignee" to be assigned in advance; they represent work that has already been executed (`performedById`). The performer is automatically derived from the active authenticated session user (BR-03).
-- **Inactive User Protection**: A deactivated user cannot authenticate (BR-01 from Lab 3); therefore, an inactive user can never record an Action Taken. Ticket ownership reassignment continues to reject inactive staff with HTTP 400 (Lab 3 BR-07). Historical actions recorded by a user who is later deactivated remain intact for audit preservation.
+### 11.1 Action Taken Lifecycle & Active Assignee Model (Reviewer Hardening: BR-19 .. BR-23)
+- **Reviewer Feedback Alignment**: Per reviewer `@MiMikoChAn913`'s inspection on PR #55, Lab 4 Part 6 requires a formal operational lifecycle for Actions Taken:
+  1. **ActionStatus Lifecycle**: `PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.
+  2. **Permitted Status Transitions**:
+     - `PENDING` $\rightarrow$ `IN_PROGRESS`, `COMPLETED`, `CANCELLED`.
+     - `IN_PROGRESS` $\rightarrow$ `COMPLETED`, `CANCELLED`.
+     - `COMPLETED` & `CANCELLED` are **terminal and permanently immutable** (`TERMINAL_ACTION_LOCKED` 400).
+  3. **Conditional Result Field**: `result` is optional during initial creation and in-progress work, but strictly **mandatory** upon transitioning to or updating in `COMPLETED` status.
+  4. **Active Operational Assignee (`assigneeId`)**: Actions can be delegated to operational IT Staff or Admin users (`assigneeId`). Any attempt to assign to an inactive user or requester is strictly rejected with HTTP 400 (`INACTIVE_ASSIGNEE`).
+  5. **Creator/Performer Audit**: `performedById` / `createdById` remains securely derived from the authenticated session user, strictly ignoring client tampering.
 
-### 11.2 Append-Only Semantics & Auditability (BR-10)
-- **Decision**: Actions Taken cannot be deleted (`DELETE` route omitted). However, operational realities require allowing edits to correct typographical errors or clarify technical notes.
-- **Implementation**: Edits maintain immutable creation metadata (`createdAt`, `createdById`), record modification audit fields (`updatedAt`, `updatedById`), and increment an integer `version`. The UI displays an edited badge when `updatedAt > createdAt`.
+### 11.2 Atomic Optimistic Concurrency Control with Database Predicates (Reviewer Hardening: BR-14, BR-24)
+- **Vulnerability Addressed**: In-memory version comparisons followed by an `update({ where: { id } })` permit lost updates under concurrent writes if two requests read the same initial version.
+- **Implementation**:
+  - Updates MUST incorporate the expected numeric `version` directly in the database write predicate (`prisma.actionTaken.updateMany({ where: { id, version: expectedVersion }, data: { ..., version: expectedVersion + 1 } })` and `prisma.ticket.updateMany({ where: { id: ticketId, version: expectedVersion }, data: { ..., version: expectedVersion + 1 } })`) inside an explicit transaction.
+  - If `count === 0`, the transaction detects stale write or conflict, returning HTTP 409 Conflict with current database state.
+  - A missing or non-numeric version on status writes is rejected with HTTP 400 (`VALIDATION_ERROR`).
 
-### 11.3 Resolution Gate Definition (BR-13)
+### 11.3 Append-Only Ticket Status History (Reviewer Hardening: BR-25, BR-26)
+- **Reviewer Feedback Alignment**: Part 7 requires stable ordering, append-only behavior, and role-appropriate visibility for ticket workflow transitions.
+- **Implementation**:
+  - Added `TicketStatusHistory` model: `id`, `ticketId`, `fromStatus`, `toStatus`, `changedById`, `changedAt`.
+  - Created atomically in the same database transaction as the version-incremented ticket status update.
+  - Stale writes or failed status transitions append 0 rows; each successful status transition appends exactly 1 history row.
+  - Exposed via `GET /api/staff/tickets/:id/status-history` and `GET /api/tickets/:id/status-history` (isolated to ticket owner for Requesters).
+
+### 11.4 Append-Only Semantics & Auditability (BR-10)
+- **Decision**: Actions Taken cannot be deleted (`DELETE` route omitted). Edits maintain immutable creation metadata (`createdAt`, `createdById`), record modification audit fields (`updatedAt`, `updatedById`), and increment integer `version`. The UI displays an edited badge when `updatedAt > createdAt`.
+
+### 11.5 Resolution Gate Definition (BR-13)
 - **Decision**: Moving a ticket to `RESOLVED` requires:
   1. An assigned ticket owner (`ownerId !== null`).
   2. At least one `ActionTaken` record on the ticket.
-  3. At least one `ActionTaken` record having a non-empty `result` string.
+  3. At least one `ActionTaken` record in `COMPLETED` status having a non-empty `result` string.
   4. Any `ActionTaken` having `followUpRequired = true` must have an associated non-empty `followUpNote`.
 - **Advisory Requester Action**: The Requester "Problem Appears Resolved" button remains strictly advisory, appending a system Public Comment without mutating `Ticket.currentStatus`.
 
-### 11.4 Concurrency Mechanism (BR-14)
-- **Decision**: Use an integer `version` field (defaulting to 1, incremented on each update) rather than timestamp comparison.
-- **Rationale**: Integer versions eliminate millisecond rounding discrepancies between PostgreSQL `timestamptz` and JavaScript `Date` objects, providing foolproof deterministic concurrency checks.
-
-### 11.5 Timezone & Date Formatting (BR-04)
+### 11.6 Timezone & Date Formatting (BR-04)
 - **Decision**: Timestamps are stored in PostgreSQL as UTC ISO-8601 strings (`DateTime`).
 - **Display**: Client components format all timestamps in the user's localized timezone, defaulting to `Asia/Bangkok` (GMT+7) per course specification, using 24-hour time formatting (`YYYY-MM-DD HH:mm`).
 
-### 11.6 Requester Isolation HTTP Status Code (BR-08)
-- **Decision**: When a Requester requests `/api/tickets/:ticketId/actions-taken` for a ticket owned by another user, the server returns HTTP 404 Not Found (rather than 403 Forbidden).
-- **Rationale**: Returning 403 confirms that a ticket with that ID exists, enabling ticket ID enumeration. Returning 404 maintains consistent privacy semantics established in Lab 2 and Lab 3.
+### 11.7 Requester Isolation HTTP Status Code (BR-08)
+- **Decision**: When a Requester requests `/api/tickets/:ticketId/actions-taken` for a ticket owned by another user, the server returns HTTP 404 Not Found (rather than 403 Forbidden) to prevent ticket ID enumeration.

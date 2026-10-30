@@ -313,6 +313,10 @@ app.get('/api/tickets/:id', authenticateUser, requirePasswordChangeCheck, async 
           include: { author: { select: { id: true, name: true, role: true } } },
           orderBy: { createdAt: 'asc' },
         },
+        statusHistory: {
+          include: { changedBy: { select: { id: true, name: true, role: true } } },
+          orderBy: [{ changedAt: 'asc' }, { id: 'asc' }],
+        },
       },
     });
 
@@ -331,6 +335,49 @@ app.get('/api/tickets/:id', authenticateUser, requirePasswordChangeCheck, async 
     return;
   } catch (error) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch ticket detail.' } });
+    return;
+  }
+});
+
+// Ticket Status History View
+app.get('/api/tickets/:id/status-history', authenticateUser, requirePasswordChangeCheck, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = req.user!;
+    const ticketId = parseId(req.params.id);
+
+    if (isNaN(ticketId)) {
+      res.status(400).json({ error: { code: 'INVALID_ID', message: 'Ticket ID must be a number.' } });
+      return;
+    }
+
+    const ticket = await prisma.ticket.findFirst({
+      where: { id: ticketId },
+      select: { id: true, requesterId: true },
+    });
+
+    if (!ticket) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
+      return;
+    }
+
+    // Ownership check for Requester
+    if (user.role === Role.REQUESTER && ticket.requesterId !== user.id) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
+      return;
+    }
+
+    const statusHistory = await prisma.ticketStatusHistory.findMany({
+      where: { ticketId },
+      include: {
+        changedBy: { select: { id: true, name: true, role: true } },
+      },
+      orderBy: [{ changedAt: 'asc' }, { id: 'asc' }],
+    });
+
+    res.status(200).json({ statusHistory });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch ticket status history.' } });
     return;
   }
 });

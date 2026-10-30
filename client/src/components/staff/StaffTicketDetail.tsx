@@ -62,6 +62,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   // Action feedback
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   // File Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -112,6 +113,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   const handleClaim = async () => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/claim`, {
         method: 'PATCH',
@@ -121,12 +123,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('Successfully claimed ticket ownership.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handleAssign = async (targetOwnerId: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/assign`, {
         method: 'PATCH',
@@ -140,12 +143,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('Ticket owner updated successfully.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handlePriorityChange = async (newPriority: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/priority`, {
         method: 'PATCH',
@@ -159,12 +163,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('IT Priority updated successfully.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handleStatusChange = async (newStatus: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/status`, {
         method: 'PATCH',
@@ -181,7 +186,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage(`Ticket status updated to ${newStatus}.`);
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
@@ -340,6 +345,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </div>
       )}
 
+      {statusError && (
+        <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1rem' }}>
+          <span>⚠️</span>
+          <div>{statusError}</div>
+        </div>
+      )}
+
       {/* Main Ticket Card Grid */}
       <div className="tkt-detail-card">
         {/* Row 1: Ticket No, Category, Related System */}
@@ -401,8 +413,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </div>
 
           <div>
-            <label className="tkt-label">Current Status</label>
+            <label htmlFor="ticketStatusSelect" className="tkt-label">Current Status</label>
             <select
+              id="ticketStatusSelect"
               value={ticket.currentStatus}
               onChange={(e) => handleStatusChange(e.target.value)}
               className="tkt-input"
@@ -487,6 +500,62 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         isReadOnly={false}
         onActionsUpdated={fetchTicketDetail}
       />
+
+      {/* Append-only Status History Timeline (Part 7) */}
+      <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+          <span style={{ fontSize: '1.2rem' }}>📜</span>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+            Ticket Status History ({ticket.statusHistory?.length || 0})
+          </h3>
+          <span className="tkt-pill tkt-pill-status-in-progress" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
+            Append-Only Audit Log
+          </span>
+        </div>
+
+        {!ticket.statusHistory || ticket.statusHistory.length === 0 ? (
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>
+            No status transitions recorded yet. Ticket created in status {ticket.currentStatus}.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {ticket.statusHistory.map((hist) => (
+              <div
+                key={hist.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 600, color: '#475569' }}>{hist.fromStatus}</span>
+                  <span style={{ color: '#006B3C', fontWeight: 700 }}>→</span>
+                  <span style={{ fontWeight: 700, color: '#006B3C' }}>{hist.toStatus}</span>
+                  <span style={{ color: '#94a3b8' }}>•</span>
+                  <span style={{ color: '#334155', fontWeight: 500 }}>
+                    by {hist.changedBy?.name || 'Staff'} ({hist.changedBy?.role || 'STAFF'})
+                  </span>
+                </div>
+                <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
+                  {new Date(hist.changedAt).toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Attachments Section for Staff */}
       <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>

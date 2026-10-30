@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role, ActionStatus } from '@prisma/client';
 import { AuthRequest, authenticateUser, requirePasswordChangeCheck } from '../middleware/authMiddleware';
 import { sanitizeHtml } from '../utils/validators';
 
@@ -9,6 +9,39 @@ const prisma = new PrismaClient();
 const parseId = (idParam: any): number => {
   const raw = Array.isArray(idParam) ? idParam[0] : String(idParam);
   return parseInt(raw, 10);
+};
+
+const VALID_ACTION_STATUSES = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+const VALID_ACTION_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ['IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+  IN_PROGRESS: ['PENDING', 'COMPLETED', 'CANCELLED'],
+  COMPLETED: [],
+  CANCELLED: [],
+};
+
+const validateAssignee = async (
+  assigneeId: any
+): Promise<{ error?: { code: string; message: string }; user?: any }> => {
+  if (assigneeId === null || assigneeId === undefined || assigneeId === '') {
+    return {};
+  }
+  const idNum = typeof assigneeId === 'number' ? assigneeId : parseId(assigneeId);
+  if (isNaN(idNum)) {
+    return { error: { code: 'VALIDATION_ERROR', message: 'assigneeId must be a valid number.' } };
+  }
+  const user = await prisma.user.findUnique({ where: { id: idNum } });
+  if (!user) {
+    return { error: { code: 'VALIDATION_ERROR', message: 'Assignee not found.' } };
+  }
+  if (!user.isActive || (user.role !== Role.STAFF && user.role !== Role.ADMIN)) {
+    return {
+      error: {
+        code: 'INACTIVE_ASSIGNEE',
+        message: 'Assignee must be an active IT Staff or Administrator.',
+      },
+    };
+  }
+  return { user };
 };
 
 // 1. GET /api/tickets/:ticketId/actions-taken (or /actions)
@@ -44,6 +77,9 @@ router.get(
         where: { ticketId },
         include: {
           performedBy: {
+            select: { id: true, name: true, email: true },
+          },
+          assignee: {
             select: { id: true, name: true, email: true },
           },
         },
@@ -106,6 +142,8 @@ router.post(
         actionDateTime,
         description,
         result,
+        status,
+        assigneeId,
         followUpRequired,
         followUpNote,
         attachmentNotes,
@@ -154,7 +192,7 @@ router.post(
         return;
       }
 
-      // BR-05: description and result validation
+      // BR-05: description validation
       if (!description || typeof description !== 'string' || description.trim().length === 0) {
         res.status(400).json({
           error: {
@@ -175,24 +213,60 @@ router.post(
         return;
       }
 
-      if (!result || typeof result !== 'string' || result.trim().length === 0) {
-        res.status(400).json({
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'result is required and must not be empty.',
-          },
-        });
-        return;
+      // Status validation & Lifecycle rules
+      let targetStatus: ActionStatus = ActionStatus.PENDING;
+      if (status !== undefined) {
+        if (!VALID_ACTION_STATUSES.includes(status)) {
+          res.status(400).json({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: `Invalid Action status ${status}.`,
+            },
+          });
+          return;
+        }
+        targetStatus = status as ActionStatus;
       }
 
-      if (result.trim().length > 1000) {
-        res.status(400).json({
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'result cannot exceed 1000 characters.',
-          },
-        });
-        return;
+      // Result validation: required ONLY when completing the action
+      let validatedResult: string | null = null;
+      if (targetStatus === ActionStatus.COMPLETED) {
+        if (!result || typeof result !== 'string' || result.trim().length === 0) {
+          res.status(400).json({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'result is required when completing an Action Taken.',
+            },
+          });
+          return;
+        }
+      }
+
+      if (result !== undefined && result !== null && typeof result === 'string') {
+        const trimmed = result.trim();
+        if (trimmed.length > 1000) {
+          res.status(400).json({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'result cannot exceed 1000 characters.',
+            },
+          });
+          return;
+        }
+        if (trimmed.length > 0) {
+          validatedResult = sanitizeHtml(trimmed);
+        }
+      }
+
+      // Assignee validation: operational relation check (must be active staff or admin)
+      let validatedAssigneeId: number | null = null;
+      if (assigneeId !== undefined && assigneeId !== null && assigneeId !== '') {
+        const { error: assigneeErr, user: validAssignee } = await validateAssignee(assigneeId);
+        if (assigneeErr) {
+          res.status(400).json({ error: assigneeErr });
+          return;
+        }
+        validatedAssigneeId = validAssignee.id;
       }
 
       // BR-06: followUpRequired & followUpNote validation
@@ -242,7 +316,9 @@ router.post(
           ticketId,
           actionDateTime: parsedActionDate,
           description: sanitizeHtml(description.trim()),
-          result: sanitizeHtml(result.trim()),
+          result: validatedResult,
+          status: targetStatus,
+          assigneeId: validatedAssigneeId,
           performedById: req.user!.id,
           followUpRequired: isFollowUp,
           followUpNote: validatedFollowUpNote,
@@ -252,6 +328,9 @@ router.post(
         },
         include: {
           performedBy: {
+            select: { id: true, name: true, email: true },
+          },
+          assignee: {
             select: { id: true, name: true, email: true },
           },
         },
@@ -300,6 +379,7 @@ router.get(
         where: { id: actionId, ticketId },
         include: {
           performedBy: { select: { id: true, name: true, email: true } },
+          assignee: { select: { id: true, name: true, email: true } },
         },
       });
 
@@ -351,7 +431,7 @@ router.patch(
         return;
       }
 
-      // BR-14: Concurrency control
+      // BR-14: Concurrency control check (version is strictly required)
       const { version } = req.body;
       if (version === undefined || typeof version !== 'number') {
         res.status(400).json({
@@ -363,21 +443,102 @@ router.patch(
         return;
       }
 
-      if (action.version !== version) {
-        res.status(409).json({
+      // Terminal immutability: completed or cancelled actions are terminal
+      if (action.status === ActionStatus.COMPLETED || action.status === ActionStatus.CANCELLED) {
+        res.status(400).json({
           error: {
-            code: 'CONCURRENCY_CONFLICT',
-            message: 'This Action Taken has been modified by another user. Please reload the latest data.',
-            currentEntity: action,
+            code: 'TERMINAL_ACTION_LOCKED',
+            message: `Action Taken in terminal status ${action.status} is immutable and cannot be updated.`,
           },
         });
         return;
       }
 
+      // Lifecycle / status transition validation
+      let nextStatus: ActionStatus = action.status;
+      if (req.body.status !== undefined) {
+        if (!VALID_ACTION_STATUSES.includes(req.body.status)) {
+          res.status(400).json({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: `Invalid Action status ${req.body.status}.`,
+            },
+          });
+          return;
+        }
+
+        const requestedStatus = req.body.status as ActionStatus;
+        const permitted = VALID_ACTION_TRANSITIONS[action.status] || [];
+        if (requestedStatus !== action.status && !permitted.includes(requestedStatus)) {
+          res.status(400).json({
+            error: {
+              code: 'INVALID_TRANSITION',
+              message: `Cannot transition Action Taken from ${action.status} to ${requestedStatus}.`,
+              allowedTransitions: permitted,
+            },
+          });
+          return;
+        }
+        nextStatus = requestedStatus;
+      }
+
       const updateData: any = {
-        version: action.version + 1,
         updatedById: req.user!.id,
       };
+
+      if (req.body.status !== undefined) {
+        updateData.status = nextStatus;
+      }
+
+      // Result validation: required ONLY when completing the action
+      if (nextStatus === ActionStatus.COMPLETED) {
+        const candidateResult = req.body.result !== undefined ? req.body.result : action.result;
+        if (!candidateResult || typeof candidateResult !== 'string' || candidateResult.trim().length === 0) {
+          res.status(400).json({
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'result is required when completing an Action Taken.',
+            },
+          });
+          return;
+        }
+      }
+
+      if (req.body.result !== undefined) {
+        if (req.body.result === null || req.body.result === '') {
+          if (nextStatus === ActionStatus.COMPLETED) {
+            res.status(400).json({
+              error: {
+                code: 'VALIDATION_ERROR',
+                message: 'result is required when completing an Action Taken.',
+              },
+            });
+            return;
+          }
+          updateData.result = null;
+        } else {
+          const resStr = String(req.body.result).trim();
+          if (resStr.length > 1000) {
+            res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'result cannot exceed 1000 chars.' } });
+            return;
+          }
+          updateData.result = sanitizeHtml(resStr);
+        }
+      }
+
+      // Assignee assignment / reassignment validation
+      if (req.body.assigneeId !== undefined) {
+        if (req.body.assigneeId === null || req.body.assigneeId === '') {
+          updateData.assigneeId = null;
+        } else {
+          const { error: assigneeErr, user: validAssignee } = await validateAssignee(req.body.assigneeId);
+          if (assigneeErr) {
+            res.status(400).json({ error: assigneeErr });
+            return;
+          }
+          updateData.assigneeId = validAssignee.id;
+        }
+      }
 
       if (req.body.actionDateTime !== undefined) {
         const parsed = new Date(req.body.actionDateTime);
@@ -395,15 +556,6 @@ router.patch(
           return;
         }
         updateData.description = sanitizeHtml(desc);
-      }
-
-      if (req.body.result !== undefined) {
-        const resStr = String(req.body.result).trim();
-        if (resStr.length === 0 || resStr.length > 1000) {
-          res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'result must be 1-1000 chars.' } });
-          return;
-        }
-        updateData.result = sanitizeHtml(resStr);
       }
 
       if (req.body.followUpRequired !== undefined) {
@@ -430,15 +582,59 @@ router.patch(
         updateData.attachmentNotes = notes ? sanitizeHtml(notes) : null;
       }
 
-      const updated = await prisma.actionTaken.update({
-        where: { id: actionId },
-        data: updateData,
-        include: {
-          performedBy: { select: { id: true, name: true, email: true } },
-        },
+      // Atomic optimistic lock write in database predicate via transaction
+      const txResult = await prisma.$transaction(async (tx) => {
+        const updateResult = await tx.actionTaken.updateMany({
+          where: {
+            id: actionId,
+            ...(ticketId !== undefined ? { ticketId } : {}),
+            version: version, // Atomic optimistic lock predicate!
+          },
+          data: {
+            ...updateData,
+            version: version + 1,
+          },
+        });
+
+        if (updateResult.count === 0) {
+          const current = await tx.actionTaken.findFirst({
+            where: { id: actionId, ...(ticketId !== undefined ? { ticketId } : {}) },
+            include: {
+              performedBy: { select: { id: true, name: true, email: true } },
+              assignee: { select: { id: true, name: true, email: true } },
+            },
+          });
+          return { conflict: true, notFound: !current, entity: current };
+        }
+
+        const updated = await tx.actionTaken.findUnique({
+          where: { id: actionId },
+          include: {
+            performedBy: { select: { id: true, name: true, email: true } },
+            assignee: { select: { id: true, name: true, email: true } },
+          },
+        });
+
+        return { conflict: false, notFound: false, entity: updated };
       });
 
-      res.status(200).json({ actionTaken: updated });
+      if (txResult.notFound) {
+        res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Action Taken not found.' } });
+        return;
+      }
+
+      if (txResult.conflict) {
+        res.status(409).json({
+          error: {
+            code: 'CONCURRENCY_CONFLICT',
+            message: 'This Action Taken has been modified by another user. Please reload the latest data.',
+            currentEntity: txResult.entity,
+          },
+        });
+        return;
+      }
+
+      res.status(200).json({ actionTaken: txResult.entity });
       return;
     } catch (error) {
       res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update Action Taken.' } });

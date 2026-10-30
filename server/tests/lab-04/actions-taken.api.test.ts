@@ -415,4 +415,238 @@ describe('Lab 4 - Actions Taken API Test Suite', () => {
 
     expect([404, 405]).toContain(res.status);
   });
+
+  // =========================================================================
+  // REVIEW REGRESSION TESTS (PR #55 Feedback - Lifecycle, Assignment, Concurrency)
+  // =========================================================================
+
+  it('TEST-ACT-18: Action Taken assignment to active staff member succeeds', async () => {
+    const staffToken = await getStaffToken();
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const ticketId = queueRes.body.tickets[0].id;
+
+    // Get Sarah Staff ID
+    const assigneesRes = await request(app)
+      .get('/api/staff/assignees')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const sarah = assigneesRes.body.assignees.find((a: any) => a.email === 'sarah.staff@toktickit.com');
+    expect(sarah).toBeDefined();
+
+    const createRes = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        actionDateTime: new Date().toISOString(),
+        description: 'Assigned diagnostic task to Sarah for fiber optic testing.',
+        status: 'PENDING',
+        assigneeId: sarah.id,
+      });
+
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.actionTaken.assigneeId).toBe(sarah.id);
+    expect(createRes.body.actionTaken.assignee.email).toBe('sarah.staff@toktickit.com');
+    expect(createRes.body.actionTaken.status).toBe('PENDING');
+  });
+
+  it('TEST-ACT-19: Inactive assignee assignment is strictly rejected with 400', async () => {
+    const staffToken = await getStaffToken();
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const ticketId = queueRes.body.tickets[0].id;
+
+    // Find Kevin (inactive staff) from DB directly or via seed
+    const inactiveUserRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'kevin.inactive@toktickit.com', password: 'Password123!' });
+    // Deactivated user cannot authenticate, get user id from admin list
+    const adminToken = await getAdminToken();
+    const usersRes = await request(app)
+      .get('/api/admin/users')
+      .set('Authorization', `Bearer ${adminToken}`);
+    const kevin = usersRes.body.users.find((u: any) => u.email === 'kevin.inactive@toktickit.com');
+    expect(kevin).toBeDefined();
+    expect(kevin.isActive).toBe(false);
+
+    // Attempt to create action assigned to inactive staff
+    const res = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        actionDateTime: new Date().toISOString(),
+        description: 'Attempting to assign work to inactive staff member.',
+        status: 'PENDING',
+        assigneeId: kevin.id,
+      });
+
+    expect(res.status).toBe(400);
+    expect(['INACTIVE_ASSIGNEE', 'VALIDATION_ERROR']).toContain(res.body.error.code);
+  });
+
+  it('TEST-ACT-20: Action Taken lifecycle: PENDING -> IN_PROGRESS -> COMPLETED requires result', async () => {
+    const staffToken = await getStaffToken();
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const ticketId = queueRes.body.tickets[0].id;
+
+    // 1. Create action in PENDING (result is optional)
+    const createRes = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        actionDateTime: new Date().toISOString(),
+        description: 'Initial triage step for memory diagnostics.',
+        status: 'PENDING',
+      });
+
+    expect(createRes.status).toBe(201);
+    const action = createRes.body.actionTaken;
+    expect(action.status).toBe('PENDING');
+    expect(action.result).toBeNull();
+
+    // 2. Transition from PENDING to IN_PROGRESS
+    const progressRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: action.version,
+        status: 'IN_PROGRESS',
+      });
+
+    expect(progressRes.status).toBe(200);
+    const inProgressAction = progressRes.body.actionTaken;
+    expect(inProgressAction.status).toBe('IN_PROGRESS');
+
+    // 3. Attempting to complete without providing result fails with 400
+    const failCompleteRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: inProgressAction.version,
+        status: 'COMPLETED',
+        // result omitted!
+      });
+
+    expect(failCompleteRes.status).toBe(400);
+    expect(failCompleteRes.body.error.code).toBe('VALIDATION_ERROR');
+
+    // 4. Transition to COMPLETED with valid result succeeds
+    const completeRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: inProgressAction.version,
+        status: 'COMPLETED',
+        result: 'MemTest86 completed 4 passes with 0 errors.',
+      });
+
+    expect(completeRes.status).toBe(200);
+    const completedAction = completeRes.body.actionTaken;
+    expect(completedAction.status).toBe('COMPLETED');
+    expect(completedAction.result).toBe('MemTest86 completed 4 passes with 0 errors.');
+
+    // 5. Terminal immutability: Cannot edit or transition COMPLETED action
+    const terminalEditRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: completedAction.version,
+        description: 'Attempting to modify completed action description.',
+      });
+
+    expect(terminalEditRes.status).toBe(400);
+    expect(terminalEditRes.body.error.code).toBe('TERMINAL_ACTION_LOCKED');
+  });
+
+  it('TEST-ACT-21: Action Taken cancellation enforces terminal immutability', async () => {
+    const staffToken = await getStaffToken();
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const ticketId = queueRes.body.tickets[0].id;
+
+    // Create action
+    const createRes = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        actionDateTime: new Date().toISOString(),
+        description: 'Redundant diagnostic step scheduled.',
+        status: 'PENDING',
+      });
+
+    const action = createRes.body.actionTaken;
+
+    // Transition to CANCELLED
+    const cancelRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: action.version,
+        status: 'CANCELLED',
+      });
+
+    expect(cancelRes.status).toBe(200);
+    expect(cancelRes.body.actionTaken.status).toBe('CANCELLED');
+
+    // Attempting to re-open or edit cancelled action fails
+    const editCancelRes = await request(app)
+      .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        version: cancelRes.body.actionTaken.version,
+        status: 'IN_PROGRESS',
+      });
+
+    expect(editCancelRes.status).toBe(400);
+    expect(editCancelRes.body.error.code).toBe('TERMINAL_ACTION_LOCKED');
+  });
+
+  it('TEST-ACT-22: Concurrent writes on Action Taken: atomic lock ensures exactly one winner (200) and one conflict (409)', async () => {
+    const staffToken = await getStaffToken();
+    const queueRes = await request(app)
+      .get('/api/staff/tickets')
+      .set('Authorization', `Bearer ${staffToken}`);
+    const ticketId = queueRes.body.tickets[0].id;
+
+    const createRes = await request(app)
+      .post(`/api/tickets/${ticketId}/actions-taken`)
+      .set('Authorization', `Bearer ${staffToken}`)
+      .send({
+        actionDateTime: new Date().toISOString(),
+        description: 'Base action for concurrent edit race condition test.',
+        status: 'PENDING',
+      });
+
+    const action = createRes.body.actionTaken;
+    const initialVersion = action.version;
+
+    // Fire two concurrent updates with identical initial version
+    const [req1, req2] = await Promise.all([
+      request(app)
+        .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({
+          version: initialVersion,
+          description: 'Client A concurrent write update.',
+        }),
+      request(app)
+        .patch(`/api/tickets/${ticketId}/actions-taken/${action.id}`)
+        .set('Authorization', `Bearer ${staffToken}`)
+        .send({
+          version: initialVersion,
+          description: 'Client B concurrent write update.',
+        }),
+    ]);
+
+    const statuses = [req1.status, req2.status].sort();
+    expect(statuses).toEqual([200, 409]);
+
+    const conflictResponse = req1.status === 409 ? req1 : req2;
+    expect(conflictResponse.body.error.code).toBe('CONCURRENCY_CONFLICT');
+    expect(conflictResponse.body.error.currentEntity.version).toBe(initialVersion + 1);
+  });
 });
