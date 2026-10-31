@@ -5,6 +5,9 @@ import { AuthRequest, authenticateUser, requirePasswordChangeCheck } from '../mi
 const router = Router();
 const prisma = new PrismaClient();
 
+const ACTIVE_OPEN_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'];
+const RECENTLY_RESOLVED_WINDOW_DAYS = 30;
+
 // 1. GET /api/dashboard/requester
 router.get(
   '/requester',
@@ -13,6 +16,7 @@ router.get(
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const userId = req.user!.id;
+      const thirtyDaysAgo = new Date(Date.now() - RECENTLY_RESOLVED_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
       const [
         openTicketsCount,
@@ -25,7 +29,7 @@ router.get(
         prisma.ticket.count({
           where: {
             requesterId: userId,
-            currentStatus: { in: ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'] },
+            currentStatus: { in: ACTIVE_OPEN_STATUSES },
           },
         }),
         prisma.ticket.count({
@@ -38,6 +42,7 @@ router.get(
           where: {
             requesterId: userId,
             currentStatus: 'RESOLVED',
+            updatedAt: { gte: thirtyDaysAgo },
           },
         }),
         prisma.ticket.count({
@@ -108,7 +113,7 @@ router.get(
       }
 
       const userId = req.user!.id;
-      const nonTerminal = { notIn: ['CLOSED', 'CANCELLED'] };
+      const activeOpenFilter = { in: ACTIVE_OPEN_STATUSES };
 
       const [
         unassignedCount,
@@ -121,16 +126,16 @@ router.get(
         rawUrgentTickets,
       ] = await Promise.all([
         prisma.ticket.count({
-          where: { ownerId: null, currentStatus: nonTerminal },
+          where: { ownerId: null, currentStatus: activeOpenFilter },
         }),
         prisma.ticket.count({
-          where: { ownerId: userId, currentStatus: nonTerminal },
+          where: { ownerId: userId, currentStatus: activeOpenFilter },
         }),
         prisma.ticket.count({
-          where: { currentStatus: nonTerminal },
+          where: { currentStatus: activeOpenFilter },
         }),
         prisma.ticket.count({
-          where: { itPriority: 'URGENT', currentStatus: nonTerminal },
+          where: { itPriority: 'URGENT', currentStatus: activeOpenFilter },
         }),
         prisma.ticket.groupBy({
           by: ['currentStatus'],
@@ -138,7 +143,7 @@ router.get(
         }),
         prisma.ticket.groupBy({
           by: ['itPriority'],
-          where: { itPriority: { not: null }, currentStatus: nonTerminal },
+          where: { itPriority: { not: null }, currentStatus: activeOpenFilter },
           _count: { id: true },
         }),
         prisma.actionTaken.findMany({
@@ -150,7 +155,7 @@ router.get(
           },
         }),
         prisma.ticket.findMany({
-          where: { itPriority: 'URGENT', currentStatus: nonTerminal },
+          where: { itPriority: 'URGENT', currentStatus: activeOpenFilter },
           orderBy: { createdAt: 'asc' },
           take: 5,
           include: {

@@ -231,7 +231,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
             className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-sm"
             title="Refresh dashboard metrics"
           >
-            <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="14" height="14" className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Refresh Metrics
@@ -240,7 +240,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
             onClick={() => onNavigate && onNavigate('staff-queue')}
             className="tkt-btn-action-primary inline-flex items-center gap-2"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="16" height="16" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Ticket Queue
@@ -261,7 +261,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 Unassigned
               </span>
               <div className="tkt-card-icon-badge tkt-card-icon-amber">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
               </div>
@@ -287,7 +287,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 My Assigned
               </span>
               <div className="tkt-card-icon-badge tkt-card-icon-green">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
@@ -313,7 +313,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 High &amp; Urgent
               </span>
               <div className="tkt-card-icon-badge tkt-card-icon-red">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
@@ -339,7 +339,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 Open Total
               </span>
               <div className="tkt-card-icon-badge tkt-card-icon-blue">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="20" height="20" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
@@ -436,7 +436,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {Object.entries(metrics.byStatus || {}).map(([st, cnt]) => {
                 const total = metrics.openTotalCount || 15;
                 const pct = Math.min(100, Math.round((cnt / total) * 100));
@@ -445,7 +445,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                   <div
                     key={st}
                     onClick={() => onNavigate && onNavigate('staff-queue', { status: st })}
-                    className="p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+                    className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
                   >
                     <div className="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5 group-hover:text-emerald-800">
                       <span>{formatStatus(st)}</span>
@@ -464,6 +464,46 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 );
               })}
             </div>
+
+            {/* Priority Breakdown Bar */}
+            {metrics.byPriority && (
+              <div className="mt-5 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Priority Breakdown (Active Queue)
+                  </h3>
+                  <span className="text-[11px] text-slate-500">By IT Priority</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(['URGENT', 'HIGH', 'MEDIUM', 'LOW'] as const).map((prio) => {
+                    const pCount = metrics.byPriority?.[prio] ?? 0;
+                    const badgeStyle =
+                      prio === 'URGENT'
+                        ? { bg: '#fef2f2', border: '#fecaca', text: '#b91c1c' }
+                        : prio === 'HIGH'
+                        ? { bg: '#fff7ed', border: '#fed7aa', text: '#c2410c' }
+                        : prio === 'MEDIUM'
+                        ? { bg: '#fffbeb', border: '#fde68a', text: '#b45309' }
+                        : { bg: '#f0fdf4', border: '#bbf7d0', text: '#15803d' };
+                    return (
+                      <div
+                        key={prio}
+                        onClick={() => onNavigate && onNavigate('staff-queue', { priority: prio })}
+                        style={{
+                          backgroundColor: badgeStyle.bg,
+                          border: `1px solid ${badgeStyle.border}`,
+                          color: badgeStyle.text,
+                        }}
+                        className="p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition hover:shadow-sm"
+                      >
+                        <span className="text-xs font-bold">{prio}</span>
+                        <span className="text-sm font-extrabold font-mono">{pCount}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -493,7 +533,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 className="tkt-quick-action-btn"
               >
                 <span className="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center text-sm">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="16" height="16" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </span>
@@ -508,7 +548,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 className="tkt-quick-action-btn"
               >
                 <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="16" height="16" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                 </span>
@@ -534,7 +574,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
             {myRecentActions.length === 0 ? (
               <div className="py-8 px-4 text-center bg-emerald-50/40 border border-emerald-100 rounded-xl">
                 <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="20" height="20" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -561,20 +601,26 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                       <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                         {action.ticketNumber}
                       </span>
-                      <span className="text-[11px] text-slate-400">
-                        {new Date(action.actionDateTime).toLocaleDateString('en-GB', {
+                      <span className="text-xs text-slate-400" style={{ fontSize: '0.72rem' }}>
+                        {new Date(action.actionDateTime).toLocaleString('en-GB', {
+                          timeZone: 'Asia/Bangkok',
+                          day: '2-digit',
                           month: 'short',
-                          day: 'numeric',
+                          year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          hour12: false,
                         })}
                       </span>
                     </div>
-                    <div className="text-xs font-medium text-slate-800 group-hover:text-emerald-900 transition line-clamp-2">
+                    <div className="text-xs font-medium text-slate-800 group-hover:text-emerald-900 transition line-clamp-2" style={{ fontSize: '0.78rem' }}>
                       {action.description}
                     </div>
                     {action.result && (
-                      <div className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <div
+                        className="mt-1.5 inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
+                        style={{ fontSize: '0.72rem', lineHeight: 1.35 }}
+                      >
                         <span className="font-semibold text-emerald-900">Result:</span> {action.result}
                       </div>
                     )}

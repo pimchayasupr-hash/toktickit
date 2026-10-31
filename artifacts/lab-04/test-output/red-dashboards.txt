@@ -1,0 +1,26 @@
+=== RED PHASE TEST OUTPUT: requester-dashboard.api.test.ts & staff-dashboard.api.test.ts ===
+Timestamp: 2026-10-19T20:42:00Z
+Command: npx vitest run server/tests/lab-04/requester-dashboard.api.test.ts server/tests/lab-04/staff-dashboard.api.test.ts
+
+ ❯ tests/lab-04/requester-dashboard.api.test.ts (3 tests | 3 failed)
+   × TEST-DSH-REQ-01: Requester dashboard returns metrics and recent tickets
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/requester"
+   × TEST-DSH-REQ-02: Requester with zero tickets returns zeros without error
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/requester"
+   × TEST-DSH-REQ-03: Requester metrics isolate other users' ticket data
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/requester"
+
+ ❯ tests/lab-04/staff-dashboard.api.test.ts (4 tests | 4 failed)
+   × TEST-DSH-STF-01: IT Staff dashboard returns unassigned, assigned, and breakdowns
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/staff"
+   × TEST-DSH-STF-02: Staff dashboard returns recent actions performed by current user
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/staff"
+   × TEST-DSH-ADM-01: Administrator dashboard includes user statistics
+     → expected 200 "OK", got 404 "Cannot GET /api/dashboard/staff"
+   × TEST-DSH-ADM-02: Requester cannot access staff dashboard (HTTP 403)
+     → expected 403 "Forbidden", got 404 "Cannot GET /api/dashboard/staff"
+
+Test Files  2 failed (2)
+     Tests  7 failed (7)
+  Duration  1.05s
+

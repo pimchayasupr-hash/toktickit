@@ -49,13 +49,18 @@ router.get('/tickets', async (req: AuthRequest, res: Response): Promise<void> =>
 
     const andConditions: any[] = [];
 
-    const VALID_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CLOSED', 'REOPENED', 'CANCELLED'];
+    const VALID_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CLOSED', 'REOPENED', 'CANCELLED', 'ACTIVE_OPEN'];
     if (status && typeof status === 'string' && status.trim() !== '') {
-      if (!VALID_STATUSES.includes(status.trim())) {
+      const trimmedStatus = status.trim();
+      if (!VALID_STATUSES.includes(trimmedStatus)) {
         res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Invalid status filter value.' } });
         return;
       }
-      andConditions.push({ currentStatus: status.trim() });
+      if (trimmedStatus === 'ACTIVE_OPEN') {
+        andConditions.push({ currentStatus: { in: ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'] } });
+      } else {
+        andConditions.push({ currentStatus: trimmedStatus });
+      }
     }
 
     if (categoryId) {
@@ -296,8 +301,8 @@ router.patch('/tickets/:id/priority', async (req: AuthRequest, res: Response): P
 // 6. PATCH /api/staff/tickets/:id/status (Update Status per transition matrix BR-10)
 const VALID_TRANSITIONS: Record<string, string[]> = {
   NEW: ['OPEN', 'IN_PROGRESS', 'CANCELLED'],
-  OPEN: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'IN_PROGRESS'],
-  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'OPEN'],
+  OPEN: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
+  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   WAITING_FOR_REQUESTER: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
   RESOLVED: ['CLOSED', 'REOPENED'],
   CLOSED: ['REOPENED'],

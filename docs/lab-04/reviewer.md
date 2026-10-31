@@ -34,7 +34,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - [x] Append-only actor-attributed `TicketStatusHistory` recorded on every ticket status change.
   - [x] Requester and Staff dashboards compute metrics on the backend without unbounded data leakage.
   - [x] Zen Green design tokens, 44px touch targets, and zero horizontal scroll verified.
-  - [x] All automated tests pass (144/144 server tests + 40/40 client tests + 11/11 Lab 4 Playwright E2E).
+  - [x] All automated tests pass (144/144 server tests + 40/40 client tests + 12/12 Lab 4 Playwright E2E specs across Chromium, Firefox, WebKit = 196 unique tests / 220 total runs).
 - **Reviewer Comments & Technical Resolutions**:
   - *Comment 1 (Schema / Part 6 Lifecycle - P1)*:
     > "[P1] The required Action Taken lifecycle is not representable in this model. Lab 4 Part 6 explicitly requires assign, edit, status transition, complete, cancel, and inactive-assignee rejection, but ActionTaken has neither assigneeId nor a lifecycle/status field. The POST route consequently requires result immediately and every record is effectively already complete. Please add an Action status enum and active operational assignee relation, enforce permitted transitions/terminal immutability, and require a result only when completing the Action. Cover assignment, inactive assignees, completion, cancellation, and requester read-only behavior in API/UI/E2E tests."
@@ -76,7 +76,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
 - **Review Date**: 2026-10-31
 - **Reviewer Inspection Checklist**:
   - [x] All feature increments merged into staging cleanly with zero merge conflicts.
-  - [x] End-to-end regression tests green on Playwright Chromium (21/21 passed).
+  - [x] End-to-end regression tests green on Playwright (12 unique E2E scenarios, 36/36 cross-browser runs passed).
   - [x] Documentation complete: `specification.md`, `ui-spec.md`, `api-spec.md`, `tests.md`, `ai-use.md`.
   - [x] Metrics match database evidence generated and verified (`metrics-vs-db.txt`).
 - **Reviewer Comments & Feedback (Review ID 5721962382)**:
@@ -86,6 +86,25 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
     > "Thank you @supa-gif173 for the detailed and constructive peer review on the Lab 4 release increment! All core features have been fully verified across all 205 automated tests and database parity checks."
 - **Approval Status**: `APPROVED`
 - **Merged By**: `@supa-gif173` into `main` (Merge commit: `86f4516602b6bad3ae8b75101a4acc234001ce1d` on 2026-10-31)
+
+---
+
+### PR #3: Final Visual Hardening, Telemetry Unification, and Evidence Audit (PR #57)
+- **Title**: `fix(ui,pdf): enforce explicit SVG dimensions, fix visual bugs, and update submission evidence`
+- **Branch**: `hotfix/lab4-icon-dimensions-and-audit` $\rightarrow$ `lab4-staging`
+- **PR Link**: https://github.com/pimchayasupr-hash/toktickit/pull/57
+- **Review URL**: https://github.com/pimchayasupr-hash/toktickit/pull/57#pullrequestreview-5722313017 (`PRR_kwDOTzBGN88AAAABVROROQ`)
+- **Author**: `@pimchayasupr-hash`
+- **Reviewer**: `@supa-gif173`
+- **Submitted At**: `2026-10-31T10:16:15Z`
+- **Reviewer Verification Summary (Review ID 5722313017 / `PRR_kwDOTzBGN88AAAABVROROQ`)**:
+  - [x] Explicit SVG dimensions (`width` and `height` HTML attributes across all 52 inline SVGs) and Playwright E2E bounding-box guardrail (`<= 64px` in `e2e/lab-04/dashboards.spec.ts`).
+  - [x] Unified `ACTIVE_OPEN_STATUSES` and 30-day rolling window (`recentlyResolvedCount`) across Staff and Requester Dashboards (`artifacts/lab-04/metrics-vs-db.txt`).
+  - [x] Committed raw test output logs (`artifacts/lab-04/test-output/*.txt`) and verified 196 unique tests / 220 total cross-browser executions (144 Server + 40 Client + 36 Playwright E2E across Chromium, Firefox, WebKit = 100% PASS).
+  - [x] Authentic two-session HTTP 409 Conflict capture on Edit mode, real Requester HTTP 403 Forbidden captures, and 17-page `LAB4_SUBMISSION.pdf`.
+- **Approval Status**: `APPROVED`
+- **Merged By**: `@supa-gif173` into `lab4-staging` (Merge commit: `83b3cbcbc92153ab6728037f0b4660fa9d454659` on 2026-10-31)
+- **Final Release Staging to Main PR**: https://github.com/pimchayasupr-hash/toktickit/pull/58 (`lab4-staging` $\rightarrow$ `main`)
 
 ---
 

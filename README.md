@@ -6,7 +6,7 @@ TokTickIT is a modern, enterprise-grade IT Service Desk application for Account 
 - **Backend:** Node.js + Express + TypeScript (`server/`)
 - **Database:** PostgreSQL accessed via Prisma ORM (`server/prisma/`)
 - **Auth & Concurrency:** JWT with RBAC + atomic database predicate optimistic locking (`version`)
-- **Testing:** Vitest (Server API + Client RTL components) + Playwright (E2E browser tests) — **195 / 195 tests passing (144 Server, 40 Client, 11 Playwright E2E)**
+- **Testing:** Vitest (Server API + Client RTL components) + Playwright (E2E browser tests) — **196 unique tests passing (144 Server, 40 Client, 12 Playwright E2E specs executed across Chromium, Firefox, WebKit = 220 total test runs, 100% PASS)**
 
 ---
 
@@ -73,21 +73,20 @@ toktickit/
 │   │   └── seed.ts                  # Idempotent database seed (18 realistic tickets)
 │   └── tests/lab-04/                # Vitest + Supertest API integration tests (40 tests)
 │
-├── e2e/lab-04/                      # Playwright E2E browser test suite (11 tests)
+├── e2e/lab-04/                      # Playwright E2E browser test suite (12 scenarios / 36 cross-browser runs)
 │   ├── actions-taken-flow.spec.ts   # Actions Taken lifecycle, assignees, requester read-only mode
 │   ├── ticket-resolution.spec.ts    # Deterministic resolution gate rejection & success verification
-│   └── dashboards-and-overflow.spec.ts # Responsive viewports (360px, 768px, 1280px) & Axe-core a11y
+│   └── dashboards.spec.ts           # Responsive viewports (360px, 768px, 1280px), SVG <= 64px & Axe-core a11y
 │
 ├── docs/lab-04/                     # Sprint 4 documentation & engineering artifacts
 │   ├── specification.md             # 11-section formal engineering contract
 │   ├── ui-spec.md                   # Screen layouts, tokens, responsive conventions
 │   ├── api-spec.md                  # REST API contract and status codes
 │   ├── tests.md                     # Traceability matrix and planned test register
-│   ├── report.md                    # Lab 4 Engineering Report (Reviewer responses & evidence)
+│   ├── ai-use.md                    # AI Use & Reflection report
 │   ├── reviewer.md                  # Peer review governance log
-│   ├── screenshots/                 # 10 live application screenshots across viewports
-│   ├── submission.html              # Compiled HTML source for PDF rendering
-│   └── LAB4_SUBMISSION.pdf          # Official single submission PDF
+│   ├── screenshots/                 # 31+ high-resolution application screenshots across viewports
+│   └── LAB4_SUBMISSION.pdf          # Official single submission PDF (17 pages)
 │
 └── artifacts/lab-04/                # Generated audit and review evidence
     ├── metrics-vs-db.txt            # Direct DB query vs API metrics mathematical comparison
@@ -149,7 +148,7 @@ All seeded accounts use password: `Password123!`
 | **Requester** | `jennifer.anderson@example.com` | `Password123!` | Requester Dashboard, Attention Banner, Read-Only Actions Taken |
 | **Requester** | `michael.brown@example.com` | `Password123!` | Create tickets, view ticket detail, public comments |
 | **Administrator** | `john.admin@toktickit.com` | `Password123!` | Staff dashboard + Admin user metrics, User Management, Password resets |
-| **Inactive Staff** | `david.inactive@toktickit.com` | `Password123!` | Negative testing (Login blocked, Assignee delegation rejected) |
+| **Inactive Staff** | `kevin.inactive@toktickit.com` | `Password123!` | Negative testing (Login blocked, Assignee delegation rejected) |
 
 ---
 
@@ -173,8 +172,8 @@ npm run test:server
 # 3. Client Component Tests (40 tests across 17 suites)
 npm run test:client
 
-# 4. Playwright End-to-End Tests (11 scenarios)
-npx playwright test e2e/lab-04/ --project=chromium --reporter=list
+# 4. Playwright End-to-End Tests (12 scenarios across Chromium, Firefox, WebKit = 36 runs)
+npx playwright test e2e/lab-04/ --reporter=list
 ```
 
 ---
@@ -201,5 +200,5 @@ npx playwright test e2e/lab-04/ --project=chromium --reporter=list
    - From the Staff Ticket Queue, search for `TKT-2026-001233` (Status: `OPEN`, zero actions taken).
    - Attempt to change the ticket status to `Resolved` in the dropdown.
    - Notice the system immediately displays the prominent red alert banner:  
-     `⚠️ Resolution Gate: At least one Action Taken must be recorded before resolving.`
+     `Resolution Gate Failed: At least one COMPLETED Action Taken with a recorded result is required before resolving a ticket.`
    - Notice the ticket status remains safely at `OPEN` without side effects.

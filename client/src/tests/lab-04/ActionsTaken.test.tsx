@@ -164,9 +164,11 @@ describe('Lab 4 UI - ActionsTakenSection Component', () => {
     const saveBtn = screen.getByRole('button', { name: /Save Action/i });
     fireEvent.click(saveBtn);
 
-    // Must show validation error
+    // Must show validation error and link field-level error via aria-describedby
     await waitFor(() => {
-      expect(screen.getByText(/Result is required when completing an Action Taken/i)).toBeDefined();
+      expect(screen.getAllByText(/Result is required when completing an Action Taken/i).length).toBeGreaterThan(0);
+      expect(screen.getByTestId('field-error-result')).toBeDefined();
+      expect(screen.getByLabelText(/Action Result/i).getAttribute('aria-describedby')).toBe('actionResult-error');
     });
   });
 });

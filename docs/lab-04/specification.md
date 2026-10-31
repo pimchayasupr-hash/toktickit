@@ -104,19 +104,19 @@ The stakeholder requires advancing TokTickIT from a basic communication and tick
 | **BR-09** | **Role Authorization for Actions** | Creating or updating an `ActionTaken` is restricted to users with role `STAFF` or `ADMIN`. Requester attempts return HTTP 403 Forbidden regardless of UI presentation. |
 | **BR-10** | **Append-Only & Audit Preservation** | Actions Taken cannot be deleted (`DELETE` endpoint is omitted). Edits preserve original `createdAt` and `createdById`, update `updatedAt` and `updatedById`, and increment `version`. Actions display in stable order: `actionDateTime ASC, createdAt ASC, id ASC`. |
 | **BR-11** | **Terminal State Invariance** | New Actions Taken cannot be added to tickets in terminal statuses (`CLOSED`, `CANCELLED`). If a ticket is reopened (`REOPENED`), logging new actions is resumed. |
-| **BR-12** | **Status Transition Matrix** | Ticket status changes must strictly adhere to the approved status transition matrix. Disallowed transitions are rejected with HTTP 400/422 `INVALID_STATUS_TRANSITION`. |
-| **BR-13** | **Resolution Gate** | A ticket may transition to `RESOLVED` only if: (1) `ownerId !== null`, (2) the ticket has at least one associated `ActionTaken`, (3) at least one `ActionTaken` has a non-empty `result` (trimmed length ≥ 1), and (4) all actions with `followUpRequired = true` have documented notes. Advisory Requester signals ("Problem Appears Resolved") do NOT bypass the gate. |
+| **BR-12** | **Status Transition Matrix** | Ticket status changes must strictly adhere to the approved status transition matrix (Step 1). Disallowed transitions (including `NEW -> RESOLVED` and `IN_PROGRESS -> OPEN`) are immediately rejected with HTTP 400 `INVALID_TRANSITION`. |
+| **BR-13** | **Resolution Gate (Step 2)** | When transitioning from a permitted origin status (`OPEN`, `IN_PROGRESS`, `WAITING_FOR_REQUESTER`, or `REOPENED`) to `RESOLVED`, the server evaluates the 4-condition Resolution Gate: (1) `ownerId !== null` (`OWNER_REQUIRED`), (2) `itPriority !== null` (`PRIORITY_REQUIRED`), (3) at least one `ActionTaken` has `status = 'COMPLETED'` and a non-empty `result` (`COMPLETED_ACTION_REQUIRED`), and (4) zero actions have unresolved follow-ups (`followUpRequired = true AND status != 'COMPLETED'` — `OPEN_FOLLOW_UPS_EXIST`). Failing any condition returns HTTP 422 `RESOLUTION_GATE_FAILED`. Advisory Requester signals ("Problem Appears Resolved") do NOT bypass the gate. |
 | **BR-14** | **Optimistic Concurrency Control** | Every update to an `ActionTaken` or a `Ticket` status must supply the known entity `version`. If the submitted version does not match the current database version, the update is aborted with HTTP 409 Conflict returning current entity state. |
 | **BR-15** | **Duplicate Submission Guard** | Create endpoints accept an optional idempotency identifier (`Idempotency-Key` header or `clientSubmissionId`). Submitting the same identifier returns the existing record without creating duplicate entries. Client UI disables submit buttons during in-flight requests. |
-| **BR-16** | **Requester Metric: Open Tickets** | Total count of non-terminal tickets owned by the requester: `requesterId = user.id` AND `currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')`. |
+| **BR-16** | **Requester Metric: Open Tickets** | Total count of active open tickets owned by the requester using unified `ACTIVE_OPEN_STATUSES`: `requesterId = user.id` AND `currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')`. |
 | **BR-17** | **Requester Metric: Waiting for Requester** | Count of tickets owned by the requester where `currentStatus = 'WAITING_FOR_REQUESTER'`. Highlights items requiring requester action. |
 | **BR-18** | **Requester Metric: Recently Updated** | List of the 5 most recently updated tickets owned by the requester (`orderBy: { updatedAt: 'desc' }`). |
-| **BR-19** | **Requester Metric: Resolved & Closed** | Count of tickets in `RESOLVED` (resolved within last 30 days) and total count in `CLOSED`. List of top 5 recently resolved tickets. |
-| **BR-20** | **Staff Metric: Unassigned Queue** | Total count of non-terminal tickets where `ownerId IS NULL` and `currentStatus NOT IN ('CLOSED', 'CANCELLED')`. |
-| **BR-21** | **Staff Metric: My Assigned Tickets** | Total count of non-terminal tickets where `ownerId = user.id` and `currentStatus NOT IN ('CLOSED', 'CANCELLED')`. |
-| **BR-22** | **Staff Metric: Status & Priority Distributions** | Real-time counts of active tickets grouped by `currentStatus` and grouped by `itPriority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`). |
+| **BR-19** | **Requester Metric: Resolved & Closed** | Count of tickets in `RESOLVED` within the **30-day rolling window** (`currentStatus = 'RESOLVED' AND updatedAt >= NOW() - INTERVAL '30 days'`, evaluated in `Asia/Bangkok UTC+7`) and total count in `CLOSED`. List of top 5 recently resolved tickets. |
+| **BR-20** | **Staff Metric: Unassigned Queue** | Total count of active open tickets where `ownerId IS NULL` and `currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')` (unified `ACTIVE_OPEN_STATUSES`). |
+| **BR-21** | **Staff Metric: My Assigned Tickets** | Total count of active open tickets where `ownerId = user.id` and `currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')` (unified `ACTIVE_OPEN_STATUSES`). |
+| **BR-22** | **Staff Metric: Status & Priority Distributions** | Real-time counts of active open tickets (`currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')`) and full distribution grouped by `currentStatus` and `itPriority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`). |
 | **BR-23** | **Staff Metric: My Recent Actions Taken** | List of the 5 most recent `ActionTaken` records performed by the current staff user (`performedById = user.id`, ordered by `actionDateTime DESC, createdAt DESC`). |
-| **BR-24** | **Staff Metric: Urgent Attention List** | Top 5 active tickets where `itPriority = 'URGENT'`, ordered by `createdAt ASC`. |
+| **BR-24** | **Staff Metric: Urgent Attention List** | Top 5 active open tickets (`currentStatus IN ('NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED')`) where `itPriority = 'URGENT'`, ordered by `createdAt ASC`. |
 | **BR-25** | **Admin Metric: System Overview** | When accessed by an Administrator, the dashboard includes all IT Staff metrics plus user account distributions: total users, active vs deactivated, and breakdown by role (`REQUESTER`, `STAFF`, `ADMIN`). |
 | **BR-26** | **Legacy Ticket Compatibility** | Existing tickets from Labs 1–3 having zero Actions Taken remain completely valid. Dashboard queries and ticket detail views handle empty action collections without errors. |
 
@@ -131,23 +131,26 @@ The stakeholder requires advancing TokTickIT from a basic communication and tick
 | `NEW` | `CANCELLED` | STAFF, ADMIN, REQUESTER (own) | Confirmation prompt | Terminal state; reason logged |
 | `OPEN` | `IN_PROGRESS` | STAFF, ADMIN | None | Investigation begins |
 | `OPEN` | `WAITING_FOR_REQUESTER` | STAFF, ADMIN | None | Requires public comment prompt |
-| `OPEN` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner assigned + ≥1 Action with result | Confirmation dialog required |
+| `OPEN` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner + Priority + ≥1 Completed Action with result + 0 open follow-ups | Confirmation dialog required |
 | `OPEN` | `CANCELLED` | STAFF, ADMIN, REQUESTER (own) | Confirmation prompt | Terminal state |
 | `IN_PROGRESS` | `WAITING_FOR_REQUESTER` | STAFF, ADMIN | None | Awaiting requester reply |
-| `IN_PROGRESS` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner assigned + ≥1 Action with result | Confirmation dialog required |
+| `IN_PROGRESS` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner + Priority + ≥1 Completed Action with result + 0 open follow-ups | Confirmation dialog required |
 | `IN_PROGRESS` | `CANCELLED` | STAFF, ADMIN | Confirmation prompt | Terminal state |
-| `IN_PROGRESS` | `OPEN` | STAFF, ADMIN | None | Returned to queue |
 | `WAITING_FOR_REQUESTER` | `IN_PROGRESS` | STAFF, ADMIN | Requester reply / Staff update | Active triage resumed |
-| `WAITING_FOR_REQUESTER` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner assigned + ≥1 Action with result | Confirmation dialog required |
+| `WAITING_FOR_REQUESTER` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner + Priority + ≥1 Completed Action with result + 0 open follow-ups | Confirmation dialog required |
 | `WAITING_FOR_REQUESTER` | `CANCELLED` | STAFF, ADMIN, REQUESTER (own) | Confirmation prompt | Terminal state |
 | `RESOLVED` | `CLOSED` | STAFF, ADMIN | Confirmation dialog | Formal closure |
 | `RESOLVED` | `REOPENED` | STAFF, ADMIN, REQUESTER (own) | Confirmation dialog | Reopened for rework |
 | `CLOSED` | `REOPENED` | STAFF, ADMIN | Confirmation dialog | Reopened investigation |
 | `REOPENED` | `IN_PROGRESS` | STAFF, ADMIN | None | Work resumed |
 | `REOPENED` | `WAITING_FOR_REQUESTER` | STAFF, ADMIN | None | Information requested from requester |
-| `REOPENED` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner assigned + ≥1 Action with result | Confirmation dialog required |
+| `REOPENED` | `RESOLVED` | STAFF, ADMIN | **Resolution Gate (BR-13)**: Owner + Priority + ≥1 Completed Action with result + 0 open follow-ups | Confirmation dialog required |
 | `REOPENED` | `CANCELLED` | STAFF, ADMIN | Confirmation prompt | Terminal state |
 | `CANCELLED` | *(None - Terminal)* | None | Immutable terminal state | No transitions allowed |
+
+### 5.2 Two-Step Enforcement Order (`PATCH /api/staff/tickets/:id/status`)
+1. **Step 1 — Transition Matrix Validation (`BR-12`)**: The server checks whether `targetStatus` is in `VALID_TRANSITIONS[currentStatus]` and permitted for `req.user.role`. If disallowed (e.g., `NEW -> RESOLVED` or `IN_PROGRESS -> OPEN`), the server immediately returns `HTTP 400 INVALID_TRANSITION`.
+2. **Step 2 — Resolution Gate Validation (`BR-13`)**: Only when `targetStatus === 'RESOLVED'` and the transition passed Step 1 (`OPEN -> RESOLVED`, `IN_PROGRESS -> RESOLVED`, `WAITING_FOR_REQUESTER -> RESOLVED`, or `REOPENED -> RESOLVED`), the server evaluates all 4 Resolution Gate conditions (`OWNER_REQUIRED`, `PRIORITY_REQUIRED`, `COMPLETED_ACTION_REQUIRED`, `OPEN_FOLLOW_UPS_EXIST`) and returns `HTTP 422 RESOLUTION_GATE_FAILED` if any condition is unmet.
 
 ---
 

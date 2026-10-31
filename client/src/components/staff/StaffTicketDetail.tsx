@@ -44,12 +44,12 @@ const getPriorityBadgeClass = (priority?: string) => {
 
 const PERMITTED_TRANSITIONS: Record<string, string[]> = {
   NEW: ['OPEN', 'IN_PROGRESS', 'CANCELLED'],
-  OPEN: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'IN_PROGRESS'],
-  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'OPEN'],
+  OPEN: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
+  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   WAITING_FOR_REQUESTER: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
   RESOLVED: ['CLOSED', 'REOPENED'],
   CLOSED: ['REOPENED'],
-  REOPENED: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
+  REOPENED: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   CANCELLED: [],
 };
 
@@ -315,7 +315,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           ← Back to Ticket Queue
         </button>
         <div role="alert" className="tkt-alert-error">
-          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="20" height="20" className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>{error || 'Ticket not found.'}</div>
@@ -349,7 +349,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
       {statusError && (
         <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1rem' }}>
-          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="20" height="20" className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>{statusError}</div>
@@ -508,7 +508,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {/* Append-only Status History Timeline (Part 7) */}
       <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.2rem' }}>📜</span>
+          <svg width="18" height="18" className="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
             Ticket Status History ({ticket.statusHistory?.length || 0})
           </h3>
@@ -547,12 +549,14 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   </span>
                 </div>
                 <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
-                  {new Date(hist.changedAt).toLocaleString('th-TH', {
-                    year: 'numeric',
+                  {new Date(hist.changedAt).toLocaleString('en-GB', {
+                    timeZone: 'Asia/Bangkok',
+                    day: '2-digit',
                     month: 'short',
-                    day: 'numeric',
+                    year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: false,
                   })}
                 </div>
               </div>
@@ -564,7 +568,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {/* Attachments Section for Staff */}
       <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-          <span style={{ fontSize: '1.2rem' }}>📎</span>
+          <svg width="18" height="18" className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
           <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
             Attachments ({activeAttachments.length})
           </h3>
@@ -596,7 +602,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
         {downloadError && (
           <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
-            <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="16" height="16" className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{downloadError}</span>
@@ -621,12 +627,21 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                     ({(a.sizeBytes / 1024).toFixed(1)} KB)
                   </span>
                 </div>
-                <button
-                  onClick={() => setRemovingAttachment(a)}
-                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
-                >
-                  Remove
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                    style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#006B3C', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '6px', cursor: 'pointer' }}
+                  >
+                    Download
+                  </button>
+                  <button
+                    onClick={() => setRemovingAttachment(a)}
+                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))
           )}
@@ -634,14 +649,17 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       </div>
 
       {/* Communications Grid: Public Comments & Private Internal Notes Side-by-Side */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
-        <div className="tkt-detail-card" style={{ margin: 0 }}>
+      <div data-testid="communications-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+        <div className="tkt-detail-card" style={{ margin: 0, borderTop: '4px solid #006B3C' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+            <svg width="18" height="18" className="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
               Public Comments ({publicComments.length})
             </h3>
             <span className="tkt-pill tkt-pill-status-in-progress" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
-              Visible to Requester
+              SHARED • Visible to Requester
             </span>
           </div>
           <PublicCommentsSection
@@ -651,21 +669,11 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           />
         </div>
 
-        <div className="tkt-detail-card" style={{ margin: 0, backgroundColor: '#fffdfa', borderColor: '#fde68a' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #fde68a', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#92400e' }}>
-              Private Internal Notes ({internalNotes.length})
-            </h3>
-            <span className="tkt-pill tkt-pill-status-pending" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
-              IT Staff & Admins Only
-            </span>
-          </div>
-          <InternalNotesSection
-            ticketId={ticket.id}
-            notes={internalNotes}
-            onNoteAdded={fetchTicketDetail}
-          />
-        </div>
+        <InternalNotesSection
+          ticketId={ticket.id}
+          notes={internalNotes}
+          onNoteAdded={fetchTicketDetail}
+        />
       </div>
 
       {/* Attachment Soft Removal Modal for Staff */}

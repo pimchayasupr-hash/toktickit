@@ -273,7 +273,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
           ← Back to My Tickets
         </button>
         <div role="alert" className="tkt-alert-error" data-testid="ticket-detail-error">
-          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="20" height="20" className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>{error || 'Ticket not found.'}</div>
@@ -455,7 +455,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             onClick={() => setActiveTab('attachments')}
             className={`tkt-tab-nav-btn ${activeTab === 'attachments' ? 'active' : ''}`}
           >
-            <span>📎</span> Attachments ({activeAttachments.length})
+            Attachments ({activeAttachments.length})
           </button>
         </div>
 
@@ -506,12 +506,14 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                         </span>
                       </div>
                       <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
-                        {new Date(hist.changedAt).toLocaleString('th-TH', {
-                          year: 'numeric',
+                        {new Date(hist.changedAt).toLocaleString('en-GB', {
+                          timeZone: 'Asia/Bangkok',
+                          day: '2-digit',
                           month: 'short',
-                          day: 'numeric',
+                          year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          hour12: false,
                         })}
                       </div>
                     </div>
@@ -552,7 +554,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
 
               {downloadError && (
                 <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
-                  <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg width="16" height="16" className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                   <span>{downloadError}</span>
@@ -571,18 +573,27 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                           onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
                           style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                         >
-                          📎 {a.originalFilename}
+                          {a.originalFilename}
                         </button>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                           ({(a.sizeBytes / 1024).toFixed(1)} KB)
                         </span>
                       </div>
-                      <button
-                        onClick={() => setRemovingAttachment(a)}
-                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        Remove
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#006B3C', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          Download
+                        </button>
+                        <button
+                          onClick={() => setRemovingAttachment(a)}
+                          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#dc2626', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

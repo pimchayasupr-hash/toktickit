@@ -1,0 +1,50 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.10 /Users/pimchayasuprateravarnit/toktickit/server
+
+stdout | tests/lab-04/ticket-workflow.api.test.ts
+◇ injected env (2) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-02: Transition to RESOLVED on unassigned ticket is blocked by Resolution Gate
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-03: Transition to RESOLVED with zero actions is blocked by Resolution Gate
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-04: Status transition with stale ticket version returns 409 Conflict
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-05: Disallowed status transition (e.g. NEW directly to RESOLVED) returns 400/422
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-01: Transition to RESOLVED succeeds when owner is assigned and action is documented
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-06: Omitting version on status write returns 400 validation error
+ ✓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-07: Append-only TicketStatusHistory records actor-attributed transitions in same transaction 463ms
+ ↓ tests/lab-04/ticket-workflow.api.test.ts > Lab 4 - Ticket Workflow & Resolution Gate API Test Suite > TEST-WFK-08: Concurrent status updates: atomic DB lock guarantees one 200, one 409, and zero duplicate history
+stdout | tests/lab-04/actions-taken.api.test.ts
+◇ injected env (2) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-01: Create valid Action Taken under active ticket by IT Staff
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-02: Create valid Action Taken by Administrator
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-03: Performer session binding ignores spoofed performedById in request body
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-04: Staff member can log action on ticket owned by different staff member
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-05: Missing, invalid, or future (>5 min) actionDateTime returns 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-06: actionDateTime earlier than Ticket.createdAt returns 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-07: Missing or whitespace-only description/result returns 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-08: followUpRequired=true without followUpNote returns 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-09: followUpRequired=false clears followUpNote to null
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-10: Requester role receives 403 Forbidden on create attempt
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-11: Requester accessing actions on another requester ticket returns 404
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-12: Requester can view actions on own ticket
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-13: Attempt to create action on CLOSED or CANCELLED ticket returns 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-14: Edit Action Taken updates record and increments version
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-15: Edit Action Taken with stale version returns 409 Conflict
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-16: Stored XSS payload is sanitized / escaped safely
+ ✓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-17: DELETE /api/tickets/:ticketId/actions-taken/:actionId returns 404 or 405 (append-only) 154ms
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-18: Action Taken assignment to active staff member succeeds
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-19: Inactive assignee assignment is strictly rejected with 400
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-20: Action Taken lifecycle: PENDING -> IN_PROGRESS -> COMPLETED requires result
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-21: Action Taken cancellation enforces terminal immutability
+ ↓ tests/lab-04/actions-taken.api.test.ts > Lab 4 - Actions Taken API Test Suite > TEST-ACT-22: Concurrent writes on Action Taken: atomic lock ensures exactly one winner (200) and one conflict (409)
+
+ Test Files  2 passed (2)
+      Tests  2 passed | 28 skipped (30)
+   Start at  17:26:57
+   Duration  1.32s (transform 111ms, setup 0ms, import 484ms, tests 619ms, environment 0ms)
+

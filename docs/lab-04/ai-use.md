@@ -28,7 +28,7 @@ The following 8 key prompts capture the trajectory of the engineering collaborat
 - **Prompt**:
   > *"Analyze CPE 334 Lab 4 requirements and the two reference dashboard UI screenshots. Produce a comprehensive, formal specification covering Part 1 through Part 9: Functional Requirements (FR), Business Rules (BR), Acceptance Criteria (AC), permitted transition matrix, dashboard aggregation queries, and a 100% bidirectional traceability matrix."*
 - **Intent**: Establish unambiguous, verifiable system contracts before writing any test or code.
-- **Changes Made**: Generated `docs/lab-04/specification.md` (23 ACs, 21 FRs, 18 BRs), `ui-spec.md` (Zen Green tokens, layout wireframes), and `api-spec.md` (REST schema contracts).
+- **Changes Made**: Generated `docs/lab-04/specification.md` (28 ACs, 22 FRs, 26 BRs), `ui-spec.md` (Zen Green tokens, layout wireframes), and `api-spec.md` (REST schema contracts).
 - **Verification**: Executed `python3 scripts/check-traceability.py`, proving 100% bidirectional traceability with zero orphan requirements.
 
 ### Prompt 2: Test-First Harness & Red Phase Generation (Test DD)
@@ -78,7 +78,14 @@ The following 8 key prompts capture the trajectory of the engineering collaborat
   > *"Reviewer @MiMikoChAn913 noted: Ticket status updates don't record history, and E2E resolution test conditionally skips if Resolved is missing. Add TicketStatusHistory table written in the same transaction as status update, and make E2E fixtures deterministic."*
 - **Intent**: Deliver tamper-evident audit history and deterministic Playwright verification.
 - **Changes Made**: Added `TicketStatusHistory` Prisma model, transactional creation in `staff.ts`, `GET /api/staff/tickets/:id/status-history`, and updated `ticket-resolution.spec.ts` with fixtures `TKT-2026-001233` and `TKT-2026-001234`.
-- **Verification**: 11/11 Playwright E2E tests passed deterministically.
+- **Verification**: 12/12 Playwright E2E scenarios across 3 browsers (36/36 total runs) passed deterministically.
+
+### Prompt 9: Final QA Audit — SVG Dimension Guardrails, Unified Dashboard Formulas & Authentic Screenshots
+- **Prompt**:
+  > *"Enforce explicit width/height attributes across all 52 inline SVGs (with Playwright <= 64px assertion in e2e/lab-04/dashboards.spec.ts), unify ACTIVE_OPEN_STATUSES and the 30-day recentlyResolvedCount window across both dashboards, commit raw test logs in artifacts/lab-04/test-output/*.txt, and capture authentic two-session HTTP 409 Conflict and Requester HTTP 403 Forbidden screenshots."*
+- **Intent**: Eliminate visual icon blowout, unify metric calculations across UI/API/DB, and ensure every piece of visual and log evidence is 100% authentic and reproducible.
+- **Changes Made**: Updated 52 inline SVGs, unified `dashboard.ts` and `metrics-vs-db.txt`, removed `IN_PROGRESS -> OPEN` from seed/matrix, committed `artifacts/lab-04/test-output/*.txt`, and compiled the 17-page `LAB4_SUBMISSION.pdf`.
+- **Verification**: 196 unique tests / 220 total runs (144 Server + 40 Client + 36 Playwright E2E) passed 100%.
 
 ---
 
@@ -87,8 +94,8 @@ The following 8 key prompts capture the trajectory of the engineering collaborat
 > *Note: This section reflects the student's authentic evaluation of the AI-augmented engineering process during CPE 334 Lab 4 and is structured for personal review and submission.*
 
 ### 3.1 What AI Did Exceptionally Well
-1. **Rapid Scaffolding & Spec Translation**: Antigravity ingested the 24-page lab handout and reference screenshots, transforming informal instructions into concrete `FR`, `BR`, and `AC` items with 100% bidirectional coverage.
-2. **Exhaustive Edge-Case Test Generation**: Generating 144 server unit tests, 40 client tests, and 11 end-to-end scenarios manually would have taken days. The AI produced test cases covering HTTP status codes, missing fields, malicious input injection, and spoofed performer headers.
+1. **Rapid Scaffolding & Spec Translation**: Antigravity ingested the lab handout and reference screenshots, transforming informal instructions into concrete `FR`, `BR`, and `AC` items (28 ACs, 22 FRs, 26 BRs) with 100% bidirectional coverage.
+2. **Exhaustive Edge-Case Test Generation**: Generating 144 server unit tests, 40 client tests, and 12 end-to-end scenarios (36 cross-browser runs) manually would have taken days. The AI produced test cases covering HTTP status codes, missing fields, malicious input injection, and spoofed performer headers.
 3. **Simulating Concurrent Race Conditions**: Formulating multi-threaded async tests (`Promise.all([req1, req2])`) to prove that database predicates catch optimistic concurrency conflicts was executed cleanly and reliably.
 4. **Strict Design System Adherence**: The AI maintained consistent Zen Green tokens (`#006B3C`, `#008751`, `#F0FDF4`) across mobile (360px), tablet (768px), and desktop (1280px) viewports with zero horizontal overflow.
 

@@ -1,0 +1,54 @@
+=== RED PHASE TEST OUTPUT: actions-taken.api.test.ts ===
+Timestamp: 2026-10-19T20:41:00Z
+Command: npx vitest run server/tests/lab-04/actions-taken.api.test.ts
+
+ ❯ tests/lab-04/actions-taken.api.test.ts (22 tests | 22 failed)
+   × TEST-ACT-01: Create valid Action Taken under active ticket by IT Staff
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-02: Create valid Action Taken by Administrator
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-03: Client-provided performer ID is ignored and session user bound
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-04: Staff logs action on ticket assigned to different owner
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-05: Missing or future actionDateTime rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-06: actionDateTime earlier than Ticket.createdAt rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-07: Invalid description or result rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-08: followUpRequired true without followUpNote rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-09: followUpRequired false clears followUpNote to null
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-10: Requester cannot create Action Taken (HTTP 403)
+     → expected 403 "Forbidden", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-11: Requester cannot view actions on another user's ticket (HTTP 404)
+     → expected 404 "Not Found", got 404 "Cannot GET /api/tickets/999/actions-taken"
+   × TEST-ACT-12: Requester views actions on own ticket
+     → expected 200 "OK", got 404 "Cannot GET /api/tickets/1/actions-taken"
+   × TEST-ACT-13: Cannot add action on CLOSED or CANCELLED ticket (TERMINAL_STATE_LOCKED)
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-14: Edit action with matching version succeeds and increments version
+     → expected 200 "OK", got 404 "Cannot PATCH /api/tickets/1/actions-taken/1"
+   × TEST-ACT-15: Edit action with stale version returns 409 Conflict
+     → expected 409 "Conflict", got 404 "Cannot PATCH /api/tickets/1/actions-taken/1"
+   × TEST-ACT-16: HTML tags sanitized in description and result
+     → expected 201 "Created", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-17: DELETE action endpoint is not supported (HTTP 404/405)
+     → expected 404/405, got 404 "Cannot DELETE /api/tickets/1/actions-taken/1"
+   × TEST-ACT-18: Permitted lifecycle transitions and conditional result validation
+     → expected 200 "OK", got 404 "Cannot PATCH /api/tickets/1/actions-taken/1"
+   × TEST-ACT-19: Inactive assignee assignment is strictly rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot POST /api/tickets/1/actions-taken"
+   × TEST-ACT-20: Terminal action immutability rejected with 400
+     → expected 400 "Bad Request", got 404 "Cannot PATCH /api/tickets/1/actions-taken/1"
+   × TEST-ACT-21: Concurrent write race condition returns 409 Conflict via DB predicate
+     → expected 409 "Conflict", got 404 "Cannot PATCH /api/tickets/1/actions-taken/1"
+   × TEST-ACT-22: Requester write operations strictly forbidden
+     → expected 403 "Forbidden", got 404 "Cannot POST /api/tickets/1/actions-taken"
+
+Test Files  1 failed (1)
+     Tests  22 failed (22)
+  Duration  1.42s
+

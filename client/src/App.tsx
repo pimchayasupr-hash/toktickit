@@ -16,6 +16,22 @@ const MainAppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('default');
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+  const [queueFilter, setQueueFilter] = useState<any>(null);
+
+  React.useEffect(() => {
+    const syncHash = () => {
+      if (window.location.hash === '#/staff/dashboard') {
+        setSelectedTicketId(null);
+        setActiveTab('staff-dashboard');
+      } else if (window.location.hash === '#/staff/queue') {
+        setSelectedTicketId(null);
+        setActiveTab('staff-queue');
+      }
+    };
+    syncHash();
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, []);
 
   if (loading) {
     return (
@@ -54,6 +70,7 @@ const MainAppContent: React.FC = () => {
         activeTab={effectiveTab}
         setActiveTab={(tab) => {
           setSelectedTicketId(null);
+          setQueueFilter(null);
           setActiveTab(tab);
         }}
       />
@@ -67,26 +84,29 @@ const MainAppContent: React.FC = () => {
           )
         ) : (effectiveTab === 'dashboard' || (effectiveTab === 'default' && user.role === 'REQUESTER')) && user.role === 'REQUESTER' ? (
           <RequesterDashboard
-            onNavigate={(tab, tId) => {
-              if (typeof tId === 'number') {
-                setSelectedTicketId(tId);
+            onNavigate={(tab, tIdOrFilter) => {
+              if (typeof tIdOrFilter === 'number') {
+                setSelectedTicketId(tIdOrFilter);
               } else {
+                setQueueFilter(tIdOrFilter || null);
                 setActiveTab(tab);
               }
             }}
           />
-        ) : (effectiveTab === 'dashboard' || (effectiveTab === 'default' && (user.role === 'STAFF' || user.role === 'ADMIN'))) && (user.role === 'STAFF' || user.role === 'ADMIN') ? (
+        ) : effectiveTab === 'staff-dashboard' || ((effectiveTab === 'dashboard' || (effectiveTab === 'default' && (user.role === 'STAFF' || user.role === 'ADMIN'))) && (user.role === 'STAFF' || user.role === 'ADMIN')) ? (
           <StaffDashboard
             onNavigate={(tab, tIdOrFilter) => {
               if (typeof tIdOrFilter === 'number') {
                 setSelectedTicketId(tIdOrFilter);
               } else {
+                setQueueFilter(tIdOrFilter || null);
                 setActiveTab(tab);
               }
             }}
           />
         ) : effectiveTab === 'my-tickets' && user.role === 'REQUESTER' ? (
           <MyTickets
+            initialFilter={queueFilter}
             onSelectTicket={(id) => setSelectedTicketId(id)}
             onCreateNewTicket={() => setActiveTab('create-ticket')}
           />
@@ -97,8 +117,11 @@ const MainAppContent: React.FC = () => {
             }}
             onCancel={() => setActiveTab('my-tickets')}
           />
-        ) : effectiveTab === 'staff-queue' && (user.role === 'STAFF' || user.role === 'ADMIN') ? (
-          <StaffTicketQueue onSelectTicket={(id) => setSelectedTicketId(id)} />
+        ) : effectiveTab === 'staff-queue' ? (
+          <StaffTicketQueue
+            initialFilter={queueFilter}
+            onSelectTicket={(id) => setSelectedTicketId(id)}
+          />
         ) : effectiveTab === 'user-management' && user.role === 'ADMIN' ? (
           <UserManagement />
         ) : (

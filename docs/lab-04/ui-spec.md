@@ -16,6 +16,7 @@ Lab 4 maintains and enhances the **Zen Green** enterprise design language establ
 - **Border Neutral (`--color-border`)**: `#e2e8f0` (Card borders, dividers, form input borders).
 - **Background Slate (`--color-bg-body`)**: `#f8fafc` (Page background for optimal readability).
 - **Attention Amber (`--color-warning`)**: `#f59e0b` (Background `#fef3c7`, text `#92400e` for `WAITING_FOR_REQUESTER` alert banners).
+- **Confidential Amber (`--color-confidential`)**: Surface `#FFFBEB`, border `2px solid #D97706`, text `#92400E`, and pill badge `CONFIDENTIAL • IT Staff & Admins Only` for `InternalNotesSection.tsx` (strictly visually differentiated from `PublicCommentsSection.tsx`, which uses `#FFFFFF` surface, `3px solid #006B3C` top border, and `SHARED • Visible to Requester` badge).
 - **Urgent Crimson (`--color-danger`)**: `#dc2626` (Background `#fee2e2`, text `#991b1b` for urgent priority badges and conflict warnings).
 
 ### 1.2 Status & Priority Badges (CSS Token Classes)
@@ -107,14 +108,14 @@ Rounded pill badges (`.tkt-pill`, `.badge.rounded-pill`) provide high visual rec
 Located on the Ticket Detail screen directly below the ticket summary and above the Public Comments thread.
 
 #### 1. Header & Controls:
-- Section Heading: `🛠️ Actions Taken ([Count])`.
-- IT Staff / Admin: "+ Add Action Taken" button (disabled if ticket is in `CLOSED` or `CANCELLED`).
+- Section Heading: `Actions Taken ([Count])` with inline SVG wrench icon (`width="18" height="18"`).
+- IT Staff / Admin: `+ Add Action` button (disabled if ticket is in `CLOSED` or `CANCELLED`).
 - Requester: Displays count with informative subtitle: *"Chronological log of diagnostic and remediation actions performed by IT Staff."*
 
 #### 2. Action Taken Card / Row Elements:
 Each entry renders in a clean card (`.tkt-action-card`):
 - **Card Header**:
-  - Left: Status Badge (`⏳ Pending`, `⚙ In Progress`, `✓ Completed`, `✕ Cancelled`), Action Date/Time formatted in `Asia/Bangkok` (`YYYY-MM-DD HH:mm`), Performed by badge (Performer Name), Assignee badge (`👤 Assignee: [Name]`).
+  - Left: Status Badge (`Pending`, `In Progress`, `Completed`, `Cancelled`), Action Date/Time formatted in `en-GB` (`Asia/Bangkok UTC+7`, `DD MMM YYYY, HH:mm`), Performed by badge (Performer Name), Assignee badge (`Assignee: [Name]`).
   - Right: Follow-up badge (`Follow-up Required` in amber), Terminal lock label (`(Terminal / Immutable)` for Completed and Cancelled actions), Quick Transition buttons (`Start Work`, `Complete`, `Cancel`), and Edit button (Staff/Admin only on non-terminal actions).
 - **Card Body**:
   - **Action Description**: Clearly labeled technical action text.
@@ -124,9 +125,9 @@ Each entry renders in a clean card (`.tkt-action-card`):
 - **Audit Footer**: "Created [Timestamp] by [User]" • If edited: "Edited [Timestamp] by [User] (v[Version])".
 
 #### 2.1 Ticket Status History Timeline Card (`StaffTicketDetail.tsx` & `TicketDetail.tsx`):
-- **Card Title**: `📜 Ticket Status History ([Count])`
+- **Card Title**: `Ticket Status History ([Count])` with inline SVG clock icon (`width="18" height="18"`)
 - **Audit Subtitle**: `Append-Only Audit Log`
-- **Timeline Items**: Each row displays `[fromStatus] → [toStatus]`, changed by `[Performer Name] ([Role])`, and localized timestamp (`Asia/Bangkok`).
+- **Timeline Items**: Each row displays `[fromStatus] → [toStatus]`, changed by `[Performer Name] ([Role])`, and localized timestamp (`en-GB`, `Asia/Bangkok UTC+7`).
 - **Read-Only / Isolation**: Requesters view status history for their own tickets in a dedicated tab without mutation controls.
 
 #### 3. Create Mode Modal / Form:
