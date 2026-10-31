@@ -84,7 +84,7 @@ export const PublicCommentsSection: React.FC<PublicCommentsSectionProps> = ({ ti
 
         {error && (
           <div role="alert" className="tkt-alert-error" style={{ marginBottom: '0.75rem' }}>
-            <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="20" height="20" className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <div>{error}</div>
@@ -107,7 +107,7 @@ export const PublicCommentsSection: React.FC<PublicCommentsSectionProps> = ({ ti
               className="tkt-btn-primary inline-flex items-center gap-1.5"
               style={{ width: 'auto', padding: '0.65rem 1.25rem', whiteSpace: 'nowrap' }}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width="16" height="16" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
               {submitting ? 'Posting...' : 'Post Comment'}

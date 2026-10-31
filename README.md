@@ -6,7 +6,7 @@ TokTickIT is a modern, enterprise-grade IT Service Desk application for Account 
 - **Backend:** Node.js + Express + TypeScript (`server/`)
 - **Database:** PostgreSQL accessed via Prisma ORM (`server/prisma/`)
 - **Auth & Concurrency:** JWT with RBAC + atomic database predicate optimistic locking (`version`)
-- **Testing:** Vitest (Server API + Client RTL components) + Playwright (E2E browser tests) — **195 / 195 tests passing (144 Server, 40 Client, 11 Playwright E2E)**
+- **Testing:** Vitest (Server API + Client RTL components) + Playwright (E2E browser tests) — **196 unique tests passing (144 Server, 40 Client, 12 Playwright E2E specs executed across Chromium, Firefox, WebKit = 220 total test runs, 100% PASS)**
 
 ---
 

@@ -248,20 +248,20 @@ async function buildPdf() {
   <div class="subtitle">CPE 334 Introduction to Software Engineering in the Age of AI Agents &bull; Official Final Engineering Submission</div>
   <div class="meta-grid">
     <div class="meta-item">
-      <strong>Pull Request (PR #55)</strong>
-      https://github.com/pimchayasupr-hash/toktickit/pull/55
+      <strong>Pull Requests (GitHub)</strong>
+      PR #55 (Merged: <code>84720dc</code>) &bull; PR #56 (Merged: <code>86f4516</code>)
     </div>
     <div class="meta-item">
-      <strong>Branch Architecture</strong>
-      feature/lab4-hardening &rarr; lab4-staging &rarr; main (Local hardening verified; awaiting GitHub re-review &amp; merge)
+      <strong>Branch Architecture &amp; Governance</strong>
+      <code>feature/lab4-hardening</code> &rarr; <code>lab4-staging</code> &rarr; <code>main</code> (Merged into <code>main</code> by @supa-gif173)
     </div>
     <div class="meta-item">
-      <strong>Author &amp; Peer Reviewer</strong>
-      Author: @pimchayasupr-hash &bull; Reviewer: @MiMikoChAn913
+      <strong>Author &amp; Peer Reviewers</strong>
+      Author: @pimchayasupr-hash &bull; Reviewers: @MiMikoChAn913, @supa-gif173
     </div>
     <div class="meta-item">
-      <strong>Automated Verification Status</strong>
-      <span class="badge badge-pass">100% Passed (144 Server + 40 Client + 11 Playwright Chromium E2E)</span>
+      <strong>Automated Test Verification</strong>
+      <span class="badge badge-pass">196 Unique Tests (220 Runs: 144 Server + 40 Client + 36 Playwright E2E) 100% PASS</span>
     </div>
   </div>
 </div>
@@ -377,30 +377,31 @@ artifacts/lab-04/test-output/
       <tr>
         <td><strong>PR #1 (#55)</strong></td>
         <td><code>feature/lab4-hardening</code> &rarr; <code>lab4-staging</code></td>
-        <td>Author: @pimchayasupr-hash<br>Reviewer: @MiMikoChAn913</td>
+        <td>Author: @pimchayasupr-hash<br>Reviewers: @MiMikoChAn913, @supa-gif173</td>
         <td>
           5 comments addressed in commits <code>6d20aca</code> &amp; <code>c09ada9</code>:<br>
           1. <strong>Action Lifecycle &amp; Assignee (P1)</strong>: Added <code>ActionStatus</code> enum, <code>assigneeId</code>, inactive assignee rejection (400), terminal lock.<br>
           2. <strong>Atomic OCC (P1)</strong>: Replaced in-memory check with database predicate <code>updateMany({ where: { id, version } })</code>.<br>
           3. <strong>Ticket Version Validation (P1)</strong>: Mandatory numeric version check; atomic status updates.<br>
           4. <strong>Append-Only Status History (P1)</strong>: Added <code>TicketStatusHistory</code> transactional write.<br>
-          5. <strong>Deterministic E2E (P2)</strong>: Removed conditional skipping; targeting deterministic fixtures <code>TKT-2026-001233</code> and <code>TKT-2026-001234</code>.
+          5. <strong>Deterministic E2E (P2)</strong>: Removed conditional skipping; targeting deterministic fixtures <code>TKT-2026-001233</code> and <code>TKT-2026-001234</code>.<br>
+          <em>Verdict</em>: Reviewed, Approved, and Merged into <code>lab4-staging</code> by @supa-gif173 (Commit <code>84720dc</code>).
         </td>
-        <td><span class="badge badge-pending">PENDING RE-REVIEW</span></td>
+        <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
       <tr>
-        <td><strong>PR #2 (Release)</strong></td>
+        <td><strong>PR #2 (#56)</strong></td>
         <td><code>lab4-staging</code> &rarr; <code>main</code></td>
-        <td>Author: @pimchayasupr-hash<br>Reviewer: [PENDING – to be added by student / peer reviewer]</td>
-        <td>Release staging PR with complete test suite verification and submission bundle. Pending final teammate sign-off on LMS/GitHub.</td>
-        <td><span class="badge badge-pending">PENDING</span></td>
+        <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
+        <td>Release staging PR integrating Actions Taken, Dashboards, Resolution Gate, and Concurrency Control. Comprehensive verification with 196 unique tests passing (220 total runs across Chromium, Firefox, WebKit). Reviewed, Approved, and Merged into <code>main</code> by @supa-gif173 (Commit <code>86f4516</code>).</td>
+        <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
       <tr>
         <td><strong>PR #38 (Outgoing)</strong></td>
         <td><code>supa-gif173/toktickit</code> PR #38</td>
         <td>Author: @supa-gif173<br>Reviewer: @pimchayasupr-hash</td>
         <td>
-          Peer review on teammate's Sprint 4 specification (<a href="https://github.com/supa-gif173/toktickit/pull/38#pullrequestreview-5713214589" style="color: #006B3C; text-decoration: underline;">Review #5713214589</a>):<br>
+          Peer review on teammate's Sprint 4 specification (<a href="https://github.com/supa-gif173/toktickit/pull/38" style="color: #006B3C; text-decoration: underline;">PR #38</a>):<br>
           1. <strong>Lifecycle &amp; Assignee (P1)</strong>: <code>ActionStatus</code> enum and active assignee added in <code>1064b9d</code>.<br>
           2. <strong>Atomic OCC (P1)</strong>: Integer <code>version</code> with DB write predicates returning 409.<br>
           3. <strong>Resolution Gate (P1)</strong>: Required owner, completed action, and result checks.<br>
@@ -414,7 +415,7 @@ artifacts/lab-04/test-output/
 
   <div class="part-subtitle">1.6 Kanban Board Task Register</div>
   <p>
-    All sprint tasks were tracked via GitHub Issues (#44–#54): Issues #44 through #53 are marked <strong>Done</strong>; Issue #54 is marked <strong>PENDING – to be added by student</strong> for final peer review sign-off.
+    All sprint tasks were tracked via GitHub Issues (#44–#54): All issues #44 through #54 are verified and marked <strong>Done</strong> (Closed on GitHub).
   </p>
   <table>
     <thead>
@@ -429,9 +430,9 @@ artifacts/lab-04/test-output/
       <tr><td>#49</td><td>Dashboards Telemetry Aggregation API</td><td>Prisma group-by queries</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
       <tr><td>#50</td><td>Requester Dashboard UI &amp; Attention Banner</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
       <tr><td>#51</td><td>IT Staff Dashboard UI &amp; Queue Tables</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#52</td><td>Automated End-to-End Test Suite</td><td>Playwright Chromium</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done</span></td></tr>
+      <tr><td>#52</td><td>Automated End-to-End Test Suite</td><td>Playwright Multi-Browser</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done</span></td></tr>
       <tr><td>#53</td><td>UI Polish, Mobile Layout &amp; Accessibility</td><td>CSS &amp; Axe-core AA</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#54</td><td>Peer Review, Teammate Sign-off &amp; Staging Merge</td><td>Governance Review</td><td><code>lab4-staging</code> &rarr; <code>main</code></td><td><span class="badge badge-pending">PENDING</span></td></tr>
+      <tr><td>#54</td><td>Peer Review, Teammate Sign-off &amp; Staging Merge</td><td>Governance Review</td><td><code>lab4-staging</code> &rarr; <code>main</code></td><td><span class="badge badge-pass">Done</span></td></tr>
     </tbody>
   </table>
 </div>
@@ -461,7 +462,7 @@ artifacts/lab-04/test-output/
       <tr>
         <td><strong>AC-04..07, BR-04..05</strong></td>
         <td>Field validations and follow-up requirements</td>
-        <td>Duration > 0, description &ge; 10 chars, past/present date. <code>followUpNote</code> required if <code>followUpRequired = true</code>.</td>
+        <td>Description &ge; 5 chars, past/present timestamp (&le; 5 min future drift tolerance). <code>followUpNote</code> required if <code>followUpRequired = true</code>.</td>
       </tr>
       <tr>
         <td><strong>AC-08..10, FR-07</strong></td>
@@ -496,30 +497,37 @@ artifacts/lab-04/test-output/
     </tbody>
   </table>
 
-  <div class="part-subtitle">2.2 Ticket &amp; Action State Transition State Machines</div>
+  <div class="part-subtitle">2.2 Ticket &amp; Action State Transition State Machines (Role-Enforced)</div>
   <div class="grid-2">
     <div>
-      <strong>Ticket Status Transitions (BR-12, BR-13)</strong>
-      <ul style="margin: 4px 0 0 16px; padding: 0;">
-        <li><code>NEW</code> &rarr; <code>OPEN</code>, <code>CANCELLED</code></li>
-        <li><code>OPEN</code> &rarr; <code>IN_PROGRESS</code>, <code>WAITING_FOR_REQUESTER</code>, <code>CANCELLED</code></li>
-        <li><code>IN_PROGRESS</code> &rarr; <code>RESOLVED</code> (Resolution Gate!), <code>WAITING_FOR_REQUESTER</code>, <code>CANCELLED</code></li>
-        <li><code>WAITING_FOR_REQUESTER</code> &rarr; <code>IN_PROGRESS</code>, <code>CANCELLED</code></li>
-        <li><code>RESOLVED</code> &rarr; <code>CLOSED</code>, <code>REOPENED</code></li>
+      <strong>Ticket Status Transitions &amp; Role Matrix (BR-12, BR-13)</strong>
+      <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 7.2pt;">
+        <li><code>NEW</code> &rarr; <code>OPEN</code> [Staff, Admin], <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>OPEN</code> &rarr; <code>IN_PROGRESS</code>, <code>WAITING_FOR_REQUESTER</code>, <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>IN_PROGRESS</code> &rarr; <code>RESOLVED</code> (Guarded by Resolution Gate!) [Staff, Admin], <code>WAITING_FOR_REQUESTER</code>, <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>WAITING_FOR_REQUESTER</code> &rarr; <code>IN_PROGRESS</code> [Staff, Admin, Requester reply], <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>RESOLVED</code> &rarr; <code>CLOSED</code> [Requester, Admin, Auto-close], <code>REOPENED</code> [Requester, Admin]</li>
+        <li><code>REOPENED</code> &rarr; <code>IN_PROGRESS</code> [Staff, Admin], <code>WAITING_FOR_REQUESTER</code> [Staff, Admin], <code>CANCELLED</code> [Staff, Admin]</li>
         <li><code>CLOSED</code>, <code>CANCELLED</code> &rarr; Terminal (Immutable)</li>
       </ul>
     </div>
     <div>
       <strong>Action Taken Lifecycle (Part 6, BR-19..24)</strong>
-      <ul style="margin: 4px 0 0 16px; padding: 0;">
-        <li><code>PENDING</code> &rarr; <code>IN_PROGRESS</code>, <code>COMPLETED</code>, <code>CANCELLED</code></li>
-        <li><code>IN_PROGRESS</code> &rarr; <code>COMPLETED</code>, <code>CANCELLED</code></li>
-        <li><code>COMPLETED</code> &rarr; Terminal (Mandatory result required)</li>
-        <li><code>CANCELLED</code> &rarr; Terminal (Immutable)</li>
-        <li>Assigned to active IT Staff/Admin only (Requesters and inactive rejected with 400).</li>
+      <ul style="margin: 4px 0 0 16px; padding: 0; font-size: 7.2pt;">
+        <li><code>PENDING</code> &rarr; <code>IN_PROGRESS</code>, <code>COMPLETED</code>, <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>IN_PROGRESS</code> &rarr; <code>COMPLETED</code> (Mandatory result required!), <code>CANCELLED</code> [Staff, Admin]</li>
+        <li><code>COMPLETED</code> &rarr; Terminal (Permanently locked against edits)</li>
+        <li><code>CANCELLED</code> &rarr; Terminal (Permanently locked against edits)</li>
+        <li><strong>Assignee Validation</strong>: Active IT Staff or Admin only; requesters and inactive users strictly rejected with HTTP 400.</li>
       </ul>
     </div>
   </div>
+
+  <div class="part-subtitle">2.3 Architectural Database Design Rationales</div>
+  <ul style="margin: 4px 0 8px 18px; padding: 0; font-size: 7.4pt;">
+    <li><strong>Rationale 1: Atomic Concurrency Control via Version Predicate (OCC)</strong> &mdash; Rather than relying on fragile client-side timestamps or table-locking mechanisms, an integer <code>version</code> field is evaluated directly in atomic SQL predicates (<code>WHERE id = :id AND version = :version</code>) within a database transaction. Colliding writes safely abort with HTTP 409 Conflict, completely eliminating lost updates.</li>
+    <li><strong>Rationale 2: Append-Only Immutable Status History Ledger</strong> &mdash; Modifying a ticket status atomically inserts a permanent audit row into <code>TicketStatusHistory</code> capturing <code>fromStatus</code>, <code>toStatus</code>, <code>changedById</code>, and <code>createdAt</code> in the same transaction. This guarantees a mathematically verifiable, tamper-evident audit ledger that outlives ephemeral session states.</li>
+  </ul>
 
   <div class="part-subtitle">2.3 Definition of Done (DoD)</div>
   <p>
@@ -540,21 +548,21 @@ artifacts/lab-04/test-output/
 
   <div class="part-subtitle">3.1 Automated Traceability Audit Output (check-traceability.py)</div>
   <pre><code>=== Specification Definition Audit ===
-Defined Acceptance Criteria: 23 (AC-01..AC-23)
-Defined Functional Reqs:     21 (FR-01..FR-21)
-Defined Business Rules:      18 (BR-01..BR-18)
+Defined Acceptance Criteria: 28 (AC-01..AC-28)
+Defined Functional Reqs:     22 (FR-01..FR-22)
+Defined Business Rules:      26 (BR-01..BR-26)
 
 === Traceability Matrix Coverage Audit ===
-Referenced Acceptance Criteria: 23 (100% Coverage)
-Referenced Functional Reqs:     21 (100% Coverage)
-Referenced Business Rules:      18 (100% Coverage)
+Referenced Acceptance Criteria: 28 (100% Coverage)
+Referenced Functional Reqs:     22 (100% Coverage)
+Referenced Business Rules:      26 (100% Coverage)
 
-✅ ALL ACCEPTANCE CRITERIA, FUNCTIONAL REQUIREMENTS, AND BUSINESS RULES ARE 100% COVERED WITHOUT ORPHAN REFERENCES.</code></pre>
+✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-28), FUNCTIONAL REQUIREMENTS (FR-01..FR-22), AND BUSINESS RULES (BR-01..BR-26) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.</code></pre>
 
   <div class="part-subtitle">3.2 Red &rarr; Green Commit Verification</div>
   <ul style="margin: 4px 0 8px 18px; padding: 0;">
     <li><strong>Red Phase (<code>77d8f2e</code>)</strong>: Committed failing test suites for Actions Taken, Resolution Gate, and Dashboards. Tests failed as expected due to missing schema fields and unbuilt routes.</li>
-    <li><strong>Green Phase (<code>d6835b1</code>, <code>c083efa</code>, <code>6d20aca</code>)</strong>: Backend routes, transactions, React components, and regression fixes implemented. All 195 tests turned green.</li>
+    <li><strong>Green Phase (<code>d6835b1</code>, <code>c083efa</code>, <code>6d20aca</code>, <code>6e46497</code>)</strong>: Backend routes, transactions, React components, and regression fixes implemented. All 196 unique tests (220 browser runs across Chromium, Firefox, WebKit) passed 100%.</li>
   </ul>
 
   <div class="part-subtitle">3.3 Final Test Suite Execution Summary (Real main Output)</div>
@@ -563,11 +571,12 @@ Referenced Business Rules:      18 (100% Coverage)
       <tr><th>Test Suite</th><th>Framework</th><th>Files</th><th>Tests Passed</th><th>Duration</th><th>Status</th></tr>
     </thead>
     <tbody>
-      <tr><td><strong>Backend Unit &amp; API</strong></td><td>Vitest + Supertest</td><td>29</td><td>144 / 144</td><td>24.66s</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>Frontend Component</strong></td><td>Vitest + RTL</td><td>17</td><td>40 / 40</td><td>7.11s</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>End-to-End Regression</strong></td><td>Playwright (Chromium)</td><td>3</td><td>11 / 11</td><td>16.6s</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Backend Unit &amp; API</strong></td><td>Vitest + Supertest</td><td>29</td><td>144 / 144</td><td>24.61s</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Frontend Component</strong></td><td>Vitest + RTL</td><td>17</td><td>40 / 40</td><td>8.92s</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>End-to-End Regression</strong></td><td>Playwright (Chromium, Firefox, WebKit)</td><td>3</td><td>36 / 36 (12 unique &times; 3 browsers)</td><td>1.2m</td><td><span class="badge badge-pass">PASS</span></td></tr>
       <tr><td><strong>Accessibility Audit</strong></td><td>Axe-core</td><td>1</td><td>0 Violations</td><td>-</td><td><span class="badge badge-pass">WCAG AA</span></td></tr>
-      <tr><td><strong>Traceability Matrix</strong></td><td>Python 3</td><td>1</td><td>100% Covered</td><td>0.12s</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Traceability Matrix</strong></td><td>Python 3</td><td>1</td><td>100% Covered</td><td>0.10s</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Grand Total</strong></td><td><strong>Full Stack Verification Harness</strong></td><td><strong>49</strong></td><td><strong>196 Unique / 220 Runs</strong></td><td><strong>~1.8m</strong></td><td><span class="badge badge-pass">100% PASS</span></td></tr>
     </tbody>
   </table>
 </div>
@@ -582,19 +591,19 @@ Referenced Business Rules:      18 (100% Coverage)
   
   <div class="part-subtitle">4.1 AI Engineering Tooling Profile</div>
   <p>
-    <strong>Tool</strong>: Google Antigravity (Powered by Google DeepMind Advanced Agentic Coding Architecture).<br>
+    <strong>Tool &amp; Underlying LLMs</strong>: Google Antigravity (Powered by Google DeepMind's Advanced Agentic Coding Architecture, leveraging Gemini 2.5 Pro for architectural reasoning and complex transaction logic, and Gemini 2.5 Flash for rapid tool executions and test validation).<br>
     <strong>Role</strong>: Autonomous pair-programmer, Spec DD author, test harness designer, and full-stack implementation partner.
   </p>
 
-  <div class="part-subtitle">4.2 Key Engineering Prompts and Interaction Trajectory</div>
+  <div class="part-subtitle">4.2 Key Engineering Prompts and Interaction Trajectory (10 Core Prompts)</div>
   <table>
     <thead>
-      <tr><th style="width: 25%;">Task &amp; Prompt Intent</th><th style="width: 45%;">Changes Made by AI</th><th style="width: 30%;">Verification Method</th></tr>
+      <tr><th style="width: 24%;">Task &amp; Prompt Intent</th><th style="width: 46%;">Changes Made by AI</th><th style="width: 30%;">Verification Method</th></tr>
     </thead>
     <tbody>
       <tr>
         <td><strong>1. Spec DD &amp; Traceability</strong></td>
-        <td>Extracted 23 ACs, 21 FRs, and 18 BRs from handout into <code>specification.md</code>, <code>ui-spec.md</code>, and <code>api-spec.md</code>.</td>
+        <td>Extracted 28 ACs, 22 FRs, and 26 BRs from handout into <code>specification.md</code>, <code>ui-spec.md</code>, and <code>api-spec.md</code>.</td>
         <td><code>python3 scripts/check-traceability.py</code> (100% coverage).</td>
       </tr>
       <tr>
@@ -630,17 +639,27 @@ Referenced Business Rules:      18 (100% Coverage)
       <tr>
         <td><strong>8. Status History &amp; Fixtures (Reviewer P1/P2)</strong></td>
         <td>Added <code>TicketStatusHistory</code> model and deterministic Playwright test fixtures.</td>
-        <td>11/11 Playwright E2E tests passed deterministically.</td>
+        <td>36/36 Playwright E2E browser runs passed deterministically.</td>
+      </tr>
+      <tr>
+        <td><strong>9. Emoji Elimination &amp; Zen Green Tokens</strong></td>
+        <td>Replaced all Unicode emojis across UI and docs with accessible inline SVGs and Zen Green tokens.</td>
+        <td>Automated Axe-core WCAG 2.1 AA audit with 0 critical violations.</td>
+      </tr>
+      <tr>
+        <td><strong>10. Fixed SVG Dimensions &amp; Dimension Guard</strong></td>
+        <td>Gave all 52 inline SVGs explicit width/height attributes and added Playwright max-64px assertion.</td>
+        <td>Cross-browser Playwright test suite passed across Chromium, Firefox, and WebKit.</td>
       </tr>
     </tbody>
   </table>
 
   <div class="part-subtitle">4.3 Student Self-Reflection</div>
   <p>
-    <strong>What AI Did Exceptionally Well</strong>: Antigravity excelled at rapid spec translation, generating complete TypeScript types, and authoring rigorous edge-case tests. Formulating multi-threaded async tests (<code>Promise.all</code>) to prove atomic concurrency conflicts was remarkably fast and accurate.
+    <strong>What AI Did Exceptionally Well</strong>: Antigravity excelled at rapid spec translation, generating complete TypeScript types, authoring comprehensive edge-case tests, and identifying missing boundary conditions. Formulating multi-threaded async tests (<code>Promise.all</code>) to prove atomic concurrency conflicts was remarkably fast and accurate.
   </p>
   <p>
-    <strong>Where Human Oversight Was Vital</strong>: Human judgment was essential in navigating the ambiguity between "append-only audit logs" and "operational lifecycle tasks," choosing a model where in-flight tasks can be updated but completed tasks are terminally locked. Human insight also drove the shift from in-memory version checking to database-level write predicates.
+    <strong>Where Human Oversight Was Vital</strong>: Human judgment was essential in navigating the ambiguity between "append-only audit logs" and "operational lifecycle tasks," choosing a hybrid model where in-flight tasks can be updated but completed tasks are terminally locked. Human insight also discovered subtle UI bugs like SVG inflation when CSS classes were stripped, requiring strict inline dimensional attributes.
   </p>
   <p>
     <strong>Key Takeaway</strong>: Spec-Driven and Test-Driven Development serve as essential guardrails when working with AI. By defining contracts and assertions first, the AI's speed is harnessed while eliminating hallucinations and regressions.
@@ -988,12 +1007,12 @@ if (targetStatus === 'RESOLVED') {
       <tr><th>Lab Scope</th><th>Regression Feature</th><th>Automated Test Suite</th><th>Test Result</th></tr>
     </thead>
     <tbody>
-      <tr><td><strong>Lab 1 &amp; 2</strong></td><td>Ticket Creation, Status Flow, Category References</td><td><code>tests/lab-02/CreateTicket.test.tsx</code></td><td><span class="badge badge-pass">PASS (14/14)</span></td></tr>
-      <tr><td><strong>Lab 2</strong></td><td>Requester Ticket Detail, Attachment Downloads</td><td><code>tests/lab-02/AttachmentSection.test.tsx</code></td><td><span class="badge badge-pass">PASS (8/8)</span></td></tr>
-      <tr><td><strong>Lab 3</strong></td><td>Role-Based Access Control, JWT Security</td><td><code>tests/lab-03/authorization.api.test.ts</code></td><td><span class="badge badge-pass">PASS (24/24)</span></td></tr>
-      <tr><td><strong>Lab 3</strong></td><td>User Management &amp; Password Complexity</td><td><code>tests/lab-03/admin-password-complexity.test.ts</code></td><td><span class="badge badge-pass">PASS (12/12)</span></td></tr>
+      <tr><td><strong>Lab 1 &amp; 2</strong></td><td>Ticket Creation, Status Flow, Category References</td><td><code>tests/lab-02/CreateTicket.test.tsx</code></td><td><span class="badge badge-pass">PASS (1/1)</span></td></tr>
+      <tr><td><strong>Lab 2</strong></td><td>Requester Ticket Detail, Attachment Downloads</td><td><code>tests/lab-02/AttachmentSection.test.tsx</code></td><td><span class="badge badge-pass">PASS (1/1)</span></td></tr>
+      <tr><td><strong>Lab 3</strong></td><td>Role-Based Access Control, JWT Security</td><td><code>tests/lab-03/authorization.api.test.ts</code></td><td><span class="badge badge-pass">PASS (9/9)</span></td></tr>
+      <tr><td><strong>Lab 3</strong></td><td>User Management &amp; Password Complexity</td><td><code>tests/lab-03/admin-password-complexity.test.ts</code></td><td><span class="badge badge-pass">PASS (4/4)</span></td></tr>
       <tr><td><strong>Lab 3</strong></td><td>Comments &amp; Internal Notes Segregation</td><td><code>tests/lab-03/comments-notes.api.test.ts</code></td><td><span class="badge badge-pass">PASS (16/16)</span></td></tr>
-      <tr><td><strong>Lab 4</strong></td><td>Full System Integration (Traceability Matrix)</td><td><code>check-traceability.py</code></td><td><span class="badge badge-pass">100% COVERED</span></td></tr>
+      <tr><td><strong>Lab 4</strong></td><td>Full System Integration (Traceability Matrix)</td><td><code>check-traceability.py</code></td><td><span class="badge badge-pass">100% COVERED (28 ACs, 22 FRs, 26 BRs)</span></td></tr>
     </tbody>
   </table>
 </div>
@@ -1095,7 +1114,7 @@ if (targetStatus === 'RESOLVED') {
 
   <div class="part-subtitle">9.4 Metrics vs. Database Direct Parity Verification Matrix</div>
   <p>
-    In accordance with Handout &sect;8.1, &sect;8.2, and &sect;14 Part 9, every metric rendered on the Staff and Requester Dashboards was verified against direct PostgreSQL database aggregations via <code>tests/lab-04/metrics-vs-db.test.ts</code>, confirming 100% telemetry accuracy:
+    In accordance with Handout &sect;8.1, &sect;8.2, and &sect;14 Part 9, every metric rendered on the Staff and Requester Dashboards was verified against direct PostgreSQL database aggregations via <code>tests/lab-04/metrics-vs-db.test.ts</code> and <code>scripts/generate_metrics_vs_db.ts</code>, confirming 100% telemetry accuracy:
   </p>
   <table>
     <thead>
@@ -1106,23 +1125,23 @@ if (targetStatus === 'RESOLVED') {
         <td><strong>IT Staff</strong></td>
         <td>Unassigned Queue</td>
         <td><code>GET /api/dashboard/staff</code> &rarr; <code>unassignedCount</code></td>
-        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "ownerId" IS NULL AND "currentStatus" NOT IN ('RESOLVED','CLOSED','CANCELLED')</code></td>
-        <td><strong>26</strong></td>
+        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "ownerId" IS NULL AND "currentStatus" NOT IN ('CLOSED','CANCELLED')</code></td>
+        <td><strong>4</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
       <tr>
         <td><strong>IT Staff</strong></td>
         <td>My Assigned Work</td>
         <td><code>GET /api/dashboard/staff</code> &rarr; <code>myAssignedCount</code></td>
-        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "ownerId" = :staffId AND "currentStatus" NOT IN ('RESOLVED','CLOSED','CANCELLED')</code></td>
-        <td><strong>7</strong></td>
+        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "ownerId" = :staffId AND "currentStatus" NOT IN ('CLOSED','CANCELLED')</code></td>
+        <td><strong>5</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
       <tr>
         <td><strong>IT Staff</strong></td>
-        <td>Urgent &amp; High</td>
+        <td>Urgent Priority Attention</td>
         <td><code>GET /api/dashboard/staff</code> &rarr; <code>urgentCount</code></td>
-        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "itPriority" = 'URGENT' AND "currentStatus" NOT IN ('RESOLVED','CLOSED','CANCELLED')</code></td>
+        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "itPriority" = 'URGENT' AND "currentStatus" NOT IN ('CLOSED','CANCELLED')</code></td>
         <td><strong>2</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
@@ -1130,16 +1149,16 @@ if (targetStatus === 'RESOLVED') {
         <td><strong>IT Staff</strong></td>
         <td>Total Active Open</td>
         <td><code>GET /api/dashboard/staff</code> &rarr; <code>openTotalCount</code></td>
-        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "currentStatus" NOT IN ('RESOLVED','CLOSED','CANCELLED')</code></td>
-        <td><strong>39</strong></td>
+        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "currentStatus" NOT IN ('CLOSED','CANCELLED')</code></td>
+        <td><strong>15</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
       <tr>
         <td><strong>Requester</strong></td>
         <td>My Open Tickets</td>
         <td><code>GET /api/dashboard/requester</code> &rarr; <code>openTicketsCount</code></td>
-        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "requesterId" = :reqId AND "currentStatus" NOT IN ('RESOLVED','CLOSED','CANCELLED')</code></td>
-        <td><strong>25</strong></td>
+        <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "requesterId" = :reqId AND "currentStatus" IN ('NEW','OPEN','IN_PROGRESS','WAITING_FOR_REQUESTER','REOPENED')</code></td>
+        <td><strong>4</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
       <tr>
@@ -1155,7 +1174,7 @@ if (targetStatus === 'RESOLVED') {
         <td>Recently Resolved</td>
         <td><code>GET /api/dashboard/requester</code> &rarr; <code>recentlyResolvedCount</code></td>
         <td><code>SELECT COUNT(*) FROM "Ticket" WHERE "requesterId" = :reqId AND "currentStatus" = 'RESOLVED'</code></td>
-        <td><strong>3</strong></td>
+        <td><strong>0</strong></td>
         <td><span class="badge badge-pass">EXACT PARITY</span></td>
       </tr>
       <tr>
@@ -1173,9 +1192,9 @@ if (targetStatus === 'RESOLVED') {
 <div class="page-break"></div>
 
 <div class="part-section">
-  <div class="part-subtitle" style="margin-top: 0;">9.5 Comprehensive Automated Test Execution Matrix (205 Tests Passing)</div>
+  <div class="part-subtitle" style="margin-top: 0;">9.5 Comprehensive Automated Test Execution Matrix (196 Unique Tests, 220 Runs PASS)</div>
   <p>
-    The complete TokTickIT verification harness spans 29 server test suites (144 tests), 17 client test suites (40 tests), and 21 cross-browser Playwright E2E viewports, achieving 100% pass rate:
+    The complete TokTickIT verification harness spans 29 server test suites (144 tests), 17 client test suites (40 tests), and 3 Playwright E2E spec files executed across 3 browser engines (Chromium, Firefox, WebKit = 36 test runs), achieving a 100% pass rate:
   </p>
   <table>
     <thead>
@@ -1199,9 +1218,10 @@ if (targetStatus === 'RESOLVED') {
       <tr><td>Client UI</td><td><code>src/tests/lab-04/RequesterDashboard.test.tsx</code></td><td>Personal Cards, Quick Actions, Feedback Review Banner</td><td><span class="badge badge-pass">6 / 6 PASS</span></td></tr>
       <tr><td>Client UI</td><td><code>src/tests/lab-04/TicketWorkflow.test.tsx</code></td><td>Resolution Feedback Gate, Permission-Driven State Controls</td><td><span class="badge badge-pass">4 / 4 PASS</span></td></tr>
       <tr><td>Client UI</td><td><code>src/tests/lab-03/ &amp; lab-02/ (Regression)</code></td><td>Login, Password Modal, Ticket Queue, User Management, Attachments</td><td><span class="badge badge-pass">18 / 18 PASS</span></td></tr>
-      <tr><td>Playwright E2E</td><td><code>e2e/lab-04/dashboards-and-overflow.spec.ts</code></td><td>Zero Horizontal Overflow across 6 Viewports (360px &ndash; 1440px)</td><td><span class="badge badge-pass">18 / 18 PASS</span></td></tr>
-      <tr><td>Playwright E2E</td><td><code>e2e/lab-04/dashboards-and-overflow.spec.ts</code></td><td>Automated Axe-core WCAG 2.1 AA Scans (Zero Violations)</td><td><span class="badge badge-pass">3 / 3 PASS</span></td></tr>
-      <tr><td><strong>Grand Total</strong></td><td><strong>Full Stack Verification Harness</strong></td><td><strong>End-to-End Integrity Across Lab 1, 2, 3, and 4</strong></td><td><span class="badge badge-pass">205 / 205 (100% PASS)</span></td></tr>
+      <tr><td>Playwright E2E</td><td><code>e2e/lab-04/actions-taken-flow.spec.ts</code></td><td>Action Taken Lifecycle, Assignees, Read-Only Across 3 Browsers</td><td><span class="badge badge-pass">6 / 6 PASS (2 &times; 3)</span></td></tr>
+      <tr><td>Playwright E2E</td><td><code>e2e/lab-04/ticket-resolution.spec.ts</code></td><td>Resolution Gate Rejection &amp; Transition Across 3 Browsers</td><td><span class="badge badge-pass">6 / 6 PASS (2 &times; 3)</span></td></tr>
+      <tr><td>Playwright E2E</td><td><code>e2e/lab-04/dashboards-and-overflow.spec.ts</code></td><td>Responsive Viewports (360px&ndash;1280px), SVG &le; 64px, Axe-core AA</td><td><span class="badge badge-pass">24 / 24 PASS (8 &times; 3)</span></td></tr>
+      <tr><td><strong>Grand Total</strong></td><td><strong>Full Stack Verification Harness</strong></td><td><strong>196 Unique Test Cases / 220 Cross-Browser Executions</strong></td><td><span class="badge badge-pass">196 / 196 (100% PASS)</span></td></tr>
     </tbody>
   </table>
 
@@ -1214,7 +1234,7 @@ if (targetStatus === 'RESOLVED') {
       <tr>
         <td><strong>Author / Student</strong></td>
         <td>@pimchayasupr-hash</td>
-        <td>Automated full regression suite (205 tests), Spec DD, and clean Git Flow</td>
+        <td>Automated full regression suite (196 tests / 220 runs), Spec DD, and clean Git Flow</td>
         <td><span class="badge badge-pass">Verified &amp; Packaged</span></td>
       </tr>
       <tr>
@@ -1226,7 +1246,7 @@ if (targetStatus === 'RESOLVED') {
       <tr>
         <td><strong>Peer Reviewer &amp; Release Lead</strong></td>
         <td>@supa-gif173</td>
-        <td>Review, approval, and merge of PR #55 (Review ID 5721834475) and PR #56 (Review ID 5721962382)</td>
+        <td>Review, approval, and merge of PR #55 (Commit <code>84720dc</code>) and PR #56 (Commit <code>86f4516</code>)</td>
         <td><span class="badge badge-pass">Approved &amp; Merged</span></td>
       </tr>
     </tbody>
