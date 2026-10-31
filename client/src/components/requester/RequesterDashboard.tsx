@@ -337,8 +337,8 @@ export const RequesterDashboard: React.FC<RequesterDashboardProps> = ({ onNaviga
 
           {isZeroTicket || recentTickets.length === 0 ? (
             <div className="p-12 text-center bg-slate-50/70 rounded-xl border border-dashed border-slate-200">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div style={{ width: '48px', height: '48px', margin: '0 auto 12px', borderRadius: '50%', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="24" height="24" fill="none" stroke="#065f46" viewBox="0 0 24 24" style={{ width: '24px', height: '24px' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
               </div>
@@ -352,7 +352,7 @@ export const RequesterDashboard: React.FC<RequesterDashboardProps> = ({ onNaviga
                 onClick={() => onNavigate && onNavigate('create-ticket')}
                 className="tkt-btn-action-primary mt-4 inline-flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '16px', height: '16px' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
                 Create Your First Ticket

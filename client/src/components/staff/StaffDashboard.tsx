@@ -145,8 +145,8 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
       return (
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-amber-50 border-2 border-amber-500 text-amber-900 p-6 rounded-2xl shadow-sm max-w-2xl mx-auto text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div style={{ width: '48px', height: '48px', margin: '0 auto 12px', borderRadius: '50%', backgroundColor: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="24" height="24" fill="none" stroke="#92400e" viewBox="0 0 24 24" style={{ width: '24px', height: '24px' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
