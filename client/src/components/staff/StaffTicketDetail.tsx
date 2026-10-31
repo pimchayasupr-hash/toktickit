@@ -3,6 +3,7 @@ import type { Ticket, User, Attachment } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { PublicCommentsSection } from '../comments/PublicCommentsSection';
 import { InternalNotesSection } from '../comments/InternalNotesSection';
+import { ActionsTakenSection } from './ActionsTakenSection';
 
 interface StaffTicketDetailProps {
   ticketId: number;
@@ -61,6 +62,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   // Action feedback
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   // File Upload State
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -111,6 +113,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
   const handleClaim = async () => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/claim`, {
         method: 'PATCH',
@@ -120,12 +123,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('Successfully claimed ticket ownership.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handleAssign = async (targetOwnerId: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/assign`, {
         method: 'PATCH',
@@ -139,12 +143,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('Ticket owner updated successfully.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handlePriorityChange = async (newPriority: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/priority`, {
         method: 'PATCH',
@@ -158,12 +163,13 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage('IT Priority updated successfully.');
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
   const handleStatusChange = async (newStatus: string) => {
     setActionMessage(null);
+    setStatusError(null);
     try {
       const res = await fetch(`/api/staff/tickets/${ticketId}/status`, {
         method: 'PATCH',
@@ -171,7 +177,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, version: ticket?.version }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -180,7 +186,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       setActionMessage(`Ticket status updated to ${newStatus}.`);
       fetchTicketDetail();
     } catch (err: any) {
-      setError(err.message);
+      setStatusError(err.message);
     }
   };
 
@@ -309,7 +315,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           ← Back to Ticket Queue
         </button>
         <div role="alert" className="tkt-alert-error">
-          <span>⚠️</span>
+          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <div>{error || 'Ticket not found.'}</div>
         </div>
       </div>
@@ -336,6 +344,15 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       {actionMessage && (
         <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.65rem 1rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '1rem' }}>
           {actionMessage}
+        </div>
+      )}
+
+      {statusError && (
+        <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1rem' }}>
+          <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>{statusError}</div>
         </div>
       )}
 
@@ -400,8 +417,9 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
           </div>
 
           <div>
-            <label className="tkt-label">Current Status</label>
+            <label htmlFor="ticketStatusSelect" className="tkt-label">Current Status</label>
             <select
+              id="ticketStatusSelect"
               value={ticket.currentStatus}
               onChange={(e) => handleStatusChange(e.target.value)}
               className="tkt-input"
@@ -480,6 +498,69 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </div>
       </div>
 
+      {/* Actions Taken Section for Staff */}
+      <ActionsTakenSection
+        ticketId={ticket.id}
+        isReadOnly={false}
+        onActionsUpdated={fetchTicketDetail}
+      />
+
+      {/* Append-only Status History Timeline (Part 7) */}
+      <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+          <span style={{ fontSize: '1.2rem' }}>📜</span>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
+            Ticket Status History ({ticket.statusHistory?.length || 0})
+          </h3>
+          <span className="tkt-pill tkt-pill-status-in-progress" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>
+            Append-Only Audit Log
+          </span>
+        </div>
+
+        {!ticket.statusHistory || ticket.statusHistory.length === 0 ? (
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>
+            No status transitions recorded yet. Ticket created in status {ticket.currentStatus}.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {ticket.statusHistory.map((hist) => (
+              <div
+                key={hist.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem 1rem',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 600, color: '#475569' }}>{hist.fromStatus}</span>
+                  <span style={{ color: '#006B3C', fontWeight: 700 }}>→</span>
+                  <span style={{ fontWeight: 700, color: '#006B3C' }}>{hist.toStatus}</span>
+                  <span style={{ color: '#94a3b8' }}>•</span>
+                  <span style={{ color: '#334155', fontWeight: 500 }}>
+                    by {hist.changedBy?.name || 'Staff'} ({hist.changedBy?.role || 'STAFF'})
+                  </span>
+                </div>
+                <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
+                  {new Date(hist.changedAt).toLocaleString('th-TH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Attachments Section for Staff */}
       <div className="tkt-detail-card" style={{ marginTop: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
@@ -514,8 +595,11 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
         </form>
 
         {downloadError && (
-          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem' }} role="alert">
-            ⚠️ {downloadError}
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.65rem', borderRadius: '8px', fontSize: '0.825rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="alert">
+            <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>{downloadError}</span>
           </div>
         )}
 
@@ -531,7 +615,7 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                     onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
                     style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                   >
-                    📎 {a.originalFilename}
+                    {a.originalFilename}
                   </button>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                     ({(a.sizeBytes / 1024).toFixed(1)} KB)
@@ -553,7 +637,6 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
         <div className="tkt-detail-card" style={{ margin: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '1.2rem' }}>💬</span>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#0f172a' }}>
               Public Comments ({publicComments.length})
             </h3>
@@ -570,7 +653,6 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
 
         <div className="tkt-detail-card" style={{ margin: 0, backgroundColor: '#fffdfa', borderColor: '#fde68a' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid #fde68a', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '1.2rem' }}>🔒</span>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: '#92400e' }}>
               Private Internal Notes ({internalNotes.length})
             </h3>

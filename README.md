@@ -1,24 +1,42 @@
-# TokTickIT
+# TokTickIT (ตอกติ๊กกิต) — IT Service Desk
 
-TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk application designed for Account and Access, Hardware, Software, and Network service requests. This repository contains the **Lab 3 Role-Based IT Service Desk** full-stack application with JWT authentication, RBAC (Requester / IT Staff / Administrator), and a fully tested backend API.
+TokTickIT is a modern, enterprise-grade IT Service Desk application for Account and Access, Hardware, Software, and Network service requests. This repository contains the complete full-stack increment up to **Lab 4: Actions Taken Subsystem, Role-Tailored Dashboards, Backend Resolution Gate, and Concurrency Control**.
 
-- **Frontend:** React 19 + TypeScript + Vite + Bootstrap 5 (`client/`)
+- **Frontend:** React 19 + TypeScript + Vite + Tailwind CSS & Zen Green CSS (`client/`)
 - **Backend:** Node.js + Express + TypeScript (`server/`)
 - **Database:** PostgreSQL accessed via Prisma ORM (`server/prisma/`)
-- **Auth:** JSON Web Tokens (JWT) with role-based middleware (`server/src/middleware/authMiddleware.ts`)
-- **Testing:** Vitest (server unit + API integration tests), React Testing Library (component tests), Playwright (end-to-end tests) — **163 / 163 tests passing (104 Server, 32 Client, 27 Playwright E2E)**
+- **Auth & Concurrency:** JWT with RBAC + atomic database predicate optimistic locking (`version`)
+- **Testing:** Vitest (Server API + Client RTL components) + Playwright (E2E browser tests) — **195 / 195 tests passing (144 Server, 40 Client, 11 Playwright E2E)**
 
 ---
 
-## Key Features (Lab 3)
+## Key Features & Lab 4 Increments
 
-- **JWT Authentication:** Email + password login returning a signed JWT Bearer token. Automatic forced password-change flow for users with `mustChangePassword = true`.
-- **Role-Based Access Control (RBAC):** Three roles — `REQUESTER`, `STAFF`, `ADMIN`. All authorization rules are enforced server-side; UI navigation adapts per role.
-- **Requester Workflow:** Create tickets, view owned tickets, add attachments and Public Comments, indicate "Problem Appears Resolved".
-- **IT Staff Ticket Queue:** Shared queue with text search, five dropdown filters (Status, Category, Related System, Priority, Owner), sorting, and pagination. Automatically renders as stacked cards on mobile viewports (< 768 px).
-- **IT Staff Operations:** Claim/reassign ticket ownership, update IT Priority, execute permitted status transitions (NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED → REOPENED / CANCELLED), post Public Comments and private Internal Notes.
-- **Administrator User Management:** List / search / filter all users; create users with initial password (`mustChangePassword = true`); edit name, email, role, active status; reset initial password. Safety guards prevent self-deactivation and last-admin removal.
-- **Zen Green Design System:** All screens use `#006B3C` / `#0B7A46` / `#EAF6EF` color tokens with Bootstrap 5, fully responsive across Desktop (≥ 1024 px), Tablet (768 – 1023 px), and Mobile (375 px / 390 px) without horizontal overflow.
+1. **Actions Taken Subsystem & Operational Lifecycle (Part 6)**:
+   - Record formal operational work entries under tickets with `ActionStatus` (`PENDING`, `IN_PROGRESS`, `COMPLETED`, `CANCELLED`).
+   - Automatically derive `performedById` and `createdById` from the authenticated session, preventing identity spoofing.
+   - Delegate actions to active IT Staff/Admin assignees (`assigneeId`), strictly rejecting inactive users and requesters with HTTP 400 (`INACTIVE_ASSIGNEE`).
+   - Require `result` only upon completing an action; enforce permanent terminal immutability on completed and cancelled actions (`TERMINAL_ACTION_LOCKED`).
+2. **Strict Backend Resolution Gate (Part 7, BR-13)**:
+   - Transitioning tickets to `RESOLVED` requires:
+     1. An assigned ticket owner (`ownerId !== null`).
+     2. At least one recorded `ActionTaken`.
+     3. At least one `ActionTaken` in `COMPLETED` status with a non-empty `result`.
+     4. Documented `followUpNote` for all actions requiring follow-up.
+   - The Requester "Problem Appears Resolved" indication remains strictly advisory, appending a Public Comment without bypassing the gate.
+3. **Atomic Optimistic Concurrency Control (BR-14, BR-24)**:
+   - Prevents lost updates using atomic database write predicates (`updateMany({ where: { id, version }, data: { ..., version: version + 1 } })`) inside transactions.
+   - Stale or colliding writes receive HTTP 409 Conflict with the current database record.
+4. **Append-Only Ticket Status History (BR-25, BR-26)**:
+   - Automatically records `TicketStatusHistory` rows in the same transaction as status transitions.
+   - Guarantees 0 appended history rows on stale/failed writes, and exactly 1 actor-attributed row on success.
+5. **Role-Tailored Operational Dashboards (Part 8)**:
+   - **Requester Dashboard**: Summary cards (Open, Waiting for Feedback, Resolved, Closed), Attention Banner, and recent tickets list.
+   - **IT Staff Dashboard**: Team queue counts (Unassigned, My Assigned, Open Total, Urgent Priority), status/priority breakdowns, and recent personal actions taken.
+   - **Administrator Overview**: User distribution statistics by role and active status.
+6. **Zen Green Design Language & Accessibility (Part 9)**:
+   - Unified `#006B3C` / `#008751` / `#e8f5e9` design tokens, responsive layout across Desktop (1280px), Tablet (768px), and Mobile (360px) with zero horizontal overflow.
+   - Zero WCAG 2.1 AA violations verified via Axe-core accessibility audits.
 
 ---
 
@@ -28,169 +46,160 @@ TokTickIT (ตอกติ๊กกิต) is a modern IT Service Desk applicati
 toktickit/
 ├── client/                          # React + TypeScript + Vite frontend
 │   ├── src/
-│   │   ├── components/              # UI Components (Login, Navbar, TicketForm, StaffQueue, UserManagement, …)
-│   │   ├── context/                 # AuthContext — current user, JWT storage, role helpers
-│   │   └── tests/lab-03/            # React Testing Library component tests (32 tests)
+│   │   ├── components/
+│   │   │   ├── auth/                # LoginForm, ChangePasswordModal
+│   │   │   ├── requester/           # RequesterDashboard
+│   │   │   ├── staff/               # StaffDashboard, StaffTicketQueue, StaffTicketDetail, ActionsTakenSection
+│   │   │   ├── admin/               # UserManagement
+│   │   │   └── layout/              # Navbar
+│   │   ├── context/                 # AuthContext (JWT, session storage, roles)
+│   │   └── tests/lab-04/            # RTL component tests (StaffDashboard, RequesterDashboard, ActionsTaken, TicketWorkflow)
 │   └── vite.config.ts
 │
 ├── server/                          # Node.js + Express + TypeScript backend
 │   ├── src/
-│   │   ├── middleware/
-│   │   │   └── authMiddleware.ts    # JWT verification + role guard (requireRole)
+│   │   ├── middleware/              # authMiddleware, role guards
 │   │   ├── routes/
-│   │   │   ├── auth.ts              # POST /api/auth/login, POST /api/auth/change-password, GET /api/auth/me, POST /api/auth/logout
-│   │   │   ├── tickets.ts           # CRUD tickets (Requester-scoped + Staff/Admin)
-│   │   │   ├── staff.ts             # Staff Queue, claim/reassign, status transitions, comments, notes
-│   │   │   └── admin.ts             # Admin user management endpoints
-│   │   └── index.ts                 # Express app entry point
+│   │   │   ├── auth.ts              # Login, logout, me, change-password
+│   │   │   ├── tickets.ts           # Requester ticket CRUD & attachments
+│   │   │   ├── staff.ts             # Staff queue, claim/assign, status workflow, resolution gate
+│   │   │   ├── actions-taken.ts     # Actions Taken CRUD, lifecycle, concurrency
+│   │   │   ├── dashboard.ts         # Server-aggregated dashboard metrics
+│   │   │   └── admin-users.ts       # Admin user management & password resets
+│   │   └── app.ts                   # Express application setup
 │   ├── prisma/
-│   │   ├── schema.prisma            # User, Ticket, PublicComment, InternalNote models
-│   │   ├── migrations/              # Prisma migration history (Lab 2 → Lab 3 migration included)
-│   │   └── seed.ts                  # Idempotent seed — 1 Admin, 1 Staff, 3 Requesters + demo tickets
-│   └── tests/lab-03/                # Vitest + Supertest API integration tests (104 tests)
+│   │   ├── schema.prisma            # Models: User, Ticket, ActionTaken, TicketStatusHistory, Comment, Note
+│   │   ├── migrations/              # Non-destructive migration history
+│   │   └── seed.ts                  # Idempotent database seed (18 realistic tickets)
+│   └── tests/lab-04/                # Vitest + Supertest API integration tests (40 tests)
 │
-├── e2e/lab-03/                      # Playwright end-to-end tests (27 tests)
-│   ├── auth.spec.ts
-│   ├── staff-queue.spec.ts
-│   ├── admin-users.spec.ts
-│   └── responsive-overflow.spec.ts
+├── e2e/lab-04/                      # Playwright E2E browser test suite (11 tests)
+│   ├── actions-taken-flow.spec.ts   # Actions Taken lifecycle, assignees, requester read-only mode
+│   ├── ticket-resolution.spec.ts    # Deterministic resolution gate rejection & success verification
+│   └── dashboards-and-overflow.spec.ts # Responsive viewports (360px, 768px, 1280px) & Axe-core a11y
 │
-└── docs/lab-03/                     # Lab 3 documentation
-    ├── specification.md             # 11-section Spec DD document
-    ├── tests.md                     # Test DD + traceability matrix (163/163)
-    ├── report.md                    # Sprint report / Git workflow evidence
-    ├── ui-spec.md                   # UI layout & screen wireframes
-    ├── api-spec.md                  # OpenAPI-style endpoint reference
-    ├── submission.html              # Compiled PDF submission source
-    └── LAB3_SUBMISSION.pdf          # Final submission PDF
+├── docs/lab-04/                     # Sprint 4 documentation & engineering artifacts
+│   ├── specification.md             # 11-section formal engineering contract
+│   ├── ui-spec.md                   # Screen layouts, tokens, responsive conventions
+│   ├── api-spec.md                  # REST API contract and status codes
+│   ├── tests.md                     # Traceability matrix and planned test register
+│   ├── report.md                    # Lab 4 Engineering Report (Reviewer responses & evidence)
+│   ├── reviewer.md                  # Peer review governance log
+│   ├── screenshots/                 # 10 live application screenshots across viewports
+│   ├── submission.html              # Compiled HTML source for PDF rendering
+│   └── LAB4_SUBMISSION.pdf          # Official single submission PDF
+│
+└── artifacts/lab-04/                # Generated audit and review evidence
+    ├── metrics-vs-db.txt            # Direct DB query vs API metrics mathematical comparison
+    ├── test-output/                 # Real test execution outputs (Red & Green)
+    └── submission/                  # Submission markdown and PDF bundles
 ```
-
----
-
-## Environment Variables
-
-Create `server/.env` (copy from `server/.env.example` and fill in):
-
-```env
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/toktickit?schema=public"
-PORT=3000
-JWT_SECRET="your-strong-random-secret-key-here"
-```
-
-> **Note:** `JWT_SECRET` is required in production. A default fallback is used only during local development. Use a cryptographically random string (≥ 32 characters) in any shared or deployed environment.
 
 ---
 
 ## Setup & Running Locally
 
-### Prerequisites
+### 1. Prerequisites
+- Node.js 18+ (tested on Node.js 20 & 24)
+- PostgreSQL running locally on port 5432
 
-- Node.js 20+
-- PostgreSQL 15+
-- npm 9+
-
-### Installation
-
-```bash
-# Install backend dependencies
-cd server && npm install
-
-# Install frontend dependencies
-cd ../client && npm install
-
-# Install Playwright browsers (for E2E tests)
-cd .. && npx playwright install --with-deps chromium
+### 2. Environment Configuration
+Create or verify `server/.env`:
+```env
+PORT=3000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/toktickit?schema=public"
+JWT_SECRET="toktickit_super_secret_jwt_key_2026_cpe334"
+JWT_EXPIRES_IN="8h"
+NODE_ENV="development"
 ```
 
-### Database Setup
-
+### 3. Database Migration & Seed
+Run the migrations and populate the database with realistic seed data:
 ```bash
-# Apply all migrations (creates schema + Lab 2→Lab 3 migration)
-cd server && npx prisma migrate deploy
+# Navigate to server directory
+cd server
 
-# (Optional) Seed demo data
+# Apply database migrations
+npx prisma migrate deploy
+
+# Run idempotent database seed
 npx prisma db seed
 ```
 
-Default seeded accounts:
+### 4. Start Development Servers
+Start both backend API and frontend Vite servers concurrently:
+```bash
+# From repository root
+npm run dev
+```
+Or start individually:
+- Backend server: `npm run dev:server` (runs on `http://localhost:3000`)
+- Frontend client: `npm run dev:client` (runs on `http://localhost:5173`)
 
-| Role | Email | Initial Password |
-|---|---|---|
-| Admin | `admin@toktickit.local` | `Admin@1234` |
-| Staff | `staff@toktickit.local` | `Staff@1234` |
-| Requester | `requester@toktickit.local` | `Req@1234` |
+---
 
-> All seeded users have `mustChangePassword = true` — a password change is required on first login.
+## Demo Accounts
 
-### Running
+All seeded accounts use password: `Password123!`
+
+| Role | Email | Password | Intended Workflow / Demo Focus |
+|---|---|---|---|
+| **IT Staff** | `michael.staff@toktickit.com` | `Password123!` | Operational Dashboard, Shared Queue, Actions Taken, Resolution Gate |
+| **IT Staff** | `sarah.staff@toktickit.com` | `Password123!` | Active assignee delegation and team collaboration |
+| **Requester** | `jennifer.anderson@example.com` | `Password123!` | Requester Dashboard, Attention Banner, Read-Only Actions Taken |
+| **Requester** | `michael.brown@example.com` | `Password123!` | Create tickets, view ticket detail, public comments |
+| **Administrator** | `john.admin@toktickit.com` | `Password123!` | Staff dashboard + Admin user metrics, User Management, Password resets |
+| **Inactive Staff** | `david.inactive@toktickit.com` | `Password123!` | Negative testing (Login blocked, Assignee delegation rejected) |
+
+---
+
+## Running Automated Test Suites
+
+TokTickIT features a complete multi-layered automated test suite. Run the entire verification pipeline with one command:
 
 ```bash
-# Terminal 1 — Backend (port 3000)
-cd server && npm run dev
-
-# Terminal 2 — Frontend (port 5173)
-cd client && npm run dev
+# Run full automated test suite (Traceability + Server + Client)
+npm test
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## Running Tests
-
-> **Prerequisite**: Every full automated test run MUST start from a fresh database reset and seed to guarantee clean initial state and zero cross-test state contamination:
-> ```bash
-> cd server && npx prisma migrate reset --force && npx prisma db seed
-> ```
->
-> `migrate reset --force` drops the database, re-applies all migrations, and triggers the seeder configured in `package.json#prisma.seed`. The explicit `&& npx prisma db seed` above is a safety net — if the built-in seeder hook is skipped (e.g. `--skip-seed` flag), the seed still runs. Omitting this step causes Playwright tests to fail because they expect the canonical 5 seeded users and demo tickets.
-
+### Individual Test Commands:
 ```bash
-# Server tests (104 tests — API integration, authorization matrix, unit)
-cd server && npm test
+# 1. Requirements Traceability Audit (AST parser)
+npm run test:traceability
 
-# Client tests (32 tests — component feedback states, form validation)
-cd client && npm test
+# 2. Server API & Concurrency Tests (144 tests across 29 files)
+npm run test:server
 
-# Playwright E2E tests (27 tests — auth flow, staff queue, admin, responsive)
-npx playwright test --project=chromium
-```
+# 3. Client Component Tests (40 tests across 17 suites)
+npm run test:client
 
-All 163 tests pass (104 Server, 32 Client, 27 Playwright E2E).
-
----
-
-## Ticket ID Format
-
-Tickets are identified as `TKT-YYYY-XXXXXX` (e.g. `TKT-2026-001234`). The prefix, year, and zero-padded sequence number are auto-generated server-side.
-
----
-
-## Status Lifecycle
-
-```
-NEW → OPEN → IN_PROGRESS → WAITING_FOR_REQUESTER → RESOLVED → CLOSED
-                ↑                                      ↓
-                └──────────── REOPENED ←───────────────┘
-NEW / OPEN / IN_PROGRESS / WAITING_FOR_REQUESTER → CANCELLED
+# 4. Playwright End-to-End Tests (11 scenarios)
+npx playwright test e2e/lab-04/ --project=chromium --reporter=list
 ```
 
 ---
 
-## Branch Strategy
+## Interactive Demonstration Script
 
-| Branch | Purpose |
-|---|---|
-| `main` | Production-ready code; merge via reviewed PRs only |
-| `lab3-staging` | Lab 3 integration target |
-| `feature/issue-*` | Individual feature branches |
+1. **Requester Dashboard & Read-Only Actions**:
+   - Log in as `jennifer.anderson@example.com` (`Password123!`).
+   - Observe the **My Support Dashboard** featuring personal metrics (Open, Waiting for Feedback, Resolved, Closed) and attention banner.
+   - Open ticket `TKT-2026-001234`.
+   - Click on the **Actions Taken** tab. Confirm that all actions recorded by IT Staff are visible in read-only mode (no `+ Add Action` or `Edit` buttons).
+   - Click on the **Status History** tab. View the append-only transition timeline.
 
----
+2. **Actions Taken Lifecycle & Delegation**:
+   - Log out and log in as IT Staff: `michael.staff@toktickit.com` (`Password123!`).
+   - Observe the **IT Staff Operational Dashboard** showing unassigned tickets, my assigned tickets, status breakdown, and recent actions.
+   - Open ticket `TKT-2026-001234`.
+   - Under **Actions Taken**, click `+ Add Action`. Record an action with status `Pending` and assign to `Sarah Staff`.
+   - Click `Start Work` on the pending card (status transitions to `In Progress`).
+   - Click `Complete` (prompts for required result, then transitions to `Completed`).
+   - Notice the card displays `(Terminal / Immutable)` and action controls are permanently locked.
 
-## Documentation
-
-Full Lab 3 documentation is in [`docs/lab-03/`](docs/lab-03/):
-
-- [`specification.md`](docs/lab-03/specification.md) — Spec DD (Sprint Goal → FR → BR → UI → Data → API → AC)
-- [`tests.md`](docs/lab-03/tests.md) — Test DD (163 tests with full traceability matrix)
-- [`report.md`](docs/lab-03/report.md) — Sprint report and Git workflow evidence
+3. **Strict Resolution Gate Enforcement**:
+   - From the Staff Ticket Queue, search for `TKT-2026-001233` (Status: `OPEN`, zero actions taken).
+   - Attempt to change the ticket status to `Resolved` in the dropdown.
+   - Notice the system immediately displays the prominent red alert banner:  
+     `⚠️ Resolution Gate: At least one Action Taken must be recorded before resolving.`
+   - Notice the ticket status remains safely at `OPEN` without side effects.

@@ -53,7 +53,10 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
     <div className="bg-amber-50/60 p-5 rounded-xl border border-amber-200 shadow-sm space-y-4">
       <div className="flex items-center justify-between border-b border-amber-200/60 pb-3">
         <h3 className="font-bold text-amber-900 text-base flex items-center gap-2">
-          <span>🔒</span> Private Internal Notes ({notes.length})
+          <svg className="w-4 h-4 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          Private Internal Notes ({notes.length})
         </h3>
         <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-semibold border border-amber-200">
           Visible ONLY to IT Staff & Admins

@@ -33,7 +33,11 @@ export const LoginForm: React.FC = () => {
       <div className="tkt-auth-card">
         {/* TokTickIT Brand Header Bar */}
         <div className="tkt-auth-header-bar">
-          <div className="tkt-brand-icon">⏱️</div>
+          <div className="tkt-brand-icon">
+            <svg className="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
           <div>
             <div className="tkt-brand-title">TokTickIT</div>
           </div>
@@ -45,7 +49,9 @@ export const LoginForm: React.FC = () => {
 
           {errorMessage && (
             <div role="alert" className="tkt-alert-error">
-              <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+              <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
               <div>{errorMessage}</div>
             </div>
           )}
@@ -116,7 +122,7 @@ export const LoginForm: React.FC = () => {
               </button>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
               <a
                 href="#forgot-password"
                 onClick={(e) => { e.preventDefault(); alert('Please contact your IT administrator to reset your password.'); }}
@@ -124,6 +130,68 @@ export const LoginForm: React.FC = () => {
               >
                 Forgot your password?
               </a>
+            </div>
+
+            {/* Quick Demo Access Bar */}
+            <div style={{
+              marginTop: '1.25rem',
+              paddingTop: '1rem',
+              borderTop: '1px solid #e2e8f0',
+              textAlign: 'center'
+            }}>
+              <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem', fontWeight: 500 }}>
+                Demo Accounts (Click to auto-fill)
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => { setEmail('michael.staff@toktickit.com'); setPassword('Password123!'); }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.35rem 0.65rem',
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    color: '#166534',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  IT Staff
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setEmail('jennifer.anderson@example.com'); setPassword('Password123!'); }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.35rem 0.65rem',
+                    background: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    color: '#1e40af',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  Requester
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setEmail('admin@toktickit.com'); setPassword('Password123!'); }}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.35rem 0.65rem',
+                    background: '#f8fafc',
+                    border: '1px solid #cbd5e1',
+                    color: '#334155',
+                    borderRadius: '0.375rem',
+                    cursor: 'pointer',
+                    fontWeight: 500
+                  }}
+                >
+                  Administrator
+                </button>
+              </div>
             </div>
           </form>
         </div>

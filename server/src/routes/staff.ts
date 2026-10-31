@@ -174,6 +174,17 @@ router.get('/tickets/:id', async (req: AuthRequest, res: Response): Promise<void
           include: { author: { select: { id: true, name: true, role: true } } },
           orderBy: { createdAt: 'asc' },
         },
+        actionsTaken: {
+          include: {
+            performedBy: { select: { id: true, name: true, email: true } },
+            assignee: { select: { id: true, name: true, email: true } },
+          },
+          orderBy: [{ actionDateTime: 'asc' }, { createdAt: 'asc' }],
+        },
+        statusHistory: {
+          include: { changedBy: { select: { id: true, name: true, role: true } } },
+          orderBy: [{ changedAt: 'asc' }, { id: 'asc' }],
+        },
       },
     });
 
@@ -290,14 +301,14 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   WAITING_FOR_REQUESTER: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
   RESOLVED: ['CLOSED', 'REOPENED'],
   CLOSED: ['REOPENED'],
-  REOPENED: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
+  REOPENED: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   CANCELLED: [],
 };
 
 router.patch('/tickets/:id/status', async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const ticketId = parseId(req.params.id);
-    const { status } = req.body;
+    const { status, version } = req.body;
 
     const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
     if (!ticket) {
@@ -319,15 +330,173 @@ router.patch('/tickets/:id/status', async (req: AuthRequest, res: Response): Pro
       return;
     }
 
-    const updatedTicket = await prisma.ticket.update({
-      where: { id: ticketId },
-      data: { currentStatus: status },
+    // BR-14: Concurrency control requirement - version is strictly required
+    if (version === undefined || typeof version !== 'number') {
+      res.status(400).json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Numeric expected version is required for optimistic concurrency control.',
+        },
+      });
+      return;
+    }
+
+    // BR-13: Resolution Gate check when transitioning to RESOLVED
+    if (status === 'RESOLVED') {
+      if (!ticket.ownerId) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: An IT Staff owner must be assigned to the ticket before resolving.',
+            field: 'ownerId',
+          },
+        });
+        return;
+      }
+
+      const actions = await prisma.actionTaken.findMany({
+        where: { ticketId },
+      });
+
+      if (actions.length === 0) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: At least one Action Taken must be recorded before resolving.',
+            field: 'actionsTaken',
+          },
+        });
+        return;
+      }
+
+      const completedActionsWithResult = actions.filter(
+        (a) => a.status === 'COMPLETED' && a.result && a.result.trim().length > 0
+      );
+      if (completedActionsWithResult.length === 0) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: At least one Action Taken must be completed with a non-empty result before resolving.',
+            field: 'result',
+          },
+        });
+        return;
+      }
+
+      const unaddressedFollowUps = actions.filter(
+        (a) => a.followUpRequired && (!a.followUpNote || a.followUpNote.trim().length === 0)
+      );
+      if (unaddressedFollowUps.length > 0) {
+        res.status(422).json({
+          error: {
+            code: 'RESOLUTION_GATE_FAILED',
+            message: 'Resolution Gate: All actions requiring follow-up must have documented follow-up notes.',
+            field: 'followUpNote',
+          },
+        });
+        return;
+      }
+    }
+
+    // Atomic compare-and-increment and append-only status history in same transaction
+    const txResult = await prisma.$transaction(async (tx) => {
+      const updateRes = await tx.ticket.updateMany({
+        where: {
+          id: ticketId,
+          version: version, // Atomic predicate
+        },
+        data: {
+          currentStatus: status,
+          version: version + 1,
+        },
+      });
+
+      if (updateRes.count === 0) {
+        const current = await tx.ticket.findUnique({
+          where: { id: ticketId },
+          include: { owner: { select: { id: true, name: true, email: true } } },
+        });
+        return { conflict: true, notFound: !current, ticket: current };
+      }
+
+      // Successful: append exactly one actor-attributed history row
+      const historyEntry = await tx.ticketStatusHistory.create({
+        data: {
+          ticketId,
+          fromStatus: currentStatus,
+          toStatus: status,
+          changedById: req.user!.id,
+        },
+        include: {
+          changedBy: { select: { id: true, name: true, role: true } },
+        },
+      });
+
+      const updatedTicket = await tx.ticket.findUnique({
+        where: { id: ticketId },
+        include: {
+          owner: { select: { id: true, name: true, email: true } },
+          statusHistory: {
+            include: { changedBy: { select: { id: true, name: true, role: true } } },
+            orderBy: [{ changedAt: 'asc' }, { id: 'asc' }],
+          },
+        },
+      });
+
+      return { conflict: false, notFound: false, ticket: updatedTicket, historyEntry };
     });
 
-    res.status(200).json({ ticket: updatedTicket });
+    if (txResult.notFound) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
+      return;
+    }
+
+    if (txResult.conflict) {
+      res.status(409).json({
+        error: {
+          code: 'CONCURRENCY_CONFLICT',
+          message: 'Ticket has been updated by another user. Please reload the latest data.',
+          currentTicket: txResult.ticket,
+        },
+      });
+      return;
+    }
+
+    res.status(200).json({ ticket: txResult.ticket, historyEntry: txResult.historyEntry });
     return;
   } catch (error) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to update status.' } });
+    return;
+  }
+});
+
+// 7. GET /api/staff/tickets/:id/status-history (Append-only status history log)
+router.get('/tickets/:id/status-history', async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const ticketId = parseId(req.params.id);
+    if (isNaN(ticketId)) {
+      res.status(400).json({ error: { code: 'INVALID_ID', message: 'Ticket ID must be a number.' } });
+      return;
+    }
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId }, select: { id: true } });
+    if (!ticket) {
+      res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ticket not found.' } });
+      return;
+    }
+
+    const statusHistory = await prisma.ticketStatusHistory.findMany({
+      where: { ticketId },
+      include: {
+        changedBy: { select: { id: true, name: true, role: true } },
+      },
+      orderBy: [{ changedAt: 'asc' }, { id: 'asc' }],
+    });
+
+    res.status(200).json({ statusHistory });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch status history.' } });
     return;
   }
 });

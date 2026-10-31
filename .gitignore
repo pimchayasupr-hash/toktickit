@@ -12,3 +12,7 @@ test-results/
 
 # Preflight run artifacts (regenerated on each run; not final evidence)
 docs/lab-03/evidence/preflight-*.txt
+
+# Lab 4 Backups and Raw Output (Safety Guardrail #2)
+artifacts/lab-04/backups/
+artifacts/lab-04/test-output/
