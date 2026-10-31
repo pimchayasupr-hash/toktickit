@@ -104,6 +104,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - [x] Authentic two-session HTTP 409 Conflict capture on Edit mode, real Requester HTTP 403 Forbidden captures, and 17-page `LAB4_SUBMISSION.pdf`.
 - **Approval Status**: `APPROVED`
 - **Merged By**: `@supa-gif173` into `lab4-staging` (Merge commit: `83b3cbcbc92153ab6728037f0b4660fa9d454659` on 2026-10-31)
+- **Final Release Staging to Main PR**: https://github.com/pimchayasupr-hash/toktickit/pull/58 (`lab4-staging` $\rightarrow$ `main`)
 
 ---
 

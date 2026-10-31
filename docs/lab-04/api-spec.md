@@ -291,38 +291,48 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 
 ---
 
-### 2.3 Dashboard Endpoints
+### 2.3 Dashboard Endpoints (Handout §4.6 & §6.2)
+
+- **Unified Active-Open Status Set**: Both `GET /api/dashboard/requester` and `GET /api/dashboard/staff` use the exact same active-open status set:
+  `ACTIVE_OPEN_STATUSES = ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED']`.
+- **Timezone & Date Boundary**: Timestamps are stored as ISO-8601 UTC in PostgreSQL and formatted in `en-GB` (`Asia/Bangkok`, UTC+7) on the client. `recentlyResolvedCount` enforces a 30-day rolling window (`currentStatus = 'RESOLVED' AND updatedAt >= NOW() - INTERVAL '30 days'`).
+- **Empty / Zero-State Behavior**: When no matching tickets exist, all integer counters return `0`, status/priority maps return `0` for every key, and list arrays (`attentionTickets`, `recentTickets`, `myRecentActions`, `urgentTickets`) return `[]`.
 
 #### `GET /api/dashboard/requester`
 - **Description**: Retrieve personal operational metrics for the authenticated Requester.
 - **Authorization**: `REQUESTER` (Staff and Admin also permitted).
 - **Query Filter**: Bound strictly to `requesterId = req.user.id`.
+- **Metric Calculations & Drill-Down Destinations**:
+  - `openTicketsCount`: `requesterId = user.id AND currentStatus IN ACTIVE_OPEN_STATUSES` → Drills down to `#/requester/tickets?status=ACTIVE_OPEN`.
+  - `waitingForRequesterCount`: `requesterId = user.id AND currentStatus = 'WAITING_FOR_REQUESTER'` → Drills down to `#/requester/tickets?status=WAITING_FOR_REQUESTER`.
+  - `recentlyResolvedCount`: `requesterId = user.id AND currentStatus = 'RESOLVED' AND updatedAt >= NOW() - INTERVAL '30 days'` → Drills down to `#/requester/tickets?status=RESOLVED`.
+  - `closedTicketsCount`: `requesterId = user.id AND currentStatus = 'CLOSED'` → Drills down to `#/requester/tickets?status=CLOSED`.
 - **Response 200 OK**:
 ```json
 {
   "metrics": {
     "openTicketsCount": 4,
     "waitingForRequesterCount": 1,
-    "recentlyResolvedCount": 2,
-    "closedTicketsCount": 7
+    "recentlyResolvedCount": 0,
+    "closedTicketsCount": 1
   },
   "attentionTickets": [
     {
       "id": 102,
-      "ticketNumber": "TKT-2026-000102",
-      "summary": "Cannot access staging database from home IP",
+      "ticketNumber": "TKT-2026-001230",
+      "summary": "Unable to access course materials on LEB2",
       "currentStatus": "WAITING_FOR_REQUESTER",
-      "updatedAt": "2026-10-19T11:00:00.000Z"
+      "updatedAt": "2026-10-31T10:09:00.000Z"
     }
   ],
   "recentTickets": [
     {
       "id": 105,
-      "ticketNumber": "TKT-2026-000105",
-      "summary": "VPN connection drops every 15 minutes",
+      "ticketNumber": "TKT-2026-001234",
+      "summary": "Laptop battery drains quickly",
       "currentStatus": "IN_PROGRESS",
-      "requestedPriority": "HIGH",
-      "updatedAt": "2026-10-19T14:35:00.000Z"
+      "requestedPriority": "MEDIUM",
+      "updatedAt": "2026-10-31T10:09:00.000Z"
     }
   ]
 }
@@ -333,28 +343,33 @@ All error responses across all endpoints adhere to the unified TokTickIT error f
 #### `GET /api/dashboard/staff`
 - **Description**: Retrieve operational service desk metrics for IT Staff and Administrators.
 - **Authorization**: `STAFF`, `ADMIN` only. (Requesters receive HTTP 403).
+- **Metric Calculations & Drill-Down Destinations**:
+  - `unassignedCount`: `ownerId IS NULL AND currentStatus IN ACTIVE_OPEN_STATUSES` → Drills down to `#/staff/queue?status=ACTIVE_OPEN&ownerId=unassigned`.
+  - `myAssignedCount`: `ownerId = req.user.id AND currentStatus IN ACTIVE_OPEN_STATUSES` → Drills down to `#/staff/queue?status=ACTIVE_OPEN&ownerId=me`.
+  - `urgentCount`: `itPriority = 'URGENT' AND currentStatus IN ACTIVE_OPEN_STATUSES` → Drills down to `#/staff/queue?status=ACTIVE_OPEN&priority=URGENT`.
+  - `openTotalCount`: `currentStatus IN ACTIVE_OPEN_STATUSES` → Drills down to `#/staff/queue?status=ACTIVE_OPEN`.
 - **Response 200 OK (IT Staff)**:
 ```json
 {
   "metrics": {
-    "unassignedCount": 3,
-    "myAssignedCount": 5,
-    "openTotalCount": 14,
+    "unassignedCount": 4,
+    "myAssignedCount": 4,
+    "openTotalCount": 13,
     "urgentCount": 2,
     "byStatus": {
-      "NEW": 3,
-      "OPEN": 2,
-      "IN_PROGRESS": 5,
-      "WAITING_FOR_REQUESTER": 2,
+      "NEW": 4,
+      "OPEN": 4,
+      "IN_PROGRESS": 3,
+      "WAITING_FOR_REQUESTER": 1,
       "RESOLVED": 2,
-      "CLOSED": 8,
-      "REOPENED": 0,
+      "CLOSED": 2,
+      "REOPENED": 1,
       "CANCELLED": 1
     },
     "byPriority": {
-      "LOW": 2,
-      "MEDIUM": 6,
-      "HIGH": 4,
+      "LOW": 1,
+      "MEDIUM": 7,
+      "HIGH": 3,
       "URGENT": 2
     }
   },

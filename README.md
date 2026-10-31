@@ -76,18 +76,17 @@ toktickit/
 ├── e2e/lab-04/                      # Playwright E2E browser test suite (12 scenarios / 36 cross-browser runs)
 │   ├── actions-taken-flow.spec.ts   # Actions Taken lifecycle, assignees, requester read-only mode
 │   ├── ticket-resolution.spec.ts    # Deterministic resolution gate rejection & success verification
-│   └── dashboards-and-overflow.spec.ts # Responsive viewports (360px, 768px, 1280px) & Axe-core a11y
+│   └── dashboards.spec.ts           # Responsive viewports (360px, 768px, 1280px), SVG <= 64px & Axe-core a11y
 │
 ├── docs/lab-04/                     # Sprint 4 documentation & engineering artifacts
 │   ├── specification.md             # 11-section formal engineering contract
 │   ├── ui-spec.md                   # Screen layouts, tokens, responsive conventions
 │   ├── api-spec.md                  # REST API contract and status codes
 │   ├── tests.md                     # Traceability matrix and planned test register
-│   ├── report.md                    # Lab 4 Engineering Report (Reviewer responses & evidence)
+│   ├── ai-use.md                    # AI Use & Reflection report
 │   ├── reviewer.md                  # Peer review governance log
-│   ├── screenshots/                 # 10 live application screenshots across viewports
-│   ├── submission.html              # Compiled HTML source for PDF rendering
-│   └── LAB4_SUBMISSION.pdf          # Official single submission PDF
+│   ├── screenshots/                 # 31+ high-resolution application screenshots across viewports
+│   └── LAB4_SUBMISSION.pdf          # Official single submission PDF (17 pages)
 │
 └── artifacts/lab-04/                # Generated audit and review evidence
     ├── metrics-vs-db.txt            # Direct DB query vs API metrics mathematical comparison
@@ -149,7 +148,7 @@ All seeded accounts use password: `Password123!`
 | **Requester** | `jennifer.anderson@example.com` | `Password123!` | Requester Dashboard, Attention Banner, Read-Only Actions Taken |
 | **Requester** | `michael.brown@example.com` | `Password123!` | Create tickets, view ticket detail, public comments |
 | **Administrator** | `john.admin@toktickit.com` | `Password123!` | Staff dashboard + Admin user metrics, User Management, Password resets |
-| **Inactive Staff** | `david.inactive@toktickit.com` | `Password123!` | Negative testing (Login blocked, Assignee delegation rejected) |
+| **Inactive Staff** | `kevin.inactive@toktickit.com` | `Password123!` | Negative testing (Login blocked, Assignee delegation rejected) |
 
 ---
 
@@ -201,5 +200,5 @@ npx playwright test e2e/lab-04/ --reporter=list
    - From the Staff Ticket Queue, search for `TKT-2026-001233` (Status: `OPEN`, zero actions taken).
    - Attempt to change the ticket status to `Resolved` in the dropdown.
    - Notice the system immediately displays the prominent red alert banner:  
-     `Resolution Gate: At least one Action Taken must be recorded before resolving.`
+     `Resolution Gate Failed: At least one COMPLETED Action Taken with a recorded result is required before resolving a ticket.`
    - Notice the ticket status remains safely at `OPEN` without side effects.

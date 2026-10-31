@@ -269,7 +269,7 @@ async function buildPdf() {
   <div class="meta-grid">
     <div class="meta-item">
       <strong>Pull Requests &amp; Repository Links</strong>
-      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (Merged: <code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (Merged: <code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (Merged: <code>83b3cbc</code>)
+      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (<code>83b3cbc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a> (<code>lab4-staging &rarr; main</code>)
     </div>
     <div class="meta-item">
       <strong>Branch Architecture &amp; Staging Flow</strong>
@@ -396,11 +396,11 @@ artifacts/lab-04/backups/
         <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
       <tr>
-        <td><strong><a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a></strong></td>
-        <td><code>hotfix/lab4-icon-dimensions-and-audit</code> &rarr; <code>lab4-staging</code></td>
+        <td><strong><a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> &amp; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a></strong></td>
+        <td><code>hotfix/lab4-*</code> &rarr; <code>lab4-staging</code> &rarr; <code>main</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
-        <td>Retargeted to <code>lab4-staging</code> per staging flow: explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. Approved (Review <code>PRR_kwDOTzBGN88AAAABVROROQ</code>) &amp; Merged into <code>lab4-staging</code> by @supa-gif173 (Commit <code>83b3cbc</code>).</td>
-        <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
+        <td>Explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. PR #57 Approved (<code>PRR_kwDOTzBGN88AAAABVROROQ</code>) &amp; Merged into <code>lab4-staging</code> by @supa-gif173 (<code>83b3cbc</code>); promoted via <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a>.</td>
+        <td><span class="badge badge-pass">PR #57 MERGED</span></td>
       </tr>
       <tr>
         <td><strong><a href="https://github.com/supa-gif173/toktickit/pull/38">Outgoing PR #38</a> &amp; <a href="https://github.com/supa-gif173/toktickit/pull/44">PR #44</a></strong></td>
