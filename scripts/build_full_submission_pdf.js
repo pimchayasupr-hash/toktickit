@@ -399,14 +399,14 @@ artifacts/lab-04/backups/
         <td><strong><a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> &amp; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a></strong></td>
         <td><code>hotfix/lab4-*</code> &rarr; <code>lab4-staging</code> &rarr; <code>main</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
-        <td>Explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. PR #57 Approved (<code>PRR_kwDOTzBGN88AAAABVROROQ</code>) &amp; Merged into <code>lab4-staging</code> by @supa-gif173 (<code>83b3cbc</code>); promoted via <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a>.</td>
-        <td><span class="badge badge-pass">PR #57 MERGED</span></td>
+        <td>Explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. PR #57 Approved (<code>PRR_kwDOTzBGN88AAAABVROROQ</code>) &amp; Merged into <code>lab4-staging</code> by @supa-gif173 (<code>83b3cbc</code>); <a href="https://github.com/pimchayasupr-hash/toktickit/pull/58">PR #58</a> Approved by @supa-gif173 (<code>PRR_kwDOTzBGN88AAAABVRpK7w</code>).</td>
+        <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
       <tr>
-        <td><strong><a href="https://github.com/supa-gif173/toktickit/pull/38">Outgoing PR #38</a> &amp; <a href="https://github.com/supa-gif173/toktickit/pull/44">PR #44</a></strong></td>
+        <td><strong><a href="https://github.com/supa-gif173/toktickit/pull/38">Outgoing PR #38</a>, <a href="https://github.com/supa-gif173/toktickit/pull/44">#44</a>, <a href="https://github.com/supa-gif173/toktickit/pull/46">#46</a></strong></td>
         <td><code>supa-gif173/toktickit</code></td>
         <td>Author: @supa-gif173<br>Reviewer: @pimchayasupr-hash</td>
-        <td>Conducted peer review on teammate's Sprint 4 specification &amp; implementation (Action lifecycle, atomic OCC write predicates, 4-condition Resolution Gate, transactional <code>TicketStatusHistory</code>, Zen Green tokens).</td>
+        <td>Conducted peer review on teammate's Sprint 4 specification, workflow, and dashboards (Action lifecycle, atomic OCC write predicates, 4-condition Resolution Gate, transactional <code>TicketStatusHistory</code>, role dashboards, Zen Green tokens; Reviews <code>PRR_kwDOT1_wHc8AAAABVRI9JQ</code>, <code>PRR_kwDOT1_wHc8AAAABVRpIzA</code>).</td>
         <td><span class="badge badge-pass">REVIEWED &amp; APPROVED</span></td>
       </tr>
     </tbody>
