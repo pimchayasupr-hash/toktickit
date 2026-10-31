@@ -434,7 +434,7 @@ artifacts/lab-04/backups/
   </table>
 
   <div class="evidence-figure" style="margin-top: 4px;">
-    <img src="${imgGithubIssues}" class="evidence-img" style="max-height: 158px;" alt="GitHub Issues Board Showing All Issues Closed" />
+    <img src="${imgGithubIssues}" class="evidence-img" style="max-height: 125px;" alt="GitHub Issues Board Showing All Issues Closed" />
     <div class="caption">Figure 1.1: GitHub Repository Issues Board (<code>is:issue is:closed</code>) verifying that all Sprint 4 engineering issues (#43–#54) are completed and closed.</div>
   </div>
 </div>
