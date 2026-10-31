@@ -62,12 +62,14 @@ export const PublicCommentsSection: React.FC<PublicCommentsSectionProps> = ({ ti
   const formatDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
+      return d.toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
         month: 'short',
-        day: 'numeric',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch {
       return dateStr;

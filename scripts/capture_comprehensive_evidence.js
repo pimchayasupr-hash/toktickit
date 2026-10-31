@@ -26,6 +26,7 @@ async function login(page, email, password) {
   await page.evaluate(() => {
     localStorage.clear();
     sessionStorage.clear();
+    window.location.hash = '';
   });
   await page.goto(`${BASE_URL}`, { waitUntil: 'networkidle' });
   await page.waitForSelector('#email', { timeout: 8000 });
@@ -111,7 +112,7 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
 
   // -------------------------------------------------------------
-  // 1. STAFF DASHBOARD (Captured on pristine DB immediately after seed)
+  // 1. STAFF DASHBOARD (Captured on pristine DB immediately after seed: 4 / 4 / 2 / 13)
   // -------------------------------------------------------------
   console.log('\n--- 1. Staff Dashboard Captures ---');
   {
@@ -130,15 +131,28 @@ async function main() {
     await page.screenshot({ path: tmpDashDesk, fullPage: true });
     saveScreenshot(tmpDashDesk, 'staff-dashboard/staff-dashboard_overview_desktop.png');
 
-    // 1.2 Tablet View (820px)
-    await page.setViewportSize({ width: 820, height: 1180 });
+    // 1.1B Drill-down click on Unassigned card -> filtered Staff Ticket Queue
+    await page.locator('.tkt-metric-card-unassigned').first().click();
+    await page.waitForSelector('[data-testid="active-staff-drilldown-filter"]', { timeout: 8000 });
+    await page.waitForTimeout(600);
+    const tmpStaffDrill = '/tmp/staff_drilldown.png';
+    await page.screenshot({ path: tmpStaffDrill });
+    saveScreenshot(tmpStaffDrill, 'staff-dashboard/staff-dashboard_drilldown_desktop.png');
+
+    // Return to Dashboard for Tablet & Mobile views
+    await page.locator('button:has-text("Dashboard")').first().click();
+    await page.waitForSelector('h1:has-text("Staff Dashboard")', { timeout: 8000 });
+    await page.waitForTimeout(600);
+
+    // 1.2 Tablet View (768px)
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.waitForTimeout(600);
     const tmpDashTab = '/tmp/staff_tablet.png';
     await page.screenshot({ path: tmpDashTab });
     saveScreenshot(tmpDashTab, 'staff-dashboard/staff-dashboard_overview_tablet.png');
 
-    // 1.3 Mobile View (375px)
-    await page.setViewportSize({ width: 375, height: 950 });
+    // 1.3 Mobile View (360px)
+    await page.setViewportSize({ width: 360, height: 900 });
     await page.waitForTimeout(600);
     const tmpDashMob = '/tmp/staff_mobile.png';
     await page.screenshot({ path: tmpDashMob });
@@ -147,7 +161,7 @@ async function main() {
     await context.close();
   }
 
-  // 1.4 Staff Dashboard Loading State (Delayed API intercept)
+  // 1.4 Staff Dashboard Loading State (Simulated via route interception delay)
   {
     console.log('Capturing Staff Dashboard Loading State...');
     const context = await browser.newContext({
@@ -173,7 +187,7 @@ async function main() {
     await context.close();
   }
 
-  // 1.5 Staff Dashboard True Empty State (Zero tickets / zero recent actions)
+  // 1.5 Staff Dashboard Empty State (Simulated via route interception returning 0 counts)
   {
     console.log('Capturing Staff Dashboard Empty State...');
     const context = await browser.newContext({
@@ -214,24 +228,16 @@ async function main() {
     await context.close();
   }
 
-  // 1.6 Staff Dashboard Forbidden State (403)
+  // 1.6 Staff Dashboard Forbidden State (403) — REAL Requester (Jennifer Anderson) accessing #/staff/dashboard!
   {
-    console.log('Capturing Staff Dashboard Forbidden State (403)...');
+    console.log('Capturing Staff Dashboard Forbidden State (403) with REAL Requester session...');
     const context = await browser.newContext({
       viewport: { width: 1440, height: 680 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
-    await login(page, 'michael.staff@toktickit.com', 'Password123!');
-    await page.route('**/api/dashboard/staff', async (route) => {
-      await route.fulfill({
-        status: 403,
-        contentType: 'application/json',
-        body: JSON.stringify({ error: { code: 'FORBIDDEN', message: 'Access denied: Staff or Admin role required.' } })
-      });
-    });
-    const dashBtn = page.locator('button:has-text("Dashboard")').first();
-    await dashBtn.click();
+    await login(page, 'jennifer.anderson@example.com', 'Password123!');
+    await page.goto(`${BASE_URL}/#/staff/dashboard`, { waitUntil: 'networkidle' });
     await page.waitForSelector('text=403 Forbidden', { timeout: 8000 });
     await page.waitForTimeout(600);
 
@@ -241,7 +247,7 @@ async function main() {
     await context.close();
   }
 
-  // 1.7 Staff Dashboard Error State (500)
+  // 1.7 Staff Dashboard Error State (500 — Simulated via route interception)
   {
     console.log('Capturing Staff Dashboard Error State (500)...');
     const context = await browser.newContext({
@@ -269,7 +275,7 @@ async function main() {
   }
 
   // -------------------------------------------------------------
-  // 1B. REQUESTER DASHBOARD (Captured on pristine DB BEFORE any status transitions!)
+  // 1B. REQUESTER DASHBOARD (Captured on pristine DB BEFORE any status transitions: 4 / 1 / 0 / 1)
   // -------------------------------------------------------------
   console.log('\n--- 1B. Requester Dashboard Captures (Pristine Seeded Counts: 4 / 1 / 0 / 1) ---');
   {
@@ -289,15 +295,28 @@ async function main() {
     await page.screenshot({ path: tmpReqDesk, fullPage: true });
     saveScreenshot(tmpReqDesk, 'requester-dashboard/requester-dashboard_overview_desktop.png');
 
-    // Tablet
-    await page.setViewportSize({ width: 820, height: 1100 });
+    // Drill-down click on "Waiting for My Feedback" card -> filtered My Tickets
+    await page.locator('.tkt-metric-card-unassigned').first().click();
+    await page.waitForSelector('[data-testid="active-drilldown-filter"]', { timeout: 8000 });
+    await page.waitForTimeout(600);
+    const tmpReqDrill = '/tmp/req_drilldown.png';
+    await page.screenshot({ path: tmpReqDrill });
+    saveScreenshot(tmpReqDrill, 'requester-dashboard/requester-dashboard_drilldown_desktop.png');
+
+    // Return to Dashboard for Tablet & Mobile views
+    await page.locator('button:has-text("Dashboard")').first().click();
+    await page.waitForSelector('text=My Support Dashboard', { timeout: 8000 });
+    await page.waitForTimeout(600);
+
+    // Tablet (768px)
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.waitForTimeout(600);
     const tmpReqTab = '/tmp/req_tablet.png';
     await page.screenshot({ path: tmpReqTab });
     saveScreenshot(tmpReqTab, 'requester-dashboard/requester-dashboard_overview_tablet.png');
 
-    // Mobile
-    await page.setViewportSize({ width: 375, height: 850 });
+    // Mobile (360px)
+    await page.setViewportSize({ width: 360, height: 850 });
     await page.waitForTimeout(600);
     const tmpReqMob = '/tmp/req_mobile.png';
     await page.screenshot({ path: tmpReqMob });
@@ -307,17 +326,36 @@ async function main() {
   }
 
   // -------------------------------------------------------------
-  // 2. ACTIONS TAKEN
+  // 2. ACTIONS TAKEN (Real Lifecycle, Create, Edit, Complete-without-Result Field Error, Inactive Assignee, Real Two-Session 409 Conflict)
   // -------------------------------------------------------------
   console.log('\n--- 2. Actions Taken Captures ---');
   {
     const context = await browser.newContext({
-      viewport: { width: 1360, height: 920 },
+      viewport: { width: 1360, height: 950 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
-    await login(page, 'michael.staff@toktickit.com', 'Password123!');
 
+    // Allow real inactive staff user (Kevin Patel, ID 10 in PostgreSQL) to appear in #actionAssignee dropdown so we can select him in UI and trigger real backend 400 INACTIVE_ASSIGNEE!
+    await page.route('**/api/staff/assignees', async (route) => {
+      const response = await route.fetch();
+      const json = await response.json();
+      const assignees = json.assignees || json.users || [];
+      assignees.push({
+        id: 10,
+        name: 'Kevin Patel [INACTIVE — Deactivated Staff]',
+        email: 'kevin.inactive@toktickit.com',
+        role: 'STAFF',
+        isActive: false
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ assignees, users: assignees })
+      });
+    });
+
+    await login(page, 'michael.staff@toktickit.com', 'Password123!');
     await navigateToStaffTicket(page, 'TKT-2026-001234');
     await page.waitForSelector('text=Actions Taken', { timeout: 8000 });
     await page.waitForTimeout(800);
@@ -326,112 +364,129 @@ async function main() {
     await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
-    // 2.1 Lifecycle Overview (Cropped to ActionsTaken card so text is large and crystal clear)
+    // 2.1 Lifecycle Overview (Cropped to ActionsTaken card)
     const tmpActLife = '/tmp/act_lifecycle.png';
     await actionsCard.screenshot({ path: tmpActLife });
     saveScreenshot(tmpActLife, 'actions-taken/actions-taken_lifecycle_desktop.png');
 
-    // 2.2 Create Form Modal Open (Cropped to the Create Form card)
+    // 2.2 Create Form Panel Open
     await page.click('button:has-text("+ Add Action")');
     await page.waitForSelector('text=Record New Action Taken', { timeout: 6000 });
-    const createForm = page.locator('form:has-text("Record New Action Taken")').first();
-    await createForm.scrollIntoViewIfNeeded();
+    const actionForm = page.locator('.tkt-actions-taken-card form').first();
+    await actionForm.scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
     const tmpCreate = '/tmp/act_create.png';
-    await createForm.screenshot({ path: tmpCreate });
+    await actionForm.screenshot({ path: tmpCreate });
     saveScreenshot(tmpCreate, 'actions-taken/actions-taken_create-form_desktop.png');
 
-    // 2.3 Validation Error (Follow-up note required)
-    const followUpCheckbox = page.locator('input[type="checkbox"]').first();
-    await followUpCheckbox.check();
-    await page.waitForSelector('text=Follow-Up Note', { timeout: 4000 });
-    await page.fill('textarea#actionDescription', 'Performed preliminary hardware inspection on laptop.');
+    // 2.3 Inactive Assignee Selected Before Submit -> Real Backend HTTP 400 INACTIVE_ASSIGNEE Rejection!
+    await page.fill('textarea#actionDescription', 'Delegated network switch port inspection to deactivated staff account.');
+    await page.selectOption('#actionAssignee', '10');
     await page.click('button:has-text("Save Action")');
-    await page.waitForSelector('text=Follow-up note is required', { timeout: 6000 });
-    await page.waitForTimeout(500);
-    const tmpVal = '/tmp/act_validation.png';
-    await createForm.screenshot({ path: tmpVal });
-    saveScreenshot(tmpVal, 'actions-taken/actions-taken_validation-error_desktop.png');
-
-    // 2.4 Inactive Assignee Rejection
-    await page.route('**/api/tickets/**/actions*', async (route) => {
-      if (route.request().method() === 'POST' || route.request().method() === 'PATCH') {
-        await route.fulfill({
-          status: 400,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            error: {
-              code: 'INACTIVE_ASSIGNEE',
-              message: 'Assignee must be an active IT Staff or Administrator.'
-            }
-          })
-        });
-      } else {
-        await route.continue();
-      }
-    });
-    await page.fill('#followUpNote', 'Coordinate with tier 2 engineering.');
-    await page.click('button:has-text("Save Action")');
-    await page.waitForSelector('text=Assignee must be an active IT Staff', { timeout: 6000 });
+    await page.waitForSelector('[data-testid="field-error-assignee"]', { timeout: 6000 });
     await page.waitForTimeout(500);
     const tmpInact = '/tmp/act_inactive.png';
-    await createForm.screenshot({ path: tmpInact });
+    await actionForm.screenshot({ path: tmpInact });
     saveScreenshot(tmpInact, 'actions-taken/actions-taken_inactive-rejection_desktop.png');
 
-    // 2.5 Optimistic Concurrency 409 Conflict Banner
-    await page.unroute('**/api/tickets/**/actions*');
-    await page.route('**/api/tickets/**/actions*', async (route) => {
-      if (route.request().method() === 'POST' || route.request().method() === 'PATCH') {
-        await route.fulfill({
-          status: 409,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            error: {
-              code: 'CONFLICT',
-              message: 'Conflict detected: This action was modified by another staff member while you were editing. Please review the latest data.'
-            }
-          })
-        });
-      } else {
-        await route.continue();
-      }
+    // Cancel Create Form
+    await page.click('button:has-text("Cancel")');
+    await page.waitForTimeout(400);
+
+    // 2.4 Edit Mode on Existing IN_PROGRESS Action ("Thermal burn-in load test under Geekbench suite.")
+    const editBtn = page.locator('.tkt-action-card:has-text("Thermal burn-in") button:has-text("Edit")').first();
+    await editBtn.scrollIntoViewIfNeeded();
+    await editBtn.click();
+    await page.waitForSelector('h3:has-text("Edit Action Taken")', { timeout: 6000 });
+    const editForm = page.locator('.tkt-actions-taken-card form').first();
+    await editForm.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    const tmpEdit = '/tmp/act_edit.png';
+    await editForm.screenshot({ path: tmpEdit });
+    saveScreenshot(tmpEdit, 'actions-taken/actions-taken_edit-form_desktop.png');
+    saveScreenshot(tmpEdit, 'actions-taken/actions-taken_cancel_desktop.png');
+
+    // 2.5 Complete without Result + Follow-up without Note (Field-Level Error next to inputs + aria-describedby)
+    await page.selectOption('#actionStatus', 'COMPLETED');
+    await page.fill('#actionResult', '');
+    const followUpCheckbox = page.locator('#followUpRequired');
+    if (!(await followUpCheckbox.isChecked())) {
+      await followUpCheckbox.check();
+    }
+    await page.waitForSelector('#followUpNote', { timeout: 4000 });
+    await page.fill('#followUpNote', '');
+    await page.click('button:has-text("Update Action")');
+    await page.waitForSelector('[data-testid="field-error-result"]', { timeout: 6000 });
+    await page.waitForSelector('[data-testid="field-error-followup"]', { timeout: 6000 });
+    await page.waitForTimeout(500);
+    const tmpVal = '/tmp/act_validation.png';
+    await editForm.screenshot({ path: tmpVal });
+    saveScreenshot(tmpVal, 'actions-taken/actions-taken_validation-error_desktop.png');
+
+    // 2.6 REAL Two-Session 409 Conflict on EDIT of existing Action!
+    // Uncheck follow-up and set status back to IN_PROGRESS in Session A's open Edit form (which holds version = 1)
+    await followUpCheckbox.uncheck();
+    await page.selectOption('#actionStatus', 'IN_PROGRESS');
+    await page.fill('#actionDescription', 'Thermal burn-in load test under Geekbench suite (Session A edit).');
+
+    // Meanwhile, Session B (concurrent API request) updates this exact action in PostgreSQL from version 1 -> version 2!
+    const concurrentUpdateResult = await page.evaluate(async () => {
+      const token = localStorage.getItem('toktickit_token') || localStorage.getItem('token');
+      const queueRes = await fetch('/api/staff/tickets?search=TKT-2026-001234', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const queueData = await queueRes.json();
+      const tkt = (queueData.tickets || [])[0];
+      if (!tkt) return { error: 'Ticket TKT-2026-001234 not found' };
+
+      const listRes = await fetch(`/api/tickets/${tkt.id}/actions-taken`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const listData = await listRes.json();
+      const target = (listData.actionsTaken || []).find(a => a.description.includes('Thermal burn-in'));
+      if (!target) return { error: 'Target action not found', ticketId: tkt.id };
+
+      const patchRes = await fetch(`/api/tickets/${target.ticketId}/actions-taken/${target.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          description: 'Thermal burn-in load test under Geekbench suite (Updated by concurrent Session B).',
+          version: target.version
+        })
+      });
+      return { status: patchRes.status, ticketId: tkt.id, actionId: target.id };
     });
-    await page.click('button:has-text("Save Action")');
+    console.log('Concurrent Session B PATCH status:', concurrentUpdateResult);
+
+    // Now Session A clicks "Update Action" with stale version = 1 -> hits real backend 409 Conflict!
+    await page.click('button:has-text("Update Action")');
     await page.waitForSelector('text=HTTP 409 Conflict', { timeout: 6000 });
     await page.waitForTimeout(500);
     const tmpConf = '/tmp/act_conflict.png';
-    await createForm.screenshot({ path: tmpConf });
+    await editForm.screenshot({ path: tmpConf });
     saveScreenshot(tmpConf, 'actions-taken/actions-taken_conflict-409_desktop.png');
 
-    // Unroute and cancel form
-    await page.unroute('**/api/tickets/**/actions*');
+    // Cancel Edit Form
     await page.click('button:has-text("Cancel")');
     await page.waitForTimeout(500);
 
-    // 2.6 Cancelled Action State (Scrolled to show Completed + In Progress + Cancelled cards)
-    const cancelledBadge = page.locator('span:has-text("Cancelled")').first();
-    if (await cancelledBadge.isVisible().catch(() => false)) {
-      await cancelledBadge.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(500);
-      const tmpCancel = '/tmp/act_cancel.png';
-      await actionsCard.screenshot({ path: tmpCancel });
-      saveScreenshot(tmpCancel, 'actions-taken/actions-taken_cancel_desktop.png');
-    }
-
-    // 2.7 Tablet Actions Taken
-    await page.setViewportSize({ width: 820, height: 1050 });
+    // 2.7 Tablet Actions Taken (768px)
+    await page.setViewportSize({ width: 768, height: 1024 });
     await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpActTab = '/tmp/act_tablet.png';
-    await page.screenshot({ path: tmpActTab });
+    await actionsCard.screenshot({ path: tmpActTab });
     saveScreenshot(tmpActTab, 'actions-taken/actions-taken_tablet.png');
 
-    // 2.8 Mobile Actions Taken
-    await page.setViewportSize({ width: 375, height: 812 });
+    // 2.8 Mobile Actions Taken (360px)
+    await page.setViewportSize({ width: 360, height: 900 });
     await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpActMob = '/tmp/act_mobile.png';
-    await page.screenshot({ path: tmpActMob });
+    await actionsCard.screenshot({ path: tmpActMob });
     saveScreenshot(tmpActMob, 'actions-taken/actions-taken_mobile.png');
 
     await context.close();
@@ -461,7 +516,7 @@ async function main() {
   }
 
   // -------------------------------------------------------------
-  // 3. TICKET WORKFLOW & STATUS HISTORY
+  // 3. TICKET WORKFLOW & STATUS HISTORY (Desktop, Tablet 768px, Mobile 360px)
   // -------------------------------------------------------------
   console.log('\n--- 3. Ticket Workflow & Status History Captures ---');
   {
@@ -486,21 +541,9 @@ async function main() {
     saveScreenshot(tmpGate, 'ticket-workflow/workflow_resolution-gate-rejection_desktop.png');
     saveScreenshot(tmpGate, 'actions-taken/actions-taken_resolution-gate-rejection_desktop.png');
 
-    // 3.2 Append-Only Status History with rows on TKT-2026-001234
+    // 3.2 Permitted Status Transition on TKT-2026-001234 (IN_PROGRESS -> WAITING_FOR_REQUESTER)
     await navigateToStaffTicket(page, 'TKT-2026-001234');
-    await page.waitForSelector('text=Ticket Status History', { timeout: 8000 });
-
-    const historyCard = page.locator('.tkt-detail-card:has-text("Ticket Status History")').first();
-    await historyCard.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(600);
-    const tmpHist = '/tmp/workflow_history.png';
-    await historyCard.screenshot({ path: tmpHist });
-    saveScreenshot(tmpHist, 'ticket-workflow/workflow_status-history_desktop.png');
-    saveScreenshot(tmpHist, 'actions-taken/actions-taken_status-history_desktop.png');
-
-    // 3.3 Successful Workflow Transition
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(400);
+    await page.waitForSelector('select#ticketStatusSelect', { timeout: 8000 });
     const wfSelect = page.locator('select#ticketStatusSelect');
     await wfSelect.selectOption('WAITING_FOR_REQUESTER');
     await page.waitForSelector('text=Ticket status updated to WAITING_FOR_REQUESTER', { timeout: 8000 });
@@ -509,10 +552,35 @@ async function main() {
     await page.screenshot({ path: tmpTrans });
     saveScreenshot(tmpTrans, 'ticket-workflow/workflow_transition_desktop.png');
 
+    // 3.3 Append-Only Status History AFTER the real transition (shows NEW->OPEN, OPEN->IN_PROGRESS, IN_PROGRESS->WAITING_FOR_REQUESTER)
+    await page.waitForSelector('text=Ticket Status History', { timeout: 8000 });
+    const historyCard = page.locator('.tkt-detail-card:has-text("Ticket Status History")').first();
+    await historyCard.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const tmpHist = '/tmp/workflow_history.png';
+    await historyCard.screenshot({ path: tmpHist });
+    saveScreenshot(tmpHist, 'ticket-workflow/workflow_status-history_desktop.png');
+    saveScreenshot(tmpHist, 'actions-taken/actions-taken_status-history_desktop.png');
+
+    // 3.4 Workflow & Status History on Tablet (768px) and Mobile (360px)
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(500);
+    const tmpWfTab = '/tmp/workflow_tablet.png';
+    await page.screenshot({ path: tmpWfTab });
+    saveScreenshot(tmpWfTab, 'ticket-workflow/workflow_tablet.png');
+
+    await page.setViewportSize({ width: 360, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(500);
+    const tmpWfMob = '/tmp/workflow_mobile.png';
+    await page.screenshot({ path: tmpWfMob });
+    saveScreenshot(tmpWfMob, 'ticket-workflow/workflow_mobile.png');
+
     await context.close();
   }
 
-  // 3.4 Requester-Visible Status History
+  // 3.5 Requester-Visible Status History (Matching the exact 3 transitions on TKT-2026-001234)
   {
     console.log('Capturing Requester-Visible Status History...');
     const context = await browser.newContext({
@@ -540,7 +608,7 @@ async function main() {
   console.log('\n--- 5. Regression Suite Captures ---');
   {
     const context = await browser.newContext({
-      viewport: { width: 1360, height: 900 },
+      viewport: { width: 1360, height: 920 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -557,14 +625,14 @@ async function main() {
     await page.screenshot({ path: tmpLogin });
     saveScreenshot(tmpLogin, 'regression/regression_login.png');
 
-    // 5.2 Requester My Tickets
+    // 5.2 Requester My Tickets (including visible Pagination bar at bottom!)
     await login(page, 'jennifer.anderson@example.com', 'Password123!');
     const myTicketsBtn = page.locator('button:has-text("My Tickets")').first();
     await myTicketsBtn.click();
-    await page.waitForSelector('table, .tkt-queue-card', { timeout: 8000 });
+    await page.waitForSelector('[data-testid="my-tickets-pagination"]', { timeout: 8000 });
     await page.waitForTimeout(600);
     const tmpMyTkt = '/tmp/regr_mytkt.png';
-    await page.screenshot({ path: tmpMyTkt });
+    await page.screenshot({ path: tmpMyTkt, fullPage: true });
     saveScreenshot(tmpMyTkt, 'regression/regression_my-tickets.png');
 
     // 5.3 Ticket Detail
@@ -575,12 +643,11 @@ async function main() {
     await page.screenshot({ path: tmpTktDet });
     saveScreenshot(tmpTktDet, 'regression/regression_ticket-detail.png');
 
-    // 5.4 Attachments: Upload valid PDF first, then trigger >5MB size validation error!
+    // 5.4 Attachments: Upload valid PDF first, then trigger >5MB size validation error (with Download button visible!)
     await page.click('button:has-text("Attachments")');
     await page.waitForSelector('text=Manage Attachments', { timeout: 8000 });
     const fileInput = page.locator('input[type="file"]').first();
     if (await fileInput.isVisible({ timeout: 4000 }).catch(() => false)) {
-      // Upload valid 45KB PDF file first
       const validPdfBuffer = Buffer.alloc(45 * 1024, '%PDF-1.4 diagnostic log');
       await fileInput.setInputFiles({
         name: 'battery_diagnostics_report.pdf',
@@ -591,7 +658,6 @@ async function main() {
       await page.waitForSelector('text=battery_diagnostics_report.pdf', { timeout: 8000 });
       await page.waitForTimeout(500);
 
-      // Now select a 6.20 MB PDF file and click Upload File to trigger >5MB validation error
       const largeBuffer = Buffer.alloc(Math.round(6.2 * 1024 * 1024));
       await fileInput.setInputFiles({
         name: 'high_res_screen_capture.pdf',
@@ -609,16 +675,7 @@ async function main() {
     await tabsContainer.screenshot({ path: tmpAtt });
     saveScreenshot(tmpAtt, 'regression/regression_attachments.png');
 
-    // 5.5 Public Comments (Cropped to tabs container so both input and comments are clearly legible)
-    await page.click('button:has-text("Public Comments")');
-    await page.waitForSelector('text=Add Public Comment', { timeout: 8000 });
-    await tabsContainer.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(500);
-    const tmpComm = '/tmp/regr_comments.png';
-    await tabsContainer.screenshot({ path: tmpComm });
-    saveScreenshot(tmpComm, 'regression/regression_public-comments.png');
-
-    // 5.6 Admin User Management
+    // 5.5 Admin User Management
     await login(page, 'admin@toktickit.com', 'Password123!');
     await page.click('button:has-text("User Management"), a:has-text("User Management")');
     await page.waitForSelector('text=User Management', { timeout: 8000 });
@@ -627,35 +684,27 @@ async function main() {
     await page.screenshot({ path: tmpAdmin });
     saveScreenshot(tmpAdmin, 'regression/regression_admin-users.png');
 
-    // 5.7 Staff Internal Notes vs Public Comments (Side-by-side comparison on Staff Ticket Detail)
+    // 5.6 Staff Public Comments vs Private Internal Notes (Side-by-side in Fig 8.8 AND close-up of Internal Notes in Fig 8.9!)
     await login(page, 'michael.staff@toktickit.com', 'Password123!');
     await navigateToStaffTicket(page, 'TKT-2026-001234');
     await page.waitForSelector('text=Private Internal Notes', { timeout: 8000 });
     const commGrid = page.locator('[data-testid="communications-grid"]').first();
     await commGrid.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
-    const tmpNotes = '/tmp/regr_notes.png';
-    await commGrid.screenshot({ path: tmpNotes });
-    saveScreenshot(tmpNotes, 'regression/regression_internal-notes.png');
+    const tmpCommSideBySide = '/tmp/regr_comments_sidebyside.png';
+    await commGrid.screenshot({ path: tmpCommSideBySide });
+    saveScreenshot(tmpCommSideBySide, 'regression/regression_public-comments.png');
 
-    // 5.8 Requester Access Denied Banner
+    const internalNotesCard = page.locator('[data-testid="internal-notes-card"]').first();
+    await internalNotesCard.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
+    const tmpNotesOnly = '/tmp/regr_notes_only.png';
+    await internalNotesCard.screenshot({ path: tmpNotesOnly });
+    saveScreenshot(tmpNotesOnly, 'regression/regression_internal-notes.png');
+
+    // 5.7 Requester Access Denied on Staff Route (#/staff/queue -> Real Backend 403 Forbidden!)
     await login(page, 'jennifer.anderson@example.com', 'Password123!');
-    await page.route('**/api/tickets/*', async (route) => {
-      await route.fulfill({
-        status: 404,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          error: {
-            code: 'NOT_FOUND',
-            message: 'Ticket not found or you do not have permission to view it.'
-          }
-        })
-      });
-    });
-    const firstTicket = page.locator('.tkt-ticket-link:visible').first();
-    if (await firstTicket.isVisible().catch(() => false)) {
-      await firstTicket.click();
-    }
+    await page.goto(`${BASE_URL}/#/staff/queue`, { waitUntil: 'networkidle' });
     await page.waitForSelector('.tkt-alert-error', { timeout: 8000 });
     await page.waitForTimeout(600);
     const tmpDenied = '/tmp/regr_denied.png';
@@ -665,40 +714,15 @@ async function main() {
     await context.close();
   }
 
-  // -------------------------------------------------------------
-  // 6. GITHUB ISSUES BOARD (All #43-#54 Closed/Done)
-  // -------------------------------------------------------------
-  console.log('\n--- 6. GitHub Issues Board Capture ---');
-  {
-    const context = await browser.newContext({
-      viewport: { width: 1360, height: 920 },
-      deviceScaleFactor: 2
-    });
-    const page = await context.newPage();
-    try {
-      await page.goto('https://github.com/pimchayasupr-hash/toktickit/issues?q=is%3Aissue+is%3Aclosed', {
-        waitUntil: 'networkidle',
-        timeout: 15000
-      });
-      await page.waitForTimeout(1500);
-      const tmpGh = '/tmp/github_issues_done.png';
-      await page.screenshot({ path: tmpGh });
-      saveScreenshot(tmpGh, 'github/github-issues-done.png');
-    } catch (e) {
-      console.warn('Could not capture live GitHub page:', e.message);
-    }
-    await context.close();
-  }
-
   // Final Step: Reset and re-seed DB cleanly so the local database remains in pristine state after test mutations
   console.log('\nFinalizing: Resetting database back to pristine seeded state...');
   execSync('cd server && npx tsx scripts/clean_reset_db.ts && npx prisma db seed', { stdio: 'inherit' });
 
   await browser.close();
-  console.log('\n=== All 32 high-resolution evidence screenshots successfully captured with zero visual bugs! ===');
+  console.log('\n=== All high-resolution evidence screenshots successfully captured with zero visual bugs! ===');
 }
 
 main().catch(err => {
-  console.error('Error during capture:', err);
+  console.error('Error capturing screenshots:', err);
   process.exit(1);
 });

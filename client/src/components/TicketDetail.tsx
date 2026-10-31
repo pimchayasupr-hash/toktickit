@@ -506,12 +506,14 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                         </span>
                       </div>
                       <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
-                        {new Date(hist.changedAt).toLocaleString('th-TH', {
-                          year: 'numeric',
+                        {new Date(hist.changedAt).toLocaleString('en-GB', {
+                          timeZone: 'Asia/Bangkok',
+                          day: '2-digit',
                           month: 'short',
-                          day: 'numeric',
+                          year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          hour12: false,
                         })}
                       </div>
                     </div>
@@ -577,12 +579,21 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                           ({(a.sizeBytes / 1024).toFixed(1)} KB)
                         </span>
                       </div>
-                      <button
-                        onClick={() => setRemovingAttachment(a)}
-                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        Remove
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#006B3C', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          Download
+                        </button>
+                        <button
+                          onClick={() => setRemovingAttachment(a)}
+                          style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#dc2626', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))
                 )}

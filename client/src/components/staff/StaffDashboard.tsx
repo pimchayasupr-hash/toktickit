@@ -601,20 +601,26 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                       <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                         {action.ticketNumber}
                       </span>
-                      <span className="text-[11px] text-slate-400">
-                        {new Date(action.actionDateTime).toLocaleDateString('en-GB', {
+                      <span className="text-xs text-slate-400" style={{ fontSize: '0.72rem' }}>
+                        {new Date(action.actionDateTime).toLocaleString('en-GB', {
+                          timeZone: 'Asia/Bangkok',
+                          day: '2-digit',
                           month: 'short',
-                          day: 'numeric',
+                          year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          hour12: false,
                         })}
                       </span>
                     </div>
-                    <div className="text-xs font-medium text-slate-800 group-hover:text-emerald-900 transition line-clamp-2">
+                    <div className="text-xs font-medium text-slate-800 group-hover:text-emerald-900 transition line-clamp-2" style={{ fontSize: '0.78rem' }}>
                       {action.description}
                     </div>
                     {action.result && (
-                      <div className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <div
+                        className="mt-1.5 inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
+                        style={{ fontSize: '0.72rem', lineHeight: 1.35 }}
+                      >
                         <span className="font-semibold text-emerald-900">Result:</span> {action.result}
                       </div>
                     )}

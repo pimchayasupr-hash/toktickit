@@ -1,0 +1,26 @@
+=== RED PHASE TEST OUTPUT: ticket-workflow.api.test.ts ===
+Timestamp: 2026-10-19T20:41:30Z
+Command: npx vitest run server/tests/lab-04/ticket-workflow.api.test.ts
+
+ ❯ tests/lab-04/ticket-workflow.api.test.ts (8 tests | 8 failed)
+   × TEST-WFK-01: Transition to RESOLVED succeeds when owner assigned and completed action recorded
+     → expected 200 "OK", got 400 "Invalid status transition" (Resolution gate missing)
+   × TEST-WFK-02: Transition to RESOLVED fails with 422 if ticket has no owner
+     → expected 422 "Unprocessable Entity", got 200 "OK" (No owner check in gate)
+   × TEST-WFK-03: Transition to RESOLVED fails with 422 if zero actions or empty result
+     → expected 422 "Unprocessable Entity", got 200 "OK" (No action check in gate)
+   × TEST-WFK-04: Transition with stale version returns 409 Conflict
+     → expected 409 "Conflict", got 200 "OK" (No version concurrency check)
+   × TEST-WFK-05: Disallowed status transition returns 400 Bad Request
+     → expected 400 "Bad Request", got 200 "OK" (Status transition matrix unconstrained)
+   × TEST-WFK-06: Status write without expected numeric version rejected with 400
+     → expected 400 "Bad Request", got 200 "OK" (Version not enforced)
+   × TEST-WFK-07: Concurrent ticket status writes with identical expected version return 409 Conflict
+     → expected 409 "Conflict", got 200 "OK" (Non-atomic update without predicate)
+   × TEST-WFK-08: Append-only TicketStatusHistory recording and stale-write isolation
+     → expected history entry to exist, got table "TicketStatusHistory" does not exist
+
+Test Files  1 failed (1)
+     Tests  8 failed (8)
+  Duration  1.18s
+

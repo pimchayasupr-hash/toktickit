@@ -206,7 +206,7 @@ export const RequesterDashboard: React.FC<RequesterDashboardProps> = ({ onNaviga
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {/* Card 1: Open Tickets */}
         <div
-          onClick={() => onNavigate && onNavigate('my-tickets')}
+          onClick={() => onNavigate && onNavigate('my-tickets', { status: 'OPEN_ACTIVE', label: 'Open Tickets (Active)' })}
           className="tkt-metric-card tkt-metric-card-assigned"
         >
           <div>
@@ -232,7 +232,7 @@ export const RequesterDashboard: React.FC<RequesterDashboardProps> = ({ onNaviga
 
         {/* Card 2: Waiting for Feedback */}
         <div
-          onClick={() => onNavigate && onNavigate('my-tickets')}
+          onClick={() => onNavigate && onNavigate('my-tickets', { status: 'WAITING_FOR_REQUESTER', label: 'Waiting for My Feedback' })}
           className="tkt-metric-card tkt-metric-card-unassigned"
         >
           <div>

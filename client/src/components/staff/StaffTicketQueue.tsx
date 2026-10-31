@@ -4,10 +4,11 @@ import { useAuth } from '../../context/AuthContext';
 
 interface StaffTicketQueueProps {
   onSelectTicket: (ticketId: number) => void;
+  initialFilter?: { filter?: string; status?: string; priority?: string } | null;
 }
 
-export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTicket }) => {
-  const { token } = useAuth();
+export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTicket, initialFilter }) => {
+  const { token, user } = useAuth();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 10, total: 0, totalPages: 1 });
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,13 +17,23 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   // Filters & Sorting
   const [search, setSearch] = useState('');
   const [submittedSearch, setSubmittedSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(
+    initialFilter?.status || (initialFilter?.filter ? 'ACTIVE_OPEN' : '')
+  );
+  const [priorityFilter, setPriorityFilter] = useState(
+    initialFilter?.priority || (initialFilter?.filter === 'urgent' ? 'URGENT' : '')
+  );
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [ownerFilter, setOwnerFilter] = useState('');
+  const [ownerFilter, setOwnerFilter] = useState(
+    initialFilter?.filter === 'unassigned'
+      ? 'unassigned'
+      : initialFilter?.filter === 'mine' && user?.id
+      ? String(user.id)
+      : ''
+  );
   const [sortOrder, setSortOrder] = useState('updatedAt_desc');
   const [page, setPage] = useState(1);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(Boolean(initialFilter));
 
   // Reference data
   const [categories, setCategories] = useState<Category[]>([]);
@@ -53,6 +64,9 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        if (res.status === 403) {
+          throw new Error('403 Forbidden: Access denied. Only IT Staff and Administrators are permitted to access /api/staff/tickets (Role Isolation Guard BR-08).');
+        }
         if (!res.ok) {
           throw new Error('Failed to fetch ticket queue.');
         }
@@ -145,11 +159,14 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
   const formatDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
+      return d.toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
         month: 'short',
-        day: 'numeric',
+        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch {
       return dateStr;
@@ -211,10 +228,12 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
                 style={{ fontSize: '0.8rem', padding: '0.45rem 0.65rem' }}
               >
                 <option value="">All Statuses</option>
+                <option value="ACTIVE_OPEN">Active Open (Non-Terminal)</option>
                 <option value="NEW">New</option>
                 <option value="OPEN">Open</option>
                 <option value="IN_PROGRESS">In Progress</option>
                 <option value="WAITING_FOR_REQUESTER">Waiting for Requester</option>
+                <option value="REOPENED">Reopened</option>
                 <option value="RESOLVED">Resolved</option>
                 <option value="CLOSED">Closed</option>
                 <option value="CANCELLED">Cancelled</option>
@@ -285,10 +304,55 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
         )}
       </div>
 
-      {/* Subtitle Count */}
-      <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.75rem', fontWeight: 500 }}>
-        Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
-        {Math.min(page * 10, pagination.total)} of {pagination.total} tickets
+      {/* Subtitle Count & Active Drill-Down Filter Badge */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+        <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+          Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
+          {Math.min(page * 10, pagination.total)} of {pagination.total} tickets
+        </div>
+        {(ownerFilter || statusFilter || priorityFilter || categoryFilter) && (
+          <div
+            data-testid="active-staff-drilldown-filter"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #BBF7D0',
+              color: '#006B3C',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '0.25rem 0.65rem',
+              borderRadius: '9999px',
+            }}
+          >
+            <span>
+              Filtered View:{' '}
+              {ownerFilter === 'unassigned'
+                ? 'Unassigned Queue'
+                : ownerFilter
+                ? 'My Assigned Queue'
+                : statusFilter
+                ? `Status = ${statusFilter}`
+                : priorityFilter
+                ? `Priority = ${priorityFilter}`
+                : 'Custom Filter'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setOwnerFilter('');
+                setStatusFilter('');
+                setPriorityFilter('');
+                setCategoryFilter('');
+                setPage(1);
+              }}
+              style={{ background: 'none', border: 'none', color: '#006B3C', fontWeight: 800, cursor: 'pointer', padding: 0 }}
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}

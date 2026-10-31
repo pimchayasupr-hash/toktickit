@@ -49,30 +49,61 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
     <div
-      className="p-5 rounded-xl shadow-sm space-y-4"
+      data-testid="internal-notes-card"
       style={{
         backgroundColor: '#FFFBEB',
-        border: '1px solid #F59E0B',
+        border: '1px solid #D97706',
         borderTop: '4px solid #D97706',
         borderRadius: '12px',
         padding: '1.25rem',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
       }}
     >
       <div
-        className="flex items-center justify-between pb-3"
-        style={{ borderBottom: '1px solid #FDE68A' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          paddingBottom: '0.75rem',
+          marginBottom: '1rem',
+          borderBottom: '1px solid #FDE68A',
+        }}
       >
         <h3
-          className="font-bold text-base flex items-center gap-2"
-          style={{ color: '#78350F', margin: 0, fontSize: '1rem', fontWeight: 700 }}
+          style={{
+            color: '#78350F',
+            margin: 0,
+            fontSize: '1rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
         >
           <svg
             width="18"
             height="18"
-            className="w-4 h-4"
-            style={{ color: '#B45309' }}
+            style={{ color: '#B45309', flexShrink: 0 }}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -82,12 +113,15 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
           Private Internal Notes ({notes.length})
         </h3>
         <span
-          className="text-xs px-2.5 py-0.5 rounded-full font-bold"
           style={{
             backgroundColor: '#FEF3C7',
-            color: '#92400E',
-            border: '1px solid #F59E0B',
+            color: '#78350F',
+            border: '1px solid #D97706',
             fontSize: '0.7rem',
+            fontWeight: 700,
+            padding: '0.2rem 0.6rem',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
           }}
         >
           CONFIDENTIAL • IT Staff &amp; Admins Only
@@ -95,35 +129,54 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
       </div>
 
       {/* Timeline */}
-      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
         {notes.length === 0 ? (
-          <p className="text-xs italic py-2" style={{ color: '#92400E' }}>
+          <p style={{ color: '#92400E', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
             No internal notes recorded yet.
           </p>
         ) : (
           notes.map((n) => (
             <div
               key={n.id}
-              className="p-3 rounded-lg space-y-1"
               style={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #FDE68A',
                 borderLeft: '4px solid #D97706',
+                borderRadius: '8px',
+                padding: '0.85rem 1rem',
               }}
             >
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold flex items-center gap-1.5" style={{ color: '#78350F' }}>
-                  {n.author.name}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  marginBottom: '0.4rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ color: '#78350F', fontWeight: 700, fontSize: '0.85rem' }}>
+                    {n.author.name}
+                  </span>
                   <span
-                    className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold"
-                    style={{ backgroundColor: '#FEF3C7', color: '#92400E', border: '1px solid #FCD34D' }}
+                    style={{
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #D97706',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      padding: '0.1rem 0.45rem',
+                      borderRadius: '4px',
+                    }}
                   >
                     {n.author.role}
                   </span>
-                </span>
-                <span className="text-slate-500">{new Date(n.createdAt).toLocaleString()}</span>
+                </div>
+                <span style={{ color: '#64748B', fontSize: '0.75rem' }}>{formatDate(n.createdAt)}</span>
               </div>
-              <p className="text-sm text-slate-800 whitespace-pre-wrap" style={{ margin: '0.35rem 0 0 0' }}>
+              <p style={{ color: '#1E293B', fontSize: '0.875rem', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
                 {n.content}
               </p>
             </div>
@@ -132,29 +185,62 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
       </div>
 
       {/* Post Note Form */}
-      {error && <div role="alert" className="text-xs text-red-600 bg-red-50 p-2 rounded">{error}</div>}
+      {error && (
+        <div
+          role="alert"
+          style={{
+            fontSize: '0.8rem',
+            color: '#DC2626',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FECACA',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '6px',
+            marginBottom: '0.75rem',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-2 pt-3"
-        style={{ borderTop: '1px solid #FDE68A' }}
+        style={{ paddingTop: '0.75rem', borderTop: '1px solid #FDE68A' }}
       >
         <textarea
-          rows={3}
+          rows={2}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write a confidential internal note (hidden from requester)..."
-          className="w-full p-2.5 rounded-lg text-sm bg-white"
-          style={{ border: '1px solid #F59E0B' }}
+          style={{
+            width: '100%',
+            padding: '0.65rem 0.75rem',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #D97706',
+            marginBottom: '0.5rem',
+            boxSizing: 'border-box',
+          }}
         />
-        <div className="flex justify-end">
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 text-white text-xs font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
-            style={{ backgroundColor: '#B45309', border: '1px solid #92400E', cursor: 'pointer' }}
+            style={{
+              backgroundColor: '#B45309',
+              border: '1px solid #92400E',
+              color: '#FFFFFF',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
           >
-            <svg width="14" height="14" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             {submitting ? 'Saving Note...' : 'Add Internal Note'}

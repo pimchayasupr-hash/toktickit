@@ -67,6 +67,12 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const [followUpNote, setFollowUpNote] = useState<string>('');
   const [attachmentNotes, setAttachmentNotes] = useState<string>('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    description?: string;
+    result?: string;
+    followUpNote?: string;
+    assigneeId?: string;
+  }>({});
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [conflictWarning, setConflictWarning] = useState<string | null>(null);
 
@@ -131,6 +137,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
     setFollowUpNote('');
     setAttachmentNotes('');
     setFormError(null);
+    setFieldErrors({});
     setConflictWarning(null);
   };
 
@@ -165,7 +172,9 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
       // Need result to complete: open edit form with status set to COMPLETED
       handleOpenEditForm(action);
       setStatus('COMPLETED');
-      setFormError('Result is required to complete this action. Please record the outcome below.');
+      const msg = 'Result is required to complete this action. Please record the outcome below (BR-06).';
+      setFormError(msg);
+      setFieldErrors({ result: msg });
       return;
     }
 
@@ -207,23 +216,37 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setFieldErrors({});
     setConflictWarning(null);
+
+    const newFieldErrors: {
+      description?: string;
+      result?: string;
+      followUpNote?: string;
+      assigneeId?: string;
+    } = {};
 
     // Validation
     if (!description.trim()) {
-      setFormError('Action description is required.');
-      return;
-    }
-    if (description.trim().length < 5) {
-      setFormError('Action description must be at least 5 characters.');
-      return;
+      newFieldErrors.description = 'Action description is required.';
+    } else if (description.trim().length < 5) {
+      newFieldErrors.description = 'Action description must be at least 5 characters.';
     }
     if (status === 'COMPLETED' && !result.trim()) {
-      setFormError('Result is required when completing an Action Taken.');
-      return;
+      newFieldErrors.result = 'Result is required when completing an Action Taken (BR-06).';
     }
     if (followUpRequired && !followUpNote.trim()) {
-      setFormError('Follow-up note is required when follow-up is checked.');
+      newFieldErrors.followUpNote = 'Follow-up note is required when follow-up is checked (BR-05).';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      setFormError(
+        newFieldErrors.description ||
+          newFieldErrors.result ||
+          newFieldErrors.followUpNote ||
+          'Please fix the highlighted validation errors below.'
+      );
       return;
     }
 
@@ -275,7 +298,11 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
       if (!res.ok) {
         const errorJson = await res.json().catch(() => ({}));
-        throw new Error(errorJson.error?.message || 'Failed to save action taken.');
+        const errMsg = errorJson.error?.message || 'Failed to save action taken.';
+        if (errorJson.error?.code === 'INACTIVE_ASSIGNEE' || errMsg.toLowerCase().includes('assignee')) {
+          setFieldErrors((prev) => ({ ...prev, assigneeId: errMsg }));
+        }
+        throw new Error(errMsg);
       }
 
       resetForm();
@@ -420,6 +447,9 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 id="actionAssignee"
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
+                aria-invalid={Boolean(fieldErrors.assigneeId)}
+                aria-describedby={fieldErrors.assigneeId ? 'actionAssignee-error' : undefined}
+                style={fieldErrors.assigneeId ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="">(Unassigned / Current Staff)</option>
@@ -429,6 +459,15 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                   </option>
                 ))}
               </select>
+              {fieldErrors.assigneeId && (
+                <div
+                  id="actionAssignee-error"
+                  data-testid="field-error-assignee"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600, marginTop: '0.25rem' }}
+                >
+                  {fieldErrors.assigneeId}
+                </div>
+              )}
             </div>
           </div>
 
@@ -445,12 +484,29 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              aria-required="true"
+              aria-invalid={Boolean(fieldErrors.description)}
+              aria-describedby={fieldErrors.description ? 'actionDescription-error' : undefined}
+              style={fieldErrors.description ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
               placeholder="Describe technical step performed (e.g., Checked fiber transceiver power level, replaced patch cable)..."
               className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
-            <div className="text-right text-[11px] text-slate-400 mt-0.5">
-              {description.length} / 2000 chars
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+              {fieldErrors.description ? (
+                <div
+                  id="actionDescription-error"
+                  data-testid="field-error-description"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  {fieldErrors.description}
+                </div>
+              ) : (
+                <span />
+              )}
+              <div className="text-right text-[11px] text-slate-400" style={{ fontSize: '0.7rem' }}>
+                {description.length} / 2000 chars
+              </div>
             </div>
           </div>
 
@@ -467,11 +523,28 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
               rows={2}
               value={result}
               onChange={(e) => setResult(e.target.value)}
+              aria-required={status === 'COMPLETED'}
+              aria-invalid={Boolean(fieldErrors.result)}
+              aria-describedby={fieldErrors.result ? 'actionResult-error' : undefined}
+              style={fieldErrors.result ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
               placeholder={status === 'COMPLETED' ? "Observed outcome or measurement (Required to complete action)..." : "Observed outcome or measurement (Optional while pending/in-progress)..."}
               className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-            <div className="text-right text-[11px] text-slate-400 mt-0.5">
-              {result.length} / 1000 chars
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+              {fieldErrors.result ? (
+                <div
+                  id="actionResult-error"
+                  data-testid="field-error-result"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  {fieldErrors.result}
+                </div>
+              ) : (
+                <span />
+              )}
+              <div className="text-right text-[11px] text-slate-400" style={{ fontSize: '0.7rem' }}>
+                {result.length} / 1000 chars
+              </div>
             </div>
           </div>
 
@@ -506,10 +579,23 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 rows={2}
                 value={followUpNote}
                 onChange={(e) => setFollowUpNote(e.target.value)}
+                aria-required="true"
+                aria-invalid={Boolean(fieldErrors.followUpNote)}
+                aria-describedby={fieldErrors.followUpNote ? 'followUpNote-error' : undefined}
+                style={fieldErrors.followUpNote ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
                 placeholder="Specify what requires further attention or monitoring..."
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
+              {fieldErrors.followUpNote && (
+                <div
+                  id="followUpNote-error"
+                  data-testid="field-error-followup"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600, marginTop: '0.25rem' }}
+                >
+                  {fieldErrors.followUpNote}
+                </div>
+              )}
             </div>
           )}
 
@@ -611,12 +697,14 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
                     <span className="text-xs text-slate-400">•</span>
                     <span className="text-xs text-slate-500">
-                      {new Date(act.actionDateTime).toLocaleString('th-TH', {
-                        year: 'numeric',
+                      {new Date(act.actionDateTime).toLocaleString('en-GB', {
+                        timeZone: 'Asia/Bangkok',
+                        day: '2-digit',
                         month: 'short',
-                        day: 'numeric',
+                        year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
+                        hour12: false,
                       })}
                     </span>
 

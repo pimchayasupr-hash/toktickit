@@ -44,12 +44,12 @@ const getPriorityBadgeClass = (priority?: string) => {
 
 const PERMITTED_TRANSITIONS: Record<string, string[]> = {
   NEW: ['OPEN', 'IN_PROGRESS', 'CANCELLED'],
-  OPEN: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'IN_PROGRESS'],
-  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED', 'OPEN'],
+  OPEN: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
+  IN_PROGRESS: ['WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   WAITING_FOR_REQUESTER: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
   RESOLVED: ['CLOSED', 'REOPENED'],
   CLOSED: ['REOPENED'],
-  REOPENED: ['IN_PROGRESS', 'RESOLVED', 'CANCELLED'],
+  REOPENED: ['IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'RESOLVED', 'CANCELLED'],
   CANCELLED: [],
 };
 
@@ -549,12 +549,14 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                   </span>
                 </div>
                 <div style={{ color: '#64748b', fontSize: '0.75rem' }}>
-                  {new Date(hist.changedAt).toLocaleString('th-TH', {
-                    year: 'numeric',
+                  {new Date(hist.changedAt).toLocaleString('en-GB', {
+                    timeZone: 'Asia/Bangkok',
+                    day: '2-digit',
                     month: 'short',
-                    day: 'numeric',
+                    year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: false,
                   })}
                 </div>
               </div>
@@ -625,12 +627,21 @@ export const StaffTicketDetail: React.FC<StaffTicketDetailProps> = ({ ticketId, 
                     ({(a.sizeBytes / 1024).toFixed(1)} KB)
                   </span>
                 </div>
-                <button
-                  onClick={() => setRemovingAttachment(a)}
-                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
-                >
-                  Remove
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
+                    style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', fontWeight: 600, color: '#006B3C', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '6px', cursor: 'pointer' }}
+                  >
+                    Download
+                  </button>
+                  <button
+                    onClick={() => setRemovingAttachment(a)}
+                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#dc2626', background: 'none', border: '1px solid #fca5a5', borderRadius: '6px', cursor: 'pointer' }}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))
           )}

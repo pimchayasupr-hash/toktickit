@@ -7,9 +7,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 interface MyTicketsProps {
   onSelectTicket: (ticketId: number) => void;
   onCreateNewTicket: () => void;
+  initialFilter?: { status?: string; label?: string } | null;
 }
 
-export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewTicket }) => {
+export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewTicket, initialFilter }) => {
   const { token } = useAuth();
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -21,8 +22,9 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSystem, setSelectedSystem] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>(initialFilter?.status || '');
   const [sort, setSort] = useState<string>('updatedAt_desc');
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(Boolean(initialFilter));
 
   // Pagination State
   const [page, setPage] = useState<number>(1);
@@ -80,10 +82,19 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         throw new Error(data.error?.message || `HTTP ${res.status}: Failed to fetch tickets.`);
       }
 
-      setTickets(data.tickets || []);
+      let fetchedTickets: Ticket[] = data.tickets || [];
+      if (selectedStatus === 'OPEN_ACTIVE') {
+        fetchedTickets = fetchedTickets.filter((t) =>
+          ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'].includes(t.currentStatus)
+        );
+      } else if (selectedStatus) {
+        fetchedTickets = fetchedTickets.filter((t) => t.currentStatus === selectedStatus);
+      }
+
+      setTickets(fetchedTickets);
       if (data.pagination) {
         setTotalPages(data.pagination.totalPages || 1);
-        setTotalTickets(data.pagination.total || 0);
+        setTotalTickets(selectedStatus ? fetchedTickets.length : data.pagination.total || 0);
       }
     } catch (err: any) {
       setError(err.message || 'Unable to connect to server. Please try again.');
@@ -91,7 +102,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
     } finally {
       setIsLoading(false);
     }
-  }, [search, selectedCategory, selectedSystem, selectedPriority, sort, page, token]);
+  }, [search, selectedCategory, selectedSystem, selectedPriority, selectedStatus, sort, page, token]);
 
   useEffect(() => {
     fetchTickets();
@@ -144,11 +155,14 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const formatDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
+      return d.toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
         month: 'short',
-        day: 'numeric',
+        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch {
       return dateStr;
@@ -276,10 +290,38 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         )}
       </div>
 
-      {/* Subtitle Count */}
-      <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.75rem', fontWeight: 500 }}>
-        Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
-        {Math.min(page * 10, totalTickets)} of {totalTickets} tickets
+      {/* Subtitle Count & Active Drill-Down Filter Badge */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+        <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+          Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
+          {Math.min(page * 10, totalTickets)} of {totalTickets} tickets
+        </div>
+        {selectedStatus && (
+          <div
+            data-testid="active-drilldown-filter"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #BBF7D0',
+              color: '#006B3C',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '0.25rem 0.65rem',
+              borderRadius: '9999px',
+            }}
+          >
+            <span>Filtered by Status: {initialFilter?.label || selectedStatus}</span>
+            <button
+              type="button"
+              onClick={() => setSelectedStatus('')}
+              style={{ background: 'none', border: 'none', color: '#006B3C', fontWeight: 800, cursor: 'pointer', padding: 0 }}
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
@@ -354,8 +396,8 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
           </table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="tkt-pagination">
+          {totalPages >= 1 && (
+            <div className="tkt-pagination" data-testid="my-tickets-pagination">
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
@@ -363,7 +405,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
               >
                 &lt; Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}

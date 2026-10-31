@@ -23,23 +23,23 @@ describe('Lab 4 Audit - Metrics vs Database Raw SQL Integrity', () => {
     expect(dashRes.status).toBe(200);
     const { metrics } = dashRes.body;
 
-    // 3. Direct DB verification queries
-    const nonTerminal = { notIn: ['CLOSED', 'CANCELLED'] };
+    // 3. Direct DB verification queries (Unified Active Open statuses across Staff & Requester)
+    const activeOpenFilter = { in: ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'] };
 
     const expectedUnassigned = await prisma.ticket.count({
-      where: { ownerId: null, currentStatus: nonTerminal },
+      where: { ownerId: null, currentStatus: activeOpenFilter },
     });
 
     const expectedMyAssigned = await prisma.ticket.count({
-      where: { ownerId: staffId, currentStatus: nonTerminal },
+      where: { ownerId: staffId, currentStatus: activeOpenFilter },
     });
 
     const expectedOpenTotal = await prisma.ticket.count({
-      where: { currentStatus: nonTerminal },
+      where: { currentStatus: activeOpenFilter },
     });
 
     const expectedUrgent = await prisma.ticket.count({
-      where: { itPriority: 'URGENT', currentStatus: nonTerminal },
+      where: { itPriority: 'URGENT', currentStatus: activeOpenFilter },
     });
 
     // 4. Assert 1:1 mathematical equality
@@ -81,10 +81,12 @@ describe('Lab 4 Audit - Metrics vs Database Raw SQL Integrity', () => {
       },
     });
 
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const expectedResolved = await prisma.ticket.count({
       where: {
         requesterId,
         currentStatus: 'RESOLVED',
+        updatedAt: { gte: thirtyDaysAgo },
       },
     });
 
