@@ -511,36 +511,27 @@ export async function seedDatabase() {
     }
 
     if (t.ticketNumber === 'TKT-2026-001234') {
-      const existingHistory = await prisma.ticketStatusHistory.findFirst({
+      await prisma.ticketStatusHistory.deleteMany({
         where: { ticketId: ticket.id },
       });
-      if (!existingHistory) {
-        await prisma.ticketStatusHistory.createMany({
-          data: [
-            {
-              ticketId: ticket.id,
-              fromStatus: 'NEW',
-              toStatus: 'OPEN',
-              changedById: staffMichael,
-              changedAt: new Date(Date.now() - 3600000 * 24 * 2), // 2 days ago
-            },
-            {
-              ticketId: ticket.id,
-              fromStatus: 'OPEN',
-              toStatus: 'IN_PROGRESS',
-              changedById: staffMichael,
-              changedAt: new Date(Date.now() - 3600000 * 24 * 1), // 1 day ago
-            },
-            {
-              ticketId: ticket.id,
-              fromStatus: 'IN_PROGRESS',
-              toStatus: 'OPEN',
-              changedById: staffMichael,
-              changedAt: new Date(Date.now() - 3600000 * 4), // 4 hours ago
-            },
-          ],
-        });
-      }
+      await prisma.ticketStatusHistory.createMany({
+        data: [
+          {
+            ticketId: ticket.id,
+            fromStatus: 'NEW',
+            toStatus: 'OPEN',
+            changedById: staffMichael,
+            changedAt: new Date(Date.now() - 3600000 * 24 * 2), // 2 days ago
+          },
+          {
+            ticketId: ticket.id,
+            fromStatus: 'OPEN',
+            toStatus: 'IN_PROGRESS',
+            changedById: staffMichael,
+            changedAt: new Date(Date.now() - 3600000 * 24 * 1), // 1 day ago
+          },
+        ],
+      });
 
       const existingAction1 = await prisma.actionTaken.findFirst({
         where: { ticketId: ticket.id, description: { contains: 'Apple Hardware Diagnostics' } },

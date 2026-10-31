@@ -22,12 +22,13 @@ async function run() {
     .set('Authorization', `Bearer ${staffToken}`);
 
   const sm = staffDash.body.metrics;
-  const nonTerminal = { notIn: ['CLOSED', 'CANCELLED'] as any };
+  const activeOpenFilter = { in: ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'] as any };
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const dbUnassigned = await prisma.ticket.count({ where: { ownerId: null, currentStatus: nonTerminal } });
-  const dbMyAssigned = await prisma.ticket.count({ where: { ownerId: staffId, currentStatus: nonTerminal } });
-  const dbOpenTotal = await prisma.ticket.count({ where: { currentStatus: nonTerminal } });
-  const dbUrgent = await prisma.ticket.count({ where: { itPriority: 'URGENT', currentStatus: nonTerminal } });
+  const dbUnassigned = await prisma.ticket.count({ where: { ownerId: null, currentStatus: activeOpenFilter } });
+  const dbMyAssigned = await prisma.ticket.count({ where: { ownerId: staffId, currentStatus: activeOpenFilter } });
+  const dbOpenTotal = await prisma.ticket.count({ where: { currentStatus: activeOpenFilter } });
+  const dbUrgent = await prisma.ticket.count({ where: { itPriority: 'URGENT', currentStatus: activeOpenFilter } });
 
   // 2. Requester Dashboard
   const reqLogin = await request(app).post('/api/auth/login').send({
@@ -44,13 +45,13 @@ async function run() {
   const rm = reqDash.body.metrics;
 
   const dbReqOpen = await prisma.ticket.count({
-    where: { requesterId: reqId, currentStatus: { in: ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'] as any } },
+    where: { requesterId: reqId, currentStatus: activeOpenFilter },
   });
   const dbReqWaiting = await prisma.ticket.count({
     where: { requesterId: reqId, currentStatus: 'WAITING_FOR_REQUESTER' },
   });
   const dbReqResolved = await prisma.ticket.count({
-    where: { requesterId: reqId, currentStatus: 'RESOLVED' },
+    where: { requesterId: reqId, currentStatus: 'RESOLVED', updatedAt: { gte: thirtyDaysAgo } },
   });
   const dbReqClosed = await prisma.ticket.count({
     where: { requesterId: reqId, currentStatus: 'CLOSED' },

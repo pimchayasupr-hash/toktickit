@@ -67,6 +67,12 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const [followUpNote, setFollowUpNote] = useState<string>('');
   const [attachmentNotes, setAttachmentNotes] = useState<string>('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    description?: string;
+    result?: string;
+    followUpNote?: string;
+    assigneeId?: string;
+  }>({});
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [conflictWarning, setConflictWarning] = useState<string | null>(null);
 
@@ -131,6 +137,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
     setFollowUpNote('');
     setAttachmentNotes('');
     setFormError(null);
+    setFieldErrors({});
     setConflictWarning(null);
   };
 
@@ -165,7 +172,9 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
       // Need result to complete: open edit form with status set to COMPLETED
       handleOpenEditForm(action);
       setStatus('COMPLETED');
-      setFormError('Result is required to complete this action. Please record the outcome below.');
+      const msg = 'Result is required to complete this action. Please record the outcome below (BR-06).';
+      setFormError(msg);
+      setFieldErrors({ result: msg });
       return;
     }
 
@@ -207,23 +216,37 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setFieldErrors({});
     setConflictWarning(null);
+
+    const newFieldErrors: {
+      description?: string;
+      result?: string;
+      followUpNote?: string;
+      assigneeId?: string;
+    } = {};
 
     // Validation
     if (!description.trim()) {
-      setFormError('Action description is required.');
-      return;
-    }
-    if (description.trim().length < 5) {
-      setFormError('Action description must be at least 5 characters.');
-      return;
+      newFieldErrors.description = 'Action description is required.';
+    } else if (description.trim().length < 5) {
+      newFieldErrors.description = 'Action description must be at least 5 characters.';
     }
     if (status === 'COMPLETED' && !result.trim()) {
-      setFormError('Result is required when completing an Action Taken.');
-      return;
+      newFieldErrors.result = 'Result is required when completing an Action Taken (BR-06).';
     }
     if (followUpRequired && !followUpNote.trim()) {
-      setFormError('Follow-up note is required when follow-up is checked.');
+      newFieldErrors.followUpNote = 'Follow-up note is required when follow-up is checked (BR-05).';
+    }
+
+    if (Object.keys(newFieldErrors).length > 0) {
+      setFieldErrors(newFieldErrors);
+      setFormError(
+        newFieldErrors.description ||
+          newFieldErrors.result ||
+          newFieldErrors.followUpNote ||
+          'Please fix the highlighted validation errors below.'
+      );
       return;
     }
 
@@ -275,7 +298,11 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
       if (!res.ok) {
         const errorJson = await res.json().catch(() => ({}));
-        throw new Error(errorJson.error?.message || 'Failed to save action taken.');
+        const errMsg = errorJson.error?.message || 'Failed to save action taken.';
+        if (errorJson.error?.code === 'INACTIVE_ASSIGNEE' || errMsg.toLowerCase().includes('assignee')) {
+          setFieldErrors((prev) => ({ ...prev, assigneeId: errMsg }));
+        }
+        throw new Error(errMsg);
       }
 
       resetForm();
@@ -291,12 +318,12 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm mt-6">
+    <div data-testid="actions-taken-card" className="tkt-actions-taken-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm mt-6">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <svg className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="20" height="20" className="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -351,17 +378,19 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
           )}
 
           {conflictWarning && (
-            <div className="bg-amber-50 text-amber-900 text-xs p-3 rounded-lg border border-amber-300 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="20" height="20" className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <span>{conflictWarning}</span>
+                <div>
+                  <strong>HTTP 409 Conflict:</strong> {conflictWarning}
+                </div>
               </div>
               <button
                 type="button"
                 onClick={fetchActions}
-                className="underline font-bold text-amber-900 ml-2"
+                className="underline font-bold text-red-900 ml-2 text-xs"
               >
                 Reload Latest Data
               </button>
@@ -400,10 +429,10 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 onChange={(e) => setStatus(e.target.value as ActionStatus)}
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
               >
-                <option value="PENDING">⏳ Pending</option>
-                <option value="IN_PROGRESS">⚙ In Progress</option>
-                <option value="COMPLETED">✓ Completed</option>
-                {editingActionId && <option value="CANCELLED">✕ Cancelled</option>}
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                {editingActionId && <option value="CANCELLED">Cancelled</option>}
               </select>
             </div>
 
@@ -418,6 +447,9 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 id="actionAssignee"
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
+                aria-invalid={Boolean(fieldErrors.assigneeId)}
+                aria-describedby={fieldErrors.assigneeId ? 'actionAssignee-error' : undefined}
+                style={fieldErrors.assigneeId ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="">(Unassigned / Current Staff)</option>
@@ -427,6 +459,15 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                   </option>
                 ))}
               </select>
+              {fieldErrors.assigneeId && (
+                <div
+                  id="actionAssignee-error"
+                  data-testid="field-error-assignee"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600, marginTop: '0.25rem' }}
+                >
+                  {fieldErrors.assigneeId}
+                </div>
+              )}
             </div>
           </div>
 
@@ -443,12 +484,29 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              aria-required="true"
+              aria-invalid={Boolean(fieldErrors.description)}
+              aria-describedby={fieldErrors.description ? 'actionDescription-error' : undefined}
+              style={fieldErrors.description ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
               placeholder="Describe technical step performed (e.g., Checked fiber transceiver power level, replaced patch cable)..."
               className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
-            <div className="text-right text-[11px] text-slate-400 mt-0.5">
-              {description.length} / 2000 chars
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+              {fieldErrors.description ? (
+                <div
+                  id="actionDescription-error"
+                  data-testid="field-error-description"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  {fieldErrors.description}
+                </div>
+              ) : (
+                <span />
+              )}
+              <div className="text-right text-[11px] text-slate-400" style={{ fontSize: '0.7rem' }}>
+                {description.length} / 2000 chars
+              </div>
             </div>
           </div>
 
@@ -465,11 +523,28 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
               rows={2}
               value={result}
               onChange={(e) => setResult(e.target.value)}
+              aria-required={status === 'COMPLETED'}
+              aria-invalid={Boolean(fieldErrors.result)}
+              aria-describedby={fieldErrors.result ? 'actionResult-error' : undefined}
+              style={fieldErrors.result ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
               placeholder={status === 'COMPLETED' ? "Observed outcome or measurement (Required to complete action)..." : "Observed outcome or measurement (Optional while pending/in-progress)..."}
               className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
-            <div className="text-right text-[11px] text-slate-400 mt-0.5">
-              {result.length} / 1000 chars
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
+              {fieldErrors.result ? (
+                <div
+                  id="actionResult-error"
+                  data-testid="field-error-result"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600 }}
+                >
+                  {fieldErrors.result}
+                </div>
+              ) : (
+                <span />
+              )}
+              <div className="text-right text-[11px] text-slate-400" style={{ fontSize: '0.7rem' }}>
+                {result.length} / 1000 chars
+              </div>
             </div>
           </div>
 
@@ -504,10 +579,23 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 rows={2}
                 value={followUpNote}
                 onChange={(e) => setFollowUpNote(e.target.value)}
+                aria-required="true"
+                aria-invalid={Boolean(fieldErrors.followUpNote)}
+                aria-describedby={fieldErrors.followUpNote ? 'followUpNote-error' : undefined}
+                style={fieldErrors.followUpNote ? { borderColor: '#dc2626', backgroundColor: '#fef2f2' } : undefined}
                 placeholder="Specify what requires further attention or monitoring..."
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 required
               />
+              {fieldErrors.followUpNote && (
+                <div
+                  id="followUpNote-error"
+                  data-testid="field-error-followup"
+                  style={{ color: '#dc2626', fontSize: '0.75rem', fontWeight: 600, marginTop: '0.25rem' }}
+                >
+                  {fieldErrors.followUpNote}
+                </div>
+              )}
             </div>
           )}
 
@@ -598,20 +686,25 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                     {act.assignee && (
                       <>
                         <span className="text-xs text-slate-400">•</span>
-                        <span className="text-xs text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                          👤 Assignee: {act.assignee.name}
+                        <span className="text-xs text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 inline-flex items-center gap-1">
+                          <svg width="12" height="12" className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          Assignee: {act.assignee.name}
                         </span>
                       </>
                     )}
 
                     <span className="text-xs text-slate-400">•</span>
                     <span className="text-xs text-slate-500">
-                      {new Date(act.actionDateTime).toLocaleString('th-TH', {
-                        year: 'numeric',
+                      {new Date(act.actionDateTime).toLocaleString('en-GB', {
+                        timeZone: 'Asia/Bangkok',
+                        day: '2-digit',
                         month: 'short',
-                        day: 'numeric',
+                        year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
+                        hour12: false,
                       })}
                     </span>
 
@@ -693,8 +786,11 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
                 {/* Attachment Notes */}
                 {act.attachmentNotes && (
-                  <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2 font-mono">
-                    📎 {act.attachmentNotes}
+                  <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2 font-mono flex items-center gap-1.5">
+                    <svg width="14" height="14" className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span>{act.attachmentNotes}</span>
                   </div>
                 )}
               </div>

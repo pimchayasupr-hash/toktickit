@@ -7,9 +7,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 interface MyTicketsProps {
   onSelectTicket: (ticketId: number) => void;
   onCreateNewTicket: () => void;
+  initialFilter?: { status?: string; label?: string } | null;
 }
 
-export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewTicket }) => {
+export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNewTicket, initialFilter }) => {
   const { token } = useAuth();
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -21,8 +22,9 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSystem, setSelectedSystem] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<string>(initialFilter?.status || '');
   const [sort, setSort] = useState<string>('updatedAt_desc');
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(Boolean(initialFilter));
 
   // Pagination State
   const [page, setPage] = useState<number>(1);
@@ -80,10 +82,19 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         throw new Error(data.error?.message || `HTTP ${res.status}: Failed to fetch tickets.`);
       }
 
-      setTickets(data.tickets || []);
+      let fetchedTickets: Ticket[] = data.tickets || [];
+      if (selectedStatus === 'OPEN_ACTIVE') {
+        fetchedTickets = fetchedTickets.filter((t) =>
+          ['NEW', 'OPEN', 'IN_PROGRESS', 'WAITING_FOR_REQUESTER', 'REOPENED'].includes(t.currentStatus)
+        );
+      } else if (selectedStatus) {
+        fetchedTickets = fetchedTickets.filter((t) => t.currentStatus === selectedStatus);
+      }
+
+      setTickets(fetchedTickets);
       if (data.pagination) {
         setTotalPages(data.pagination.totalPages || 1);
-        setTotalTickets(data.pagination.total || 0);
+        setTotalTickets(selectedStatus ? fetchedTickets.length : data.pagination.total || 0);
       }
     } catch (err: any) {
       setError(err.message || 'Unable to connect to server. Please try again.');
@@ -91,7 +102,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
     } finally {
       setIsLoading(false);
     }
-  }, [search, selectedCategory, selectedSystem, selectedPriority, sort, page, token]);
+  }, [search, selectedCategory, selectedSystem, selectedPriority, selectedStatus, sort, page, token]);
 
   useEffect(() => {
     fetchTickets();
@@ -144,11 +155,14 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
   const formatDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
-      return d.toLocaleDateString('en-US', {
+      return d.toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
         month: 'short',
-        day: 'numeric',
+        year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch {
       return dateStr;
@@ -168,7 +182,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
           className="tkt-btn-primary inline-flex items-center gap-2"
           style={{ width: 'auto', padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="16" height="16" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
           </svg>
           Create New Ticket
@@ -180,7 +194,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         <form onSubmit={handleSearchSubmit} className="tkt-search-row">
           <div className="tkt-search-input-group">
             <span className="tkt-search-icon">
-              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width="16" height="16" className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
@@ -197,7 +211,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
             onClick={() => setShowFilters(!showFilters)}
             className="tkt-btn-filters inline-flex items-center gap-1.5"
           >
-            <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="16" height="16" className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
             Filters
@@ -276,16 +290,44 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         )}
       </div>
 
-      {/* Subtitle Count */}
-      <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.75rem', fontWeight: 500 }}>
-        Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
-        {Math.min(page * 10, totalTickets)} of {totalTickets} tickets
+      {/* Subtitle Count & Active Drill-Down Filter Badge */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+        <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+          Showing {tickets.length > 0 ? (page - 1) * 10 + 1 : 0} to{' '}
+          {Math.min(page * 10, totalTickets)} of {totalTickets} tickets
+        </div>
+        {selectedStatus && (
+          <div
+            data-testid="active-drilldown-filter"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #BBF7D0',
+              color: '#006B3C',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '0.25rem 0.65rem',
+              borderRadius: '9999px',
+            }}
+          >
+            <span>Filtered by Status: {initialFilter?.label || selectedStatus}</span>
+            <button
+              type="button"
+              onClick={() => setSelectedStatus('')}
+              style={{ background: 'none', border: 'none', color: '#006B3C', fontWeight: 800, cursor: 'pointer', padding: 0 }}
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
       {error && (
         <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1.25rem' }}>
-          <svg className="w-5 h-5 flex-shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg width="20" height="20" className="w-5 h-5 flex-shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <div>{error}</div>
@@ -299,7 +341,11 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         </div>
       ) : tickets.length === 0 ? (
         <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '2.5rem' }}>📭</span>
+          <div style={{ width: '48px', height: '48px', margin: '0 auto 0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="24" height="24" className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.5rem 0 0.25rem 0', color: '#0f172a' }}>No Tickets Found</h3>
           <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>You have not submitted any support tickets matching these criteria.</p>
         </div>
@@ -350,8 +396,8 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
           </table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="tkt-pagination">
+          {totalPages >= 1 && (
+            <div className="tkt-pagination" data-testid="my-tickets-pagination">
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
@@ -359,7 +405,7 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
               >
                 &lt; Previous
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}

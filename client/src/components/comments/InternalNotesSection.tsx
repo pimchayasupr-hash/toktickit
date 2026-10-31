@@ -49,59 +49,200 @@ export const InternalNotesSection: React.FC<InternalNotesSectionProps> = ({ tick
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString('en-GB', {
+        timeZone: 'Asia/Bangkok',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
-    <div className="bg-amber-50/60 p-5 rounded-xl border border-amber-200 shadow-sm space-y-4">
-      <div className="flex items-center justify-between border-b border-amber-200/60 pb-3">
-        <h3 className="font-bold text-amber-900 text-base flex items-center gap-2">
-          <svg className="w-4 h-4 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div
+      data-testid="internal-notes-card"
+      style={{
+        backgroundColor: '#FFFBEB',
+        border: '1px solid #D97706',
+        borderTop: '4px solid #D97706',
+        borderRadius: '12px',
+        padding: '1.25rem',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          paddingBottom: '0.75rem',
+          marginBottom: '1rem',
+          borderBottom: '1px solid #FDE68A',
+        }}
+      >
+        <h3
+          style={{
+            color: '#78350F',
+            margin: 0,
+            fontSize: '1rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+        >
+          <svg
+            width="18"
+            height="18"
+            style={{ color: '#B45309', flexShrink: 0 }}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           Private Internal Notes ({notes.length})
         </h3>
-        <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-semibold border border-amber-200">
-          Visible ONLY to IT Staff & Admins
+        <span
+          style={{
+            backgroundColor: '#FEF3C7',
+            color: '#78350F',
+            border: '1px solid #D97706',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            padding: '0.2rem 0.6rem',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          CONFIDENTIAL • IT Staff &amp; Admins Only
         </span>
       </div>
 
       {/* Timeline */}
-      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
         {notes.length === 0 ? (
-          <p className="text-xs text-amber-700/80 italic py-2">No internal notes recorded yet.</p>
+          <p style={{ color: '#92400E', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+            No internal notes recorded yet.
+          </p>
         ) : (
           notes.map((n) => (
-            <div key={n.id} className="p-3 bg-white/90 rounded-lg border border-amber-200 space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-amber-900 flex items-center gap-1.5">
-                  {n.author.name}
-                  <span className="px-1.5 py-0.2 rounded text-[10px] bg-amber-100 text-amber-800 font-mono">
+            <div
+              key={n.id}
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #FDE68A',
+                borderLeft: '4px solid #D97706',
+                borderRadius: '8px',
+                padding: '0.85rem 1rem',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem',
+                  marginBottom: '0.4rem',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ color: '#78350F', fontWeight: 700, fontSize: '0.85rem' }}>
+                    {n.author.name}
+                  </span>
+                  <span
+                    style={{
+                      backgroundColor: '#FEF3C7',
+                      color: '#92400E',
+                      border: '1px solid #D97706',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      padding: '0.1rem 0.45rem',
+                      borderRadius: '4px',
+                    }}
+                  >
                     {n.author.role}
                   </span>
-                </span>
-                <span className="text-slate-400">{new Date(n.createdAt).toLocaleString()}</span>
+                </div>
+                <span style={{ color: '#64748B', fontSize: '0.75rem' }}>{formatDate(n.createdAt)}</span>
               </div>
-              <p className="text-sm text-slate-800 whitespace-pre-wrap">{n.content}</p>
+              <p style={{ color: '#1E293B', fontSize: '0.875rem', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>
+                {n.content}
+              </p>
             </div>
           ))
         )}
       </div>
 
       {/* Post Note Form */}
-      {error && <div role="alert" className="text-xs text-red-600 bg-red-50 p-2 rounded">{error}</div>}
+      {error && (
+        <div
+          role="alert"
+          style={{
+            fontSize: '0.8rem',
+            color: '#DC2626',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FECACA',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '6px',
+            marginBottom: '0.75rem',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-2 pt-2 border-t border-amber-200/60">
+      <form
+        onSubmit={handleSubmit}
+        style={{ paddingTop: '0.75rem', borderTop: '1px solid #FDE68A' }}
+      >
         <textarea
-          rows={3}
+          rows={2}
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Write a private internal note for staff..."
-          className="w-full p-2.5 border border-amber-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+          placeholder="Write a confidential internal note (hidden from requester)..."
+          style={{
+            width: '100%',
+            padding: '0.65rem 0.75rem',
+            borderRadius: '8px',
+            fontSize: '0.875rem',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #D97706',
+            marginBottom: '0.5rem',
+            boxSizing: 'border-box',
+          }}
         />
-        <div className="flex justify-end">
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: '#B45309',
+              border: '1px solid #92400E',
+              color: '#FFFFFF',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
           >
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
             {submitting ? 'Saving Note...' : 'Add Internal Note'}
           </button>
         </div>

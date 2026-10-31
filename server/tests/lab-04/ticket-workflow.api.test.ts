@@ -288,6 +288,17 @@ describe('Lab 4 - Ticket Workflow & Resolution Gate API Test Suite', () => {
       .set('Authorization', `Bearer ${reqToken}`);
     expect(reqHistRes.status).toBe(200);
     expect(reqHistRes.body.statusHistory).toHaveLength(2);
+
+    // Append-only immutability verification: DELETE and PATCH attempts on status-history are rejected (404) and preserve all rows
+    const delHistRes = await request(app)
+      .delete(`/api/staff/tickets/${ticket.id}/status-history`)
+      .set('Authorization', `Bearer ${staffToken}`);
+    expect(delHistRes.status).toBe(404);
+
+    const verifyAfterDel = await request(app)
+      .get(`/api/staff/tickets/${ticket.id}/status-history`)
+      .set('Authorization', `Bearer ${staffToken}`);
+    expect(verifyAfterDel.body.statusHistory).toHaveLength(2);
   });
 
   it('TEST-WFK-08: Concurrent status updates: atomic DB lock guarantees one 200, one 409, and zero duplicate history', async () => {
