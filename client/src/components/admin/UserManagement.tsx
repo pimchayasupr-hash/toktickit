@@ -197,9 +197,12 @@ export const UserManagement: React.FC = () => {
         </div>
         <button
           onClick={() => { resetCreateForm(); setShowCreateModal(true); }}
-          className="tkt-btn-action-primary"
+          className="tkt-btn-action-primary inline-flex items-center gap-2"
         >
-          <span>➕</span> Create New User
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create New User
         </button>
       </div>
 
@@ -240,7 +243,11 @@ export const UserManagement: React.FC = () => {
         </div>
       ) : users.length === 0 ? (
         <div className="bg-white p-12 text-center rounded-xl shadow-sm border border-slate-200">
-          <span style={{ fontSize: '2.5rem' }}>👥</span>
+          <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.5rem 0 0.25rem 0', color: '#0f172a' }}>No Users Found</h3>
           <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Try adjusting your search query or role filter.</p>
         </div>

@@ -165,10 +165,13 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
         </div>
         <button
           onClick={onCreateNewTicket}
-          className="tkt-btn-primary"
+          className="tkt-btn-primary inline-flex items-center gap-2"
           style={{ width: 'auto', padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}
         >
-          <span>➕</span> Create New Ticket
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create New Ticket
         </button>
       </div>
 
@@ -176,7 +179,11 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
       <div className="tkt-search-card">
         <form onSubmit={handleSearchSubmit} className="tkt-search-row">
           <div className="tkt-search-input-group">
-            <span className="tkt-search-icon">🔍</span>
+            <span className="tkt-search-icon">
+              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
             <input
               type="text"
               value={search}
@@ -188,9 +195,12 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className="tkt-btn-filters"
+            className="tkt-btn-filters inline-flex items-center gap-1.5"
           >
-            <span>🎛️</span> Filters
+            <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Filters
           </button>
           <button
             type="submit"
@@ -275,7 +285,9 @@ export const MyTickets: React.FC<MyTicketsProps> = ({ onSelectTicket, onCreateNe
       {/* Content Area */}
       {error && (
         <div role="alert" className="tkt-alert-error" style={{ marginBottom: '1.25rem' }}>
-          <span>⚠️</span>
+          <svg className="w-5 h-5 flex-shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
           <div>{error}</div>
         </div>
       )}
