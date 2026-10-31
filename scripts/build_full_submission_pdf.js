@@ -269,7 +269,7 @@ async function buildPdf() {
   <div class="meta-grid">
     <div class="meta-item">
       <strong>Pull Requests &amp; Repository Links</strong>
-      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (Merged: <code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (Merged: <code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (Approved: <code>PRR_kwDOTzBGN88AAAABVROROQ</code> &rarr; <code>lab4-staging</code>)
+      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (Merged: <code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (Merged: <code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (Merged: <code>83b3cbc</code>)
     </div>
     <div class="meta-item">
       <strong>Branch Architecture &amp; Staging Flow</strong>
@@ -289,24 +289,26 @@ async function buildPdf() {
 <div class="part-section">
   <div class="part-title">Answer Part 1: Git Use with Engineering Workflow (10 pt)</div>
   <p style="margin: 2px 0 4px 0;">
-    The TokTickIT engineering workflow enforces Specification-Driven Development (Spec DD), Test-Driven Development (Test DD), feature branch isolation, and peer review governance (<a href="https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-04/reviewer.md">docs/lab-04/reviewer.md</a>). Core Lab 4 features were merged via <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>feature/lab4-hardening &rarr; lab4-staging</code>) and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>lab4-staging &rarr; main</code>), and final QA evidence hardening is submitted in <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> targeting <code>lab4-staging</code>.
+    The TokTickIT engineering workflow enforces Specification-Driven Development (Spec DD), Test-Driven Development (Test DD), feature branch isolation, and peer review governance (<a href="https://github.com/pimchayasupr-hash/toktickit/blob/main/docs/lab-04/reviewer.md">docs/lab-04/reviewer.md</a>). Core Lab 4 features were merged via <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>feature/lab4-hardening &rarr; lab4-staging</code>), <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>lab4-staging &rarr; main</code>), and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (<code>hotfix/lab4-icon-dimensions-and-audit &rarr; lab4-staging</code>, merged at <code>83b3cbc</code>).
   </p>
 
-  <div class="part-subtitle">1.1 Verbatim Git Commit Log Graph (main + hotfix/lab4-icon-dimensions-and-audit)</div>
-  <pre><code>* adeed3e (HEAD -> hotfix/lab4-icon-dimensions-and-audit, origin/hotfix/lab4-icon-dimensions-and-audit) docs(audit): resolve all final QA review items, unify metrics, and commit raw test logs
-* 813ba96 fix(ui,e2e,pdf): enforce explicit SVG dimensions, add Confidential Internal Notes visual distinction, crop evidence screenshots
-*   86f4516 (origin/main, main) Merge pull request #56 from pimchayasupr-hash/lab4-staging
+  <div class="part-subtitle">1.1 Verbatim Git Commit Log Graph (lab4-staging &amp; main)</div>
+  <pre><code>*   83b3cbc (HEAD -> lab4-staging, origin/lab4-staging) Merge pull request #57 from pimchayasupr-hash/hotfix/lab4-icon-dimensions-and-audit
 |\  
-| * 84720dc (origin/lab4-staging, lab4-staging) Merge pull request #55 from pimchayasupr-hash/feature/lab4-hardening
-|/| 
-| * 6e46497 (origin/feature/lab4-hardening, feature/lab4-hardening) fix(ui,pdf): enforce explicit dimensions on 403 Forbidden lock icon
+| * a2f008a (origin/hotfix/lab4-icon-dimensions-and-audit) docs(reviewer,pdf): record @supa-gif173 approval review PRR_kwDOTzBGN88AAAABVROROQ on PR #57
+| * adeed3e fix(audit): resolve all QA review items, unify dashboard formulas, commit raw test logs, and recapture real 2-session 409/403 screenshots
+| * 813ba96 fix(ui,e2e,pdf): enforce explicit SVG dimensions, add Confidential Internal Notes visual distinction, crop evidence screenshots
+| * 86f4516 (origin/main, main) Merge pull request #56 from pimchayasupr-hash/lab4-staging
+|/  
+*   84720dc Merge pull request #55 from pimchayasupr-hash/feature/lab4-hardening
+|\  
 | * 6d20aca fix(lab4): action lifecycle, atomic concurrency, status history, deterministic e2e, and engineering report
 | * 0a81173 test(e2e): end-to-end regression, dashboard audit, and resolution gate verification (fixes #52)
-| * c083efa (origin/feature/lab4-frontend, feature/lab4-frontend) feat(ui): Dashboards, Actions Taken section, and ticket workflow controls (fixes #46, #50, #51)
-| * d6835b1 (origin/feature/lab4-backend, feature/lab4-backend) feat(api): Actions Taken CRUD, resolution gate, and dashboards (fixes #45, #47, #48, #49)
-| * 65f54aa (origin/feature/lab4-db-schema, feature/lab4-db-schema) feat(db): add ActionTaken model, Ticket version field, migration, and idempotent seed (fixes #44)
-| * 77d8f2e (origin/lab4/tests, lab4/tests) test(plan): add Lab 4 test register and failing tests (Red)
-| * cf54f91 (origin/lab4/spec, lab4/spec) docs(spec): add Lab 4 specification, ui-spec, and api-spec
+| * c083efa (origin/feature/lab4-frontend) feat(ui): Dashboards, Actions Taken section, and ticket workflow controls (fixes #46, #50, #51)
+| * d6835b1 (origin/feature/lab4-backend) feat(api): Actions Taken CRUD, resolution gate, and dashboards (fixes #45, #47, #48, #49)
+| * 65f54aa (origin/feature/lab4-db-schema) feat(db): add ActionTaken model, Ticket version field, migration, and idempotent seed (fixes #44)
+| * 77d8f2e (origin/lab4/tests) test(plan): add Lab 4 test register and failing tests (Red)
+| * cf54f91 (origin/lab4/spec) docs(spec): add Lab 4 specification, ui-spec, and api-spec
 |/  
 *   7ea5af2 (tag: pre-lab4-backup) Merge pull request #42 from pimchayasupr-hash/fix/lab3-review-fixes</code></pre>
 
@@ -321,7 +323,7 @@ async function buildPdf() {
       <tr><td><strong>DB, API &amp; UI</strong></td><td><code>feature/lab4-db-schema</code>..<code>frontend</code></td><td><code>65f54aa</code>, <code>d6835b1</code>, <code>c083efa</code></td><td>Prisma schema/migrations, Express REST routes, Resolution Gate, React 19 UI</td></tr>
       <tr><td><strong>Hardening &amp; PR #55</strong></td><td><code>feature/lab4-hardening &rarr; lab4-staging</code></td><td><code>6d20aca</code>, <code>84720dc</code></td><td>Resolved 5 reviewer comments by @MiMikoChAn913; approved &amp; merged into <code>lab4-staging</code> by @supa-gif173 (<a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a>)</td></tr>
       <tr><td><strong>Release Merge PR #56</strong></td><td><code>lab4-staging &rarr; main</code></td><td><code>86f4516</code></td><td>Approved &amp; merged from <code>lab4-staging</code> into <code>main</code> by @supa-gif173 (<a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a>)</td></tr>
-      <tr><td><strong>QA Audit PR #57</strong></td><td><code>hotfix/lab4-icon-dimensions-and-audit &rarr; lab4-staging</code></td><td><code>813ba96</code>, <code>adeed3e</code></td><td>SVG dimension guard, unified dashboard formulas, committed <code>artifacts/lab-04/test-output/*.txt</code>, real 2-session 409 capture (<a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a>)</td></tr>
+      <tr><td><strong>QA Audit PR #57</strong></td><td><code>hotfix/lab4-icon-dimensions-and-audit &rarr; lab4-staging</code></td><td><code>adeed3e</code>, <code>83b3cbc</code></td><td>SVG dimension guard, unified dashboard formulas, committed <code>artifacts/lab-04/test-output/*.txt</code>, real 2-session 409 capture; approved &amp; merged into <code>lab4-staging</code> by @supa-gif173 (<a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a>)</td></tr>
     </tbody>
   </table>
 
@@ -397,8 +399,8 @@ artifacts/lab-04/backups/
         <td><strong><a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a></strong></td>
         <td><code>hotfix/lab4-icon-dimensions-and-audit</code> &rarr; <code>lab4-staging</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
-        <td>Retargeted to <code>lab4-staging</code> per staging flow: explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. Approved by @supa-gif173 (Review <code>PRR_kwDOTzBGN88AAAABVROROQ</code>).</td>
-        <td><span class="badge badge-pass">APPROVED (&rarr; lab4-staging)</span></td>
+        <td>Retargeted to <code>lab4-staging</code> per staging flow: explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. Approved (Review <code>PRR_kwDOTzBGN88AAAABVROROQ</code>) &amp; Merged into <code>lab4-staging</code> by @supa-gif173 (Commit <code>83b3cbc</code>).</td>
+        <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
       <tr>
         <td><strong><a href="https://github.com/supa-gif173/toktickit/pull/38">Outgoing PR #38</a> &amp; <a href="https://github.com/supa-gif173/toktickit/pull/44">PR #44</a></strong></td>
@@ -1001,7 +1003,7 @@ if (targetStatus === 'RESOLVED') {
     <tbody>
       <tr><td><strong>Author</strong></td><td><a href="https://github.com/pimchayasupr-hash">@pimchayasupr-hash</a></td><td>Full Spec DD, Test DD (196 tests / 220 runs PASS), committed raw logs, and verified screenshots</td><td><span class="badge badge-pass">Verified &amp; Packaged</span></td></tr>
       <tr><td><strong>Peer Reviewer 1</strong></td><td><a href="https://github.com/MiMikoChAn913">@MiMikoChAn913</a></td><td>Reviewed <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>PRR_kwDOTzBGN88AAAABVHAK1A</code>); all 5 P1/P2 findings resolved and re-verified</td><td><span class="badge badge-pass">Approved (Round 2)</span></td></tr>
-      <tr><td><strong>Peer Reviewer 2</strong></td><td><a href="https://github.com/supa-gif173">@supa-gif173</a></td><td>Approved &amp; merged <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>84720dc</code>) and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>86f4516</code>); Approved <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (<code>PRR_kwDOTzBGN88AAAABVROROQ</code>, targeting <code>lab4-staging</code>)</td><td><span class="badge badge-pass">PR #55/#56 Merged &bull; PR #57 Approved</span></td></tr>
+      <tr><td><strong>Peer Reviewer 2</strong></td><td><a href="https://github.com/supa-gif173">@supa-gif173</a></td><td>Approved &amp; merged <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>84720dc</code>), <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>86f4516</code>), and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (<code>83b3cbc</code>, Review <code>PRR_kwDOTzBGN88AAAABVROROQ</code>)</td><td><span class="badge badge-pass">APPROVED &amp; MERGED (PR #55, #56, #57)</span></td></tr>
     </tbody>
   </table>
 </div>

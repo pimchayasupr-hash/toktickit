@@ -102,7 +102,8 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - [x] Unified `ACTIVE_OPEN_STATUSES` and 30-day rolling window (`recentlyResolvedCount`) across Staff and Requester Dashboards (`artifacts/lab-04/metrics-vs-db.txt`).
   - [x] Committed raw test output logs (`artifacts/lab-04/test-output/*.txt`) and verified 196 unique tests / 220 total cross-browser executions (144 Server + 40 Client + 36 Playwright E2E across Chromium, Firefox, WebKit = 100% PASS).
   - [x] Authentic two-session HTTP 409 Conflict capture on Edit mode, real Requester HTTP 403 Forbidden captures, and 17-page `LAB4_SUBMISSION.pdf`.
-- **Approval Status**: `APPROVED` (Awaiting Reviewer Merge into `lab4-staging`)
+- **Approval Status**: `APPROVED`
+- **Merged By**: `@supa-gif173` into `lab4-staging` (Merge commit: `83b3cbcbc92153ab6728037f0b4660fa9d454659` on 2026-10-31)
 
 ---
 
