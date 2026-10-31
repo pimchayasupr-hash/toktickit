@@ -117,7 +117,11 @@ export const CreateTicket: React.FC<CreateTicketProps> = ({ onSuccess, onCancel 
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="bg-white p-8 rounded-xl shadow-md border border-slate-200 text-center space-y-4">
-          <div className="text-4xl">✅</div>
+          <div className="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <svg width="24" height="24" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
           <h2 className="text-2xl font-extrabold text-emerald-800">Ticket Created Successfully!</h2>
           <p className="text-sm text-slate-600">
             Your IT support request has been registered in the TokTickIT system.

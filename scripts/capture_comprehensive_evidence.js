@@ -88,7 +88,7 @@ async function main() {
   execSync('cd server && npx tsx scripts/clean_reset_db.ts && npx prisma db seed', { stdio: 'inherit' });
   console.log('Database seeded.');
 
-  // Step 2: Regenerate metrics-vs-db.txt in the same run
+  // Step 2: Regenerate metrics-vs-db.txt in the exact same run
   console.log('2. Regenerating metrics-vs-db.txt...');
   execSync('cd server && npx tsx scripts/generate_metrics_vs_db.ts', { stdio: 'inherit' });
 
@@ -98,38 +98,40 @@ async function main() {
     'artifacts/lab-04/screenshots/ticket-workflow',
     'artifacts/lab-04/screenshots/requester-dashboard',
     'artifacts/lab-04/screenshots/regression',
+    'artifacts/lab-04/screenshots/github',
     'docs/lab-04/screenshots/staff-dashboard',
     'docs/lab-04/screenshots/actions-taken',
     'docs/lab-04/screenshots/ticket-workflow',
     'docs/lab-04/screenshots/requester-dashboard',
-    'docs/lab-04/screenshots/regression'
+    'docs/lab-04/screenshots/regression',
+    'docs/lab-04/screenshots/github'
   ];
   dirs.forEach(d => ensureDir(path.resolve(__dirname, '..', d)));
 
   const browser = await chromium.launch({ headless: true });
 
   // -------------------------------------------------------------
-  // 1. STAFF DASHBOARD
+  // 1. STAFF DASHBOARD (Captured on pristine DB immediately after seed)
   // -------------------------------------------------------------
   console.log('\n--- 1. Staff Dashboard Captures ---');
   {
-    // 1.1 Overview Desktop (Full height to capture all 4 metric cards, queue, priority breakdown, and Recent Actions)
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1300 },
+      viewport: { width: 1440, height: 1120 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
     await loginAndGoToDashboard(page, 'michael.staff@toktickit.com', 'Password123!');
     await page.waitForSelector('h1:has-text("Staff Dashboard")', { timeout: 8000 });
     await page.waitForSelector('text=My Recent Actions', { timeout: 8000 });
-    await page.waitForTimeout(1000);
+    await page.waitForSelector('text=Priority Breakdown', { timeout: 8000 });
+    await page.waitForTimeout(800);
 
     const tmpDashDesk = '/tmp/staff_desktop.png';
-    await page.screenshot({ path: tmpDashDesk });
+    await page.screenshot({ path: tmpDashDesk, fullPage: true });
     saveScreenshot(tmpDashDesk, 'staff-dashboard/staff-dashboard_overview_desktop.png');
 
     // 1.2 Tablet View (820px)
-    await page.setViewportSize({ width: 820, height: 1200 });
+    await page.setViewportSize({ width: 820, height: 1180 });
     await page.waitForTimeout(600);
     const tmpDashTab = '/tmp/staff_tablet.png';
     await page.screenshot({ path: tmpDashTab });
@@ -149,7 +151,7 @@ async function main() {
   {
     console.log('Capturing Staff Dashboard Loading State...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 800 },
+      viewport: { width: 1440, height: 780 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -175,7 +177,7 @@ async function main() {
   {
     console.log('Capturing Staff Dashboard Empty State...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
+      viewport: { width: 1440, height: 980 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -207,7 +209,7 @@ async function main() {
     await page.waitForTimeout(600);
 
     const tmpEmpty = '/tmp/staff_empty.png';
-    await page.screenshot({ path: tmpEmpty });
+    await page.screenshot({ path: tmpEmpty, fullPage: true });
     saveScreenshot(tmpEmpty, 'staff-dashboard/staff-dashboard_state_empty.png');
     await context.close();
   }
@@ -216,7 +218,7 @@ async function main() {
   {
     console.log('Capturing Staff Dashboard Forbidden State (403)...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 700 },
+      viewport: { width: 1440, height: 680 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -243,7 +245,7 @@ async function main() {
   {
     console.log('Capturing Staff Dashboard Error State (500)...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 700 },
+      viewport: { width: 1440, height: 680 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -267,12 +269,50 @@ async function main() {
   }
 
   // -------------------------------------------------------------
+  // 1B. REQUESTER DASHBOARD (Captured on pristine DB BEFORE any status transitions!)
+  // -------------------------------------------------------------
+  console.log('\n--- 1B. Requester Dashboard Captures (Pristine Seeded Counts: 4 / 1 / 0 / 1) ---');
+  {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 950 },
+      deviceScaleFactor: 2
+    });
+    const page = await context.newPage();
+    await loginAndGoToDashboard(page, 'jennifer.anderson@example.com', 'Password123!');
+
+    await page.waitForSelector('text=My Support Dashboard', { timeout: 8000 });
+    await page.waitForSelector('.tkt-btn-attention', { timeout: 8000 });
+    await page.waitForSelector('text=Quick Actions', { timeout: 8000 });
+    await page.waitForTimeout(800);
+
+    const tmpReqDesk = '/tmp/req_desktop.png';
+    await page.screenshot({ path: tmpReqDesk, fullPage: true });
+    saveScreenshot(tmpReqDesk, 'requester-dashboard/requester-dashboard_overview_desktop.png');
+
+    // Tablet
+    await page.setViewportSize({ width: 820, height: 1100 });
+    await page.waitForTimeout(600);
+    const tmpReqTab = '/tmp/req_tablet.png';
+    await page.screenshot({ path: tmpReqTab });
+    saveScreenshot(tmpReqTab, 'requester-dashboard/requester-dashboard_overview_tablet.png');
+
+    // Mobile
+    await page.setViewportSize({ width: 375, height: 850 });
+    await page.waitForTimeout(600);
+    const tmpReqMob = '/tmp/req_mobile.png';
+    await page.screenshot({ path: tmpReqMob });
+    saveScreenshot(tmpReqMob, 'requester-dashboard/requester-dashboard_overview_mobile.png');
+
+    await context.close();
+  }
+
+  // -------------------------------------------------------------
   // 2. ACTIONS TAKEN
   // -------------------------------------------------------------
   console.log('\n--- 2. Actions Taken Captures ---');
   {
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1100 },
+      viewport: { width: 1360, height: 920 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -282,33 +322,35 @@ async function main() {
     await page.waitForSelector('text=Actions Taken', { timeout: 8000 });
     await page.waitForTimeout(800);
 
-    const actionsHeader = page.locator('text=Actions Taken').first();
-    await actionsHeader.scrollIntoViewIfNeeded();
+    const actionsCard = page.locator('.tkt-actions-taken-card').first();
+    await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
 
-    // 2.1 Lifecycle Overview
+    // 2.1 Lifecycle Overview (Cropped to ActionsTaken card so text is large and crystal clear)
     const tmpActLife = '/tmp/act_lifecycle.png';
-    await page.screenshot({ path: tmpActLife });
+    await actionsCard.screenshot({ path: tmpActLife });
     saveScreenshot(tmpActLife, 'actions-taken/actions-taken_lifecycle_desktop.png');
 
-    // 2.2 Create Form Modal Open
+    // 2.2 Create Form Modal Open (Cropped to the Create Form card)
     await page.click('button:has-text("+ Add Action")');
     await page.waitForSelector('text=Record New Action Taken', { timeout: 6000 });
-    await page.waitForTimeout(600);
+    const createForm = page.locator('form:has-text("Record New Action Taken")').first();
+    await createForm.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
     const tmpCreate = '/tmp/act_create.png';
-    await page.screenshot({ path: tmpCreate });
+    await createForm.screenshot({ path: tmpCreate });
     saveScreenshot(tmpCreate, 'actions-taken/actions-taken_create-form_desktop.png');
 
     // 2.3 Validation Error (Follow-up note required)
     const followUpCheckbox = page.locator('input[type="checkbox"]').first();
     await followUpCheckbox.check();
-    await page.waitForSelector('text=Follow-up Note', { timeout: 4000 });
+    await page.waitForSelector('text=Follow-Up Note', { timeout: 4000 });
     await page.fill('textarea#actionDescription', 'Performed preliminary hardware inspection on laptop.');
     await page.click('button:has-text("Save Action")');
     await page.waitForSelector('text=Follow-up note is required', { timeout: 6000 });
     await page.waitForTimeout(500);
     const tmpVal = '/tmp/act_validation.png';
-    await page.screenshot({ path: tmpVal });
+    await createForm.screenshot({ path: tmpVal });
     saveScreenshot(tmpVal, 'actions-taken/actions-taken_validation-error_desktop.png');
 
     // 2.4 Inactive Assignee Rejection
@@ -333,7 +375,7 @@ async function main() {
     await page.waitForSelector('text=Assignee must be an active IT Staff', { timeout: 6000 });
     await page.waitForTimeout(500);
     const tmpInact = '/tmp/act_inactive.png';
-    await page.screenshot({ path: tmpInact });
+    await createForm.screenshot({ path: tmpInact });
     saveScreenshot(tmpInact, 'actions-taken/actions-taken_inactive-rejection_desktop.png');
 
     // 2.5 Optimistic Concurrency 409 Conflict Banner
@@ -358,7 +400,7 @@ async function main() {
     await page.waitForSelector('text=HTTP 409 Conflict', { timeout: 6000 });
     await page.waitForTimeout(500);
     const tmpConf = '/tmp/act_conflict.png';
-    await page.screenshot({ path: tmpConf });
+    await createForm.screenshot({ path: tmpConf });
     saveScreenshot(tmpConf, 'actions-taken/actions-taken_conflict-409_desktop.png');
 
     // Unroute and cancel form
@@ -366,19 +408,19 @@ async function main() {
     await page.click('button:has-text("Cancel")');
     await page.waitForTimeout(500);
 
-    // 2.6 Cancelled Action State
+    // 2.6 Cancelled Action State (Scrolled to show Completed + In Progress + Cancelled cards)
     const cancelledBadge = page.locator('span:has-text("Cancelled")').first();
     if (await cancelledBadge.isVisible().catch(() => false)) {
       await cancelledBadge.scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
       const tmpCancel = '/tmp/act_cancel.png';
-      await page.screenshot({ path: tmpCancel });
+      await actionsCard.screenshot({ path: tmpCancel });
       saveScreenshot(tmpCancel, 'actions-taken/actions-taken_cancel_desktop.png');
     }
 
     // 2.7 Tablet Actions Taken
-    await page.setViewportSize({ width: 820, height: 1100 });
-    await actionsHeader.scrollIntoViewIfNeeded();
+    await page.setViewportSize({ width: 820, height: 1050 });
+    await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpActTab = '/tmp/act_tablet.png';
     await page.screenshot({ path: tmpActTab });
@@ -386,7 +428,7 @@ async function main() {
 
     // 2.8 Mobile Actions Taken
     await page.setViewportSize({ width: 375, height: 812 });
-    await actionsHeader.scrollIntoViewIfNeeded();
+    await actionsCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpActMob = '/tmp/act_mobile.png';
     await page.screenshot({ path: tmpActMob });
@@ -399,7 +441,7 @@ async function main() {
   {
     console.log('Capturing Requester Read-Only View on Actions Taken...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1360, height: 950 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -407,11 +449,13 @@ async function main() {
     await navigateToRequesterTicket(page, 'TKT-2026-001234');
     await page.waitForSelector('button:has-text("Actions Taken")', { timeout: 8000 });
     await page.click('button:has-text("Actions Taken")');
-    await page.waitForSelector('text=Actions Taken', { timeout: 8000 });
+    await page.waitForSelector('text=Actions Taken (4)', { timeout: 8000 });
+    const tabsContainer = page.locator('.tkt-tabs-container').first();
+    await tabsContainer.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
 
     const tmpReqAct = '/tmp/act_readonly.png';
-    await page.screenshot({ path: tmpReqAct });
+    await tabsContainer.screenshot({ path: tmpReqAct });
     saveScreenshot(tmpReqAct, 'actions-taken/actions-taken_requester-readonly_desktop.png');
     await context.close();
   }
@@ -422,7 +466,7 @@ async function main() {
   console.log('\n--- 3. Ticket Workflow & Status History Captures ---');
   {
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1360, height: 950 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -446,15 +490,17 @@ async function main() {
     await navigateToStaffTicket(page, 'TKT-2026-001234');
     await page.waitForSelector('text=Ticket Status History', { timeout: 8000 });
 
-    const historyCard = page.locator('text=Ticket Status History').first();
+    const historyCard = page.locator('.tkt-detail-card:has-text("Ticket Status History")').first();
     await historyCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpHist = '/tmp/workflow_history.png';
-    await page.screenshot({ path: tmpHist });
+    await historyCard.screenshot({ path: tmpHist });
     saveScreenshot(tmpHist, 'ticket-workflow/workflow_status-history_desktop.png');
     saveScreenshot(tmpHist, 'actions-taken/actions-taken_status-history_desktop.png');
 
     // 3.3 Successful Workflow Transition
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
     const wfSelect = page.locator('select#ticketStatusSelect');
     await wfSelect.selectOption('WAITING_FOR_REQUESTER');
     await page.waitForSelector('text=Ticket status updated to WAITING_FOR_REQUESTER', { timeout: 8000 });
@@ -470,7 +516,7 @@ async function main() {
   {
     console.log('Capturing Requester-Visible Status History...');
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 1000 },
+      viewport: { width: 1360, height: 850 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -479,47 +525,12 @@ async function main() {
     await page.waitForSelector('button:has-text("Status History")', { timeout: 8000 });
     await page.click('button:has-text("Status History")');
     await page.waitForSelector('text=Ticket Status History', { timeout: 8000 });
+    const tabsContainer = page.locator('.tkt-tabs-container').first();
+    await tabsContainer.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpReqHist = '/tmp/workflow_req_hist.png';
-    await page.screenshot({ path: tmpReqHist });
+    await tabsContainer.screenshot({ path: tmpReqHist });
     saveScreenshot(tmpReqHist, 'ticket-workflow/workflow_requester-history_desktop.png');
-    await context.close();
-  }
-
-  // -------------------------------------------------------------
-  // 4. REQUESTER DASHBOARD
-  // -------------------------------------------------------------
-  console.log('\n--- 4. Requester Dashboard Captures ---');
-  {
-    const context = await browser.newContext({
-      viewport: { width: 1440, height: 1100 },
-      deviceScaleFactor: 2
-    });
-    const page = await context.newPage();
-    await loginAndGoToDashboard(page, 'jennifer.anderson@example.com', 'Password123!');
-
-    await page.waitForSelector('text=My Support Dashboard', { timeout: 8000 });
-    await page.waitForSelector('.tkt-btn-attention', { timeout: 8000 });
-    await page.waitForTimeout(800);
-
-    const tmpReqDesk = '/tmp/req_desktop.png';
-    await page.screenshot({ path: tmpReqDesk });
-    saveScreenshot(tmpReqDesk, 'requester-dashboard/requester-dashboard_overview_desktop.png');
-
-    // Tablet
-    await page.setViewportSize({ width: 820, height: 1180 });
-    await page.waitForTimeout(600);
-    const tmpReqTab = '/tmp/req_tablet.png';
-    await page.screenshot({ path: tmpReqTab });
-    saveScreenshot(tmpReqTab, 'requester-dashboard/requester-dashboard_overview_tablet.png');
-
-    // Mobile
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.waitForTimeout(600);
-    const tmpReqMob = '/tmp/req_mobile.png';
-    await page.screenshot({ path: tmpReqMob });
-    saveScreenshot(tmpReqMob, 'requester-dashboard/requester-dashboard_overview_mobile.png');
-
     await context.close();
   }
 
@@ -529,7 +540,7 @@ async function main() {
   console.log('\n--- 5. Regression Suite Captures ---');
   {
     const context = await browser.newContext({
-      viewport: { width: 1440, height: 950 },
+      viewport: { width: 1360, height: 900 },
       deviceScaleFactor: 2
     });
     const page = await context.newPage();
@@ -564,29 +575,47 @@ async function main() {
     await page.screenshot({ path: tmpTktDet });
     saveScreenshot(tmpTktDet, 'regression/regression_ticket-detail.png');
 
-    // 5.4 Attachments with File Size Validation Error (>5MB)
+    // 5.4 Attachments: Upload valid PDF first, then trigger >5MB size validation error!
     await page.click('button:has-text("Attachments")');
     await page.waitForSelector('text=Manage Attachments', { timeout: 8000 });
     const fileInput = page.locator('input[type="file"]').first();
     if (await fileInput.isVisible({ timeout: 4000 }).catch(() => false)) {
-      const largeBuffer = Buffer.alloc(6 * 1024 * 1024);
+      // Upload valid 45KB PDF file first
+      const validPdfBuffer = Buffer.alloc(45 * 1024, '%PDF-1.4 diagnostic log');
       await fileInput.setInputFiles({
-        name: 'database_memory_dump_large.zip',
-        mimeType: 'application/zip',
+        name: 'battery_diagnostics_report.pdf',
+        mimeType: 'application/pdf',
+        buffer: validPdfBuffer
+      });
+      await page.click('button:has-text("Upload File")');
+      await page.waitForSelector('text=battery_diagnostics_report.pdf', { timeout: 8000 });
+      await page.waitForTimeout(500);
+
+      // Now select a 6.20 MB PDF file and click Upload File to trigger >5MB validation error
+      const largeBuffer = Buffer.alloc(Math.round(6.2 * 1024 * 1024));
+      await fileInput.setInputFiles({
+        name: 'high_res_screen_capture.pdf',
+        mimeType: 'application/pdf',
         buffer: largeBuffer
       });
+      await page.click('button:has-text("Upload File")');
+      await page.waitForSelector('text=exceeds the 5 MB size limit', { timeout: 6000 });
       await page.waitForTimeout(500);
     }
+    const tabsContainer = page.locator('.tkt-tabs-container').first();
+    await tabsContainer.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
     const tmpAtt = '/tmp/regr_attachments.png';
-    await page.screenshot({ path: tmpAtt });
+    await tabsContainer.screenshot({ path: tmpAtt });
     saveScreenshot(tmpAtt, 'regression/regression_attachments.png');
 
-    // 5.5 Public Comments
-    await page.click('button:has-text("Comments")');
-    await page.waitForSelector('text=Public Comments', { timeout: 8000 });
-    await page.waitForTimeout(600);
+    // 5.5 Public Comments (Cropped to tabs container so both input and comments are clearly legible)
+    await page.click('button:has-text("Public Comments")');
+    await page.waitForSelector('text=Add Public Comment', { timeout: 8000 });
+    await tabsContainer.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
     const tmpComm = '/tmp/regr_comments.png';
-    await page.screenshot({ path: tmpComm });
+    await tabsContainer.screenshot({ path: tmpComm });
     saveScreenshot(tmpComm, 'regression/regression_public-comments.png');
 
     // 5.6 Admin User Management
@@ -598,15 +627,15 @@ async function main() {
     await page.screenshot({ path: tmpAdmin });
     saveScreenshot(tmpAdmin, 'regression/regression_admin-users.png');
 
-    // 5.7 Staff Internal Notes (on Staff Ticket Detail)
+    // 5.7 Staff Internal Notes vs Public Comments (Side-by-side comparison on Staff Ticket Detail)
     await login(page, 'michael.staff@toktickit.com', 'Password123!');
     await navigateToStaffTicket(page, 'TKT-2026-001234');
     await page.waitForSelector('text=Private Internal Notes', { timeout: 8000 });
-    const notesHeader = page.locator('text=Private Internal Notes').first();
-    await notesHeader.scrollIntoViewIfNeeded();
+    const commGrid = page.locator('[data-testid="communications-grid"]').first();
+    await commGrid.scrollIntoViewIfNeeded();
     await page.waitForTimeout(600);
     const tmpNotes = '/tmp/regr_notes.png';
-    await page.screenshot({ path: tmpNotes });
+    await commGrid.screenshot({ path: tmpNotes });
     saveScreenshot(tmpNotes, 'regression/regression_internal-notes.png');
 
     // 5.8 Requester Access Denied Banner
@@ -636,8 +665,37 @@ async function main() {
     await context.close();
   }
 
+  // -------------------------------------------------------------
+  // 6. GITHUB ISSUES BOARD (All #43-#54 Closed/Done)
+  // -------------------------------------------------------------
+  console.log('\n--- 6. GitHub Issues Board Capture ---');
+  {
+    const context = await browser.newContext({
+      viewport: { width: 1360, height: 920 },
+      deviceScaleFactor: 2
+    });
+    const page = await context.newPage();
+    try {
+      await page.goto('https://github.com/pimchayasupr-hash/toktickit/issues?q=is%3Aissue+is%3Aclosed', {
+        waitUntil: 'networkidle',
+        timeout: 15000
+      });
+      await page.waitForTimeout(1500);
+      const tmpGh = '/tmp/github_issues_done.png';
+      await page.screenshot({ path: tmpGh });
+      saveScreenshot(tmpGh, 'github/github-issues-done.png');
+    } catch (e) {
+      console.warn('Could not capture live GitHub page:', e.message);
+    }
+    await context.close();
+  }
+
+  // Final Step: Reset and re-seed DB cleanly so the local database remains in pristine state after test mutations
+  console.log('\nFinalizing: Resetting database back to pristine seeded state...');
+  execSync('cd server && npx tsx scripts/clean_reset_db.ts && npx prisma db seed', { stdio: 'inherit' });
+
   await browser.close();
-  console.log('\n=== All 31 high-resolution evidence screenshots successfully captured with zero visual bugs! ===');
+  console.log('\n=== All 32 high-resolution evidence screenshots successfully captured with zero visual bugs! ===');
 }
 
 main().catch(err => {

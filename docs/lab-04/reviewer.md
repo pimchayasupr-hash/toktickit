@@ -34,7 +34,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
   - [x] Append-only actor-attributed `TicketStatusHistory` recorded on every ticket status change.
   - [x] Requester and Staff dashboards compute metrics on the backend without unbounded data leakage.
   - [x] Zen Green design tokens, 44px touch targets, and zero horizontal scroll verified.
-  - [x] All automated tests pass (144/144 server tests + 40/40 client tests + 11/11 Lab 4 Playwright E2E).
+  - [x] All automated tests pass (144/144 server tests + 40/40 client tests + 12/12 Lab 4 Playwright E2E specs across Chromium, Firefox, WebKit = 196 unique tests / 220 total runs).
 - **Reviewer Comments & Technical Resolutions**:
   - *Comment 1 (Schema / Part 6 Lifecycle - P1)*:
     > "[P1] The required Action Taken lifecycle is not representable in this model. Lab 4 Part 6 explicitly requires assign, edit, status transition, complete, cancel, and inactive-assignee rejection, but ActionTaken has neither assigneeId nor a lifecycle/status field. The POST route consequently requires result immediately and every record is effectively already complete. Please add an Action status enum and active operational assignee relation, enforce permitted transitions/terminal immutability, and require a result only when completing the Action. Cover assignment, inactive assignees, completion, cancellation, and requester read-only behavior in API/UI/E2E tests."
@@ -76,7 +76,7 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
 - **Review Date**: 2026-10-31
 - **Reviewer Inspection Checklist**:
   - [x] All feature increments merged into staging cleanly with zero merge conflicts.
-  - [x] End-to-end regression tests green on Playwright Chromium (21/21 passed).
+  - [x] End-to-end regression tests green on Playwright (12 unique E2E scenarios, 36/36 cross-browser runs passed).
   - [x] Documentation complete: `specification.md`, `ui-spec.md`, `api-spec.md`, `tests.md`, `ai-use.md`.
   - [x] Metrics match database evidence generated and verified (`metrics-vs-db.txt`).
 - **Reviewer Comments & Feedback (Review ID 5721962382)**:

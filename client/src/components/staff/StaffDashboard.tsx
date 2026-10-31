@@ -436,7 +436,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {Object.entries(metrics.byStatus || {}).map(([st, cnt]) => {
                 const total = metrics.openTotalCount || 15;
                 const pct = Math.min(100, Math.round((cnt / total) * 100));
@@ -445,7 +445,7 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                   <div
                     key={st}
                     onClick={() => onNavigate && onNavigate('staff-queue', { status: st })}
-                    className="p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+                    className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
                   >
                     <div className="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5 group-hover:text-emerald-800">
                       <span>{formatStatus(st)}</span>
@@ -464,6 +464,46 @@ export const StaffDashboard: React.FC<StaffDashboardProps> = ({ onNavigate }) =>
                 );
               })}
             </div>
+
+            {/* Priority Breakdown Bar */}
+            {metrics.byPriority && (
+              <div className="mt-5 pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Priority Breakdown (Active Queue)
+                  </h3>
+                  <span className="text-[11px] text-slate-500">By IT Priority</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {(['URGENT', 'HIGH', 'MEDIUM', 'LOW'] as const).map((prio) => {
+                    const pCount = metrics.byPriority?.[prio] ?? 0;
+                    const badgeStyle =
+                      prio === 'URGENT'
+                        ? { bg: '#fef2f2', border: '#fecaca', text: '#b91c1c' }
+                        : prio === 'HIGH'
+                        ? { bg: '#fff7ed', border: '#fed7aa', text: '#c2410c' }
+                        : prio === 'MEDIUM'
+                        ? { bg: '#fffbeb', border: '#fde68a', text: '#b45309' }
+                        : { bg: '#f0fdf4', border: '#bbf7d0', text: '#15803d' };
+                    return (
+                      <div
+                        key={prio}
+                        onClick={() => onNavigate && onNavigate('staff-queue', { priority: prio })}
+                        style={{
+                          backgroundColor: badgeStyle.bg,
+                          border: `1px solid ${badgeStyle.border}`,
+                          color: badgeStyle.text,
+                        }}
+                        className="p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition hover:shadow-sm"
+                      >
+                        <span className="text-xs font-bold">{prio}</span>
+                        <span className="text-sm font-extrabold font-mono">{pCount}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

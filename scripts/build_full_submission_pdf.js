@@ -53,6 +53,7 @@ async function buildPdf() {
   const imgRegAdmin = getImageDataUri('artifacts/lab-04/screenshots/regression/regression_admin-users.png');
   const imgRegInternalNotes = getImageDataUri('artifacts/lab-04/screenshots/regression/regression_internal-notes.png');
   const imgRegDenied = getImageDataUri('artifacts/lab-04/screenshots/regression/regression_requester-denied.png');
+  const imgGithubIssues = getImageDataUri('artifacts/lab-04/screenshots/github/github-issues-done.png');
 
   const metricsVsDbText = fs.readFileSync(path.resolve(__dirname, '../artifacts/lab-04/metrics-vs-db.txt'), 'utf8');
 
@@ -204,16 +205,16 @@ async function buildPdf() {
     border: 1px solid #fde68a;
   }
 
-  /* One screenshot per row, at least 80% page width */
+  /* One screenshot per row, 96% page width for maximum readability without zooming */
   .evidence-figure {
-    width: 88%;
-    margin: 8px auto 10px auto;
+    width: 96%;
+    margin: 6px auto 10px auto;
     text-align: center;
     page-break-inside: avoid;
   }
   .evidence-img {
     width: 100%;
-    max-height: 250px;
+    max-height: 340px;
     object-fit: contain;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
@@ -221,6 +222,9 @@ async function buildPdf() {
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     display: block;
     margin: 0 auto;
+  }
+  .evidence-img-tall {
+    max-height: 430px;
   }
   .caption {
     font-size: 7.2pt;
@@ -319,7 +323,8 @@ async function buildPdf() {
       <tr><td><strong>Frontend UI</strong></td><td><code>feature/lab4-frontend</code></td><td><code>c083efa</code></td><td>React 19 components, Zen Green tokens, accessible form controls</td></tr>
       <tr><td><strong>Hardening</strong></td><td><code>feature/lab4-hardening</code></td><td><code>6d20aca</code>, <code>c09ada9</code>, <code>6e46497</code></td><td>Resolved all 5 reviewer comments (P1/P2); added 8 regression tests and WCAG bounds</td></tr>
       <tr><td><strong>Staging Merge (PR #55)</strong></td><td><code>lab4-staging</code></td><td><code>84720dc</code></td><td>Merged from <code>feature/lab4-hardening</code> by @supa-gif173 with full regression pass</td></tr>
-      <tr><td><strong>Production Merge (PR #56)</strong></td><td><code>main</code></td><td><code>86f4516</code></td><td>Merged from <code>lab4-staging</code> by @supa-gif173 with 205 passing tests</td></tr>
+      <tr><td><strong>Production Merge (PR #56)</strong></td><td><code>main</code></td><td><code>86f4516</code></td><td>Merged from <code>lab4-staging</code> by @supa-gif173 (196 unique tests / 220 runs PASS)</td></tr>
+      <tr><td><strong>QA Polish &amp; Audit (PR #57)</strong></td><td><code>hotfix/lab4-icon-dimensions-and-audit</code></td><td><code>813ba96</code></td><td>Enforced explicit SVG dimensions, cropped evidence screenshots, and unified metrics</td></tr>
     </tbody>
   </table>
 
@@ -330,13 +335,14 @@ async function buildPdf() {
 ├── artifacts/lab-04/
 │   ├── backups/ (git-ignored database dumps)
 │   ├── metrics-vs-db.txt (audit table)
-│   ├── screenshots/ (staff-dashboard, actions-taken, requester-dashboard)
+│   ├── screenshots/ (staff-dashboard, actions-taken, ticket-workflow, requester-dashboard, regression, github)
+│   ├── test-output/ (traceability.txt, server-vitest.txt, client-vitest.txt, playwright-e2e.txt)
 │   └── submission/Lab4_Submission.pdf
 ├── client/
 │   ├── src/components/
 │   │   ├── requester/ (RequesterDashboard.tsx)
 │   │   └── staff/ (StaffDashboard.tsx, ActionsTakenSection.tsx)
-│   └── src/index.css (Zen Green design tokens & mobile responsive rules)
+│   └── src/index.css (Zen Green design tokens &amp; mobile responsive rules)
 ├── docs/lab-04/
 │   ├── specification.md, ui-spec.md, api-spec.md, tests.md, ai-use.md, reviewer.md
 │   └── OVERNIGHT-REPORT.md, PROGRESS.md
@@ -346,9 +352,9 @@ async function buildPdf() {
     └── src/routes/ (actions-taken.ts, staff.ts, dashboard.ts)</code></pre>
 
   <div class="part-subtitle">1.4 README.md &amp; .gitignore Excerpts</div>
-  <pre><code># README.md Excerpt (Verification & Testing)
-$ npm test                                  # Run traceability audit + Vitest server + Vitest client (184/184 PASS)
-$ npx playwright test e2e/lab-04/           # Run Playwright Chromium E2E tests (11/11 PASS, 0 Axe-core AA violations)
+  <pre><code># README.md Excerpt (Verification &amp; Testing)
+$ npm test                                  # Run traceability audit + Vitest server (144/144) + Vitest client (40/40) = 184/184 PASS
+$ npx playwright test e2e/lab-04/           # Run Playwright E2E tests (12 scenarios x 3 browsers = 36/36 PASS, 0 Axe-core AA violations)
 $ npm run seed --prefix server              # Execute idempotent seeder with 18 realistic operational tickets
 
 # .gitignore Excerpt (Safety Guardrail Adherence)
@@ -365,13 +371,13 @@ artifacts/lab-04/test-output/
 <div class="page-break"></div>
 
 <div class="part-section">
-  <div class="part-subtitle" style="margin-top: 0;">1.5 Rendered Peer Review Log (reviewer.md)</div>
+  <div class="part-subtitle" style="margin-top: 0;">1.5 Rendered Peer Review Log (reviewer.md — Verified Against Real GitHub State)</div>
   <p>
     Peer review governance strictly follows 4 rules: <strong>RULE 1 (No Self-Merge)</strong>; <strong>RULE 2 (Evidenced Code Review)</strong>; <strong>RULE 3 (Documented Resolution)</strong>; <strong>RULE 4 (Evidence Screenshots)</strong>.
   </p>
   <table>
     <thead>
-      <tr><th style="width: 14%;">PR Ref</th><th style="width: 20%;">Branch Flow</th><th style="width: 18%;">Author / Reviewer</th><th style="width: 36%;">Review Findings &amp; Technical Resolutions</th><th style="width: 12%;">Status</th></tr>
+      <tr><th style="width: 14%;">PR Ref</th><th style="width: 20%;">Branch Flow</th><th style="width: 18%;">Author / Reviewer</th><th style="width: 36%;">Review Findings &amp; Technical Resolutions</th><th style="width: 12%;">GitHub Status</th></tr>
     </thead>
     <tbody>
       <tr>
@@ -379,13 +385,13 @@ artifacts/lab-04/test-output/
         <td><code>feature/lab4-hardening</code> &rarr; <code>lab4-staging</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewers: @MiMikoChAn913, @supa-gif173</td>
         <td>
-          5 comments addressed in commits <code>6d20aca</code> &amp; <code>c09ada9</code>:<br>
+          5 comments by @MiMikoChAn913 (Review <code>PRR_kwDOTzBGN88AAAABVHAK1A</code>) addressed in <code>6d20aca</code> &amp; <code>c09ada9</code>:<br>
           1. <strong>Action Lifecycle &amp; Assignee (P1)</strong>: Added <code>ActionStatus</code> enum, <code>assigneeId</code>, inactive assignee rejection (400), terminal lock.<br>
           2. <strong>Atomic OCC (P1)</strong>: Replaced in-memory check with database predicate <code>updateMany({ where: { id, version } })</code>.<br>
           3. <strong>Ticket Version Validation (P1)</strong>: Mandatory numeric version check; atomic status updates.<br>
           4. <strong>Append-Only Status History (P1)</strong>: Added <code>TicketStatusHistory</code> transactional write.<br>
           5. <strong>Deterministic E2E (P2)</strong>: Removed conditional skipping; targeting deterministic fixtures <code>TKT-2026-001233</code> and <code>TKT-2026-001234</code>.<br>
-          <em>Verdict</em>: Reviewed, Approved, and Merged into <code>lab4-staging</code> by @supa-gif173 (Commit <code>84720dc</code>).
+          <em>Verdict</em>: Re-reviewed, Approved (Review <code>PRR_kwDOTzBGN88AAAABVQxD6w</code>), and Merged into <code>lab4-staging</code> by @supa-gif173 (Commit <code>84720dc</code>).
         </td>
         <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
       </tr>
@@ -393,8 +399,15 @@ artifacts/lab-04/test-output/
         <td><strong>PR #2 (#56)</strong></td>
         <td><code>lab4-staging</code> &rarr; <code>main</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
-        <td>Release staging PR integrating Actions Taken, Dashboards, Resolution Gate, and Concurrency Control. Comprehensive verification with 196 unique tests passing (220 total runs across Chromium, Firefox, WebKit). Reviewed, Approved, and Merged into <code>main</code> by @supa-gif173 (Commit <code>86f4516</code>).</td>
+        <td>Release staging PR integrating Actions Taken, Dashboards, Resolution Gate, and Concurrency Control. Reviewed, Approved (Review <code>PRR_kwDOTzBGN88AAAABVQ43jg</code>), and Merged into <code>main</code> by @supa-gif173 (Commit <code>86f4516</code>).</td>
         <td><span class="badge badge-pass">APPROVED &amp; MERGED</span></td>
+      </tr>
+      <tr>
+        <td><strong>PR #3 (#57)</strong></td>
+        <td><code>hotfix/lab4-icon-dimensions-and-audit</code> &rarr; <code>main</code></td>
+        <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
+        <td>Phase 10 Final QA polish: explicit SVG dimensions across all 52 icons, Private Internal Notes visual distinction, tightly cropped evidence screenshots, and unified test/dashboard metrics.</td>
+        <td><span class="badge badge-pending">OPEN (PENDING MERGE)</span></td>
       </tr>
       <tr>
         <td><strong>PR #38 (Outgoing)</strong></td>
@@ -408,33 +421,39 @@ artifacts/lab-04/test-output/
           4. <strong>Status History (P1)</strong>: Transactional append-only audit model added.<br>
           5. <strong>Tokens &amp; A11y (P2)</strong>: Canonical Zen Green tokens and Axe-core test suites.
         </td>
-        <td><span class="badge badge-pass">Approved (1064b9d)</span></td>
+        <td><span class="badge badge-pass">APPROVED (1064b9d)</span></td>
       </tr>
     </tbody>
   </table>
 
-  <div class="part-subtitle">1.6 Kanban Board Task Register</div>
+  <div class="part-subtitle">1.6 Kanban Board Task Register &amp; GitHub Issues Board Evidence</div>
   <p>
-    All sprint tasks were tracked via GitHub Issues (#44–#54): All issues #44 through #54 are verified and marked <strong>Done</strong> (Closed on GitHub).
+    All sprint tasks were tracked via GitHub Issues (#43–#54): All 12 issues #43 through #54 are verified and marked <strong>Done</strong> (Closed on GitHub).
   </p>
   <table>
     <thead>
       <tr><th>Issue #</th><th>Task Title</th><th>Component Scope</th><th>Assigned Branch</th><th>Status</th></tr>
     </thead>
     <tbody>
-      <tr><td>#44</td><td>Database Schema Migration &amp; Seed Data</td><td>Prisma ORM &amp; PostgreSQL</td><td><code>feature/lab4-db-schema</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#45</td><td>Actions Taken REST API &amp; Permissions</td><td>Express &amp; TypeScript API</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#46</td><td>Actions Taken UI Component &amp; Modals</td><td>React 19 &amp; Zen Green CSS</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#47</td><td>Optimistic Concurrency Control (OCC)</td><td>Database write predicates</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#48</td><td>Resolution Gate Backend Enforcement</td><td>Express Status Route</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#49</td><td>Dashboards Telemetry Aggregation API</td><td>Prisma group-by queries</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#50</td><td>Requester Dashboard UI &amp; Attention Banner</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#51</td><td>IT Staff Dashboard UI &amp; Queue Tables</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#52</td><td>Automated End-to-End Test Suite</td><td>Playwright Multi-Browser</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#53</td><td>UI Polish, Mobile Layout &amp; Accessibility</td><td>CSS &amp; Axe-core AA</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done</span></td></tr>
-      <tr><td>#54</td><td>Peer Review, Teammate Sign-off &amp; Staging Merge</td><td>Governance Review</td><td><code>lab4-staging</code> &rarr; <code>main</code></td><td><span class="badge badge-pass">Done</span></td></tr>
+      <tr><td>#43</td><td>Sprint 4 Engineering Contract &amp; Specification Baseline</td><td>Spec DD &amp; Traceability</td><td><code>lab4/spec</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#44</td><td>Database Schema Migration &amp; Seed Data</td><td>Prisma ORM &amp; PostgreSQL</td><td><code>feature/lab4-db-schema</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#45</td><td>Actions Taken REST API &amp; Permissions</td><td>Express &amp; TypeScript API</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#46</td><td>Actions Taken UI Component &amp; Modals</td><td>React 19 &amp; Zen Green CSS</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#47</td><td>Optimistic Concurrency Control (OCC)</td><td>Database write predicates</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#48</td><td>Resolution Gate Backend Enforcement</td><td>Express Status Route</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#49</td><td>Dashboards Telemetry Aggregation API</td><td>Prisma group-by queries</td><td><code>feature/lab4-backend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#50</td><td>Requester Dashboard UI &amp; Attention Banner</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#51</td><td>IT Staff Dashboard UI &amp; Queue Tables</td><td>React 19 View</td><td><code>feature/lab4-frontend</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#52</td><td>Automated End-to-End Test Suite</td><td>Playwright Multi-Browser</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#53</td><td>UI Polish, Mobile Layout &amp; Accessibility</td><td>CSS &amp; Axe-core AA</td><td><code>feature/lab4-hardening</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
+      <tr><td>#54</td><td>Peer Review, Teammate Sign-off &amp; Staging Merge</td><td>Governance Review</td><td><code>lab4-staging</code> &rarr; <code>main</code></td><td><span class="badge badge-pass">Done (Closed)</span></td></tr>
     </tbody>
   </table>
+
+  <div class="evidence-figure" style="margin-top: 8px;">
+    <img src="${imgGithubIssues}" class="evidence-img" style="max-height: 230px;" alt="GitHub Issues Board Showing All Issues Closed" />
+    <div class="caption">Figure 1.1: GitHub Repository Issues Board (<code>is:issue is:closed</code>) verifying that all Sprint 4 engineering issues (#43–#54) are completed and closed.</div>
+  </div>
 </div>
 
 <!-- ========================================================================== -->
@@ -557,7 +576,7 @@ Referenced Acceptance Criteria: 28 (100% Coverage)
 Referenced Functional Reqs:     22 (100% Coverage)
 Referenced Business Rules:      26 (100% Coverage)
 
-✅ ALL ACCEPTANCE CRITERIA (AC-01..AC-28), FUNCTIONAL REQUIREMENTS (FR-01..FR-22), AND BUSINESS RULES (BR-01..BR-26) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.</code></pre>
+[PASS] ALL ACCEPTANCE CRITERIA (AC-01..AC-28), FUNCTIONAL REQUIREMENTS (FR-01..FR-22), AND BUSINESS RULES (BR-01..BR-26) ARE 100% COVERED WITHOUT ORPHAN REFERENCES.</code></pre>
 
   <div class="part-subtitle">3.2 Red &rarr; Green Commit Verification</div>
   <ul style="margin: 4px 0 8px 18px; padding: 0;">
@@ -565,20 +584,33 @@ Referenced Business Rules:      26 (100% Coverage)
     <li><strong>Green Phase (<code>d6835b1</code>, <code>c083efa</code>, <code>6d20aca</code>, <code>6e46497</code>)</strong>: Backend routes, transactions, React components, and regression fixes implemented. All 196 unique tests (220 browser runs across Chromium, Firefox, WebKit) passed 100%.</li>
   </ul>
 
-  <div class="part-subtitle">3.3 Final Test Suite Execution Summary (Real main Output)</div>
+  <div class="part-subtitle">3.3 Final Test Suite Execution Summary (Single Source of Truth from Raw Logs)</div>
   <table>
     <thead>
-      <tr><th>Test Suite</th><th>Framework</th><th>Files</th><th>Tests Passed</th><th>Duration</th><th>Status</th></tr>
+      <tr><th>Test Suite</th><th>Framework</th><th>Files</th><th>Tests Passed</th><th>Raw Output Log Artifact</th><th>Status</th></tr>
     </thead>
     <tbody>
-      <tr><td><strong>Backend Unit &amp; API</strong></td><td>Vitest + Supertest</td><td>29</td><td>144 / 144</td><td>24.61s</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>Frontend Component</strong></td><td>Vitest + RTL</td><td>17</td><td>40 / 40</td><td>8.92s</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>End-to-End Regression</strong></td><td>Playwright (Chromium, Firefox, WebKit)</td><td>3</td><td>36 / 36 (12 unique &times; 3 browsers)</td><td>1.2m</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>Accessibility Audit</strong></td><td>Axe-core</td><td>1</td><td>0 Violations</td><td>-</td><td><span class="badge badge-pass">WCAG AA</span></td></tr>
-      <tr><td><strong>Traceability Matrix</strong></td><td>Python 3</td><td>1</td><td>100% Covered</td><td>0.10s</td><td><span class="badge badge-pass">PASS</span></td></tr>
-      <tr><td><strong>Grand Total</strong></td><td><strong>Full Stack Verification Harness</strong></td><td><strong>49</strong></td><td><strong>196 Unique / 220 Runs</strong></td><td><strong>~1.8m</strong></td><td><span class="badge badge-pass">100% PASS</span></td></tr>
+      <tr><td><strong>Backend Unit &amp; API</strong></td><td>Vitest + Supertest</td><td>29</td><td>144 / 144</td><td><code>artifacts/lab-04/test-output/server-vitest.txt</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Frontend Component</strong></td><td>Vitest + RTL</td><td>17</td><td>40 / 40</td><td><code>artifacts/lab-04/test-output/client-vitest.txt</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>End-to-End Regression</strong></td><td>Playwright (Chromium, Firefox, WebKit)</td><td>3</td><td>36 / 36 (12 unique &times; 3 browsers)</td><td><code>artifacts/lab-04/test-output/playwright-e2e.txt</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Accessibility Audit</strong></td><td>Axe-core</td><td>1</td><td>0 Violations</td><td><code>e2e/lab-04/dashboards-and-overflow.spec.ts</code></td><td><span class="badge badge-pass">WCAG AA</span></td></tr>
+      <tr><td><strong>Traceability Matrix</strong></td><td>Python 3</td><td>1</td><td>100% Covered</td><td><code>artifacts/lab-04/test-output/traceability.txt</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td><strong>Grand Total</strong></td><td><strong>Full Stack Verification Harness</strong></td><td><strong>49</strong></td><td><strong>196 Unique / 220 Runs</strong></td><td><strong>All Suites Verified</strong></td><td><span class="badge badge-pass">100% PASS</span></td></tr>
     </tbody>
   </table>
+
+  <div class="part-subtitle">3.4 Verbatim Test Runner Summary Excerpt (artifacts/lab-04/test-output/)</div>
+  <pre><code># 1. Server Vitest Suite (artifacts/lab-04/test-output/server-vitest.txt)
+Test Files  29 passed (29)
+     Tests  144 passed (144)
+
+# 2. Client Vitest Suite (artifacts/lab-04/test-output/client-vitest.txt)
+Test Files  17 passed (17)
+     Tests  40 passed (40)
+
+# 3. Playwright Cross-Browser E2E Suite (artifacts/lab-04/test-output/playwright-e2e.txt)
+Running 36 tests using 4 workers (Chromium: 12, Firefox: 12, WebKit: 12)
+  36 passed (33.5s)</code></pre>
 </div>
 
 <!-- ========================================================================== -->
@@ -678,8 +710,8 @@ Referenced Business Rules:      26 (100% Coverage)
   </p>
 
   <div class="evidence-figure">
-    <img src="${imgStaffDesktop}" class="evidence-img" alt="IT Staff Dashboard Desktop" />
-    <div class="caption">Figure 5.1: IT Staff Dashboard (Desktop 1440px) showing Unassigned Queue (4 tickets), My Assigned Tickets (5 tickets), Total Active (15 tickets), Urgent Priority (2 tickets), Status breakdown, Priority breakdown, and My Recent Actions Taken table.</div>
+    <img src="${imgStaffDesktop}" class="evidence-img evidence-img-tall" alt="IT Staff Dashboard Desktop" />
+    <div class="caption">Figure 5.1: IT Staff Dashboard (Desktop 1440px) showing 4-column Metric Cards (Unassigned Queue: 4, My Assigned Work: 5, Urgent Attention: 2, Total Active Open: 15), Ticket Status Breakdown, Priority Breakdown (Active Queue: URGENT 2, HIGH 4, MEDIUM 7, LOW 2), and My Recent Actions Taken table.</div>
   </div>
 
   <div class="evidence-figure">
@@ -705,8 +737,8 @@ Referenced Business Rules:      26 (100% Coverage)
   </div>
 
   <div class="evidence-figure">
-    <img src="${imgStaffEmpty}" class="evidence-img" alt="Staff Dashboard Empty State" />
-    <div class="caption">Figure 5.5: Staff Dashboard Empty State displaying friendly Zen Green icon and clear instructional guidance when 0 recent actions exist.</div>
+    <img src="${imgStaffEmpty}" class="evidence-img evidence-img-tall" alt="Staff Dashboard Empty State" />
+    <div class="caption">Figure 5.5: Staff Dashboard Empty State displaying friendly Zen Green checkmark icon, 0 across all metric counters, and clear instructional guidance when 0 active tickets and 0 recent actions exist.</div>
   </div>
 </div>
 
@@ -743,12 +775,12 @@ Referenced Business Rules:      26 (100% Coverage)
 
   <div class="evidence-figure">
     <img src="${imgActLifecycle}" class="evidence-img" alt="Actions Taken Subsystem Lifecycle" />
-    <div class="caption">Figure 6.1: Actions Taken Subsystem (Desktop 1440px) displaying Status Badges (Pending, In Progress, Completed), operational assignee delegation, quick transition buttons, and the (Terminal / Immutable) lock indicator.</div>
+    <div class="caption">Figure 6.1: Actions Taken Subsystem Card (Close-Up) displaying Status Badges (Pending, In Progress, Completed), operational assignee delegation, quick transition buttons, and the (Terminal / Immutable) lock indicator.</div>
   </div>
 
   <div class="evidence-figure">
-    <img src="${imgActCreate}" class="evidence-img" alt="Create Action Taken Modal Dialog" />
-    <div class="caption">Figure 6.2: Create Action Taken Modal Dialog featuring Action Description, Operational Assignee selector (restricted to active IT Staff), Follow-up toggle, and Attachment Notes.</div>
+    <img src="${imgActCreate}" class="evidence-img" alt="Create Action Taken Form Panel" />
+    <div class="caption">Figure 6.2: Create Action Taken Form Panel featuring Action Type selector, Operational Assignee dropdown (restricted to active IT Staff/Admins), Initial Status selector (PENDING, IN_PROGRESS, COMPLETED), Action Description, Outcome/Result field, and Follow-up Required toggle.</div>
   </div>
 </div>
 
@@ -757,12 +789,12 @@ Referenced Business Rules:      26 (100% Coverage)
 <div class="part-section">
   <div class="evidence-figure">
     <img src="${imgActValidation}" class="evidence-img" alt="Action Taken Validation Error Placement" />
-    <div class="caption">Figure 6.3: Action Taken Validation Placement. Submitting empty action description or required follow-up note triggers inline error cues without losing entered form data.</div>
+    <div class="caption">Figure 6.3: Action Taken Validation Placement (Close-Up). Submitting a short action description or empty required follow-up note triggers inline error alerts without losing entered form data.</div>
   </div>
 
   <div class="evidence-figure">
     <img src="${imgActInactive}" class="evidence-img" alt="Inactive Assignee Assignment Rejection" />
-    <div class="caption">Figure 6.4: Inactive Assignee Assignment Rejection (HTTP 400 INACTIVE_ASSIGNEE). Assigning a task to an inactive staff member or requester is strictly rejected by the backend and displays clear safe-failure feedback.</div>
+    <div class="caption">Figure 6.4: Inactive Assignee Assignment Rejection (HTTP 400 INACTIVE_ASSIGNEE). Assigning a task to an inactive staff member ("Inactive Staff (Deactivated — Test Reject)") is strictly rejected by the backend and displays clear safe-failure feedback.</div>
   </div>
 </div>
 
@@ -776,7 +808,7 @@ Referenced Business Rules:      26 (100% Coverage)
 
   <div class="evidence-figure">
     <img src="${imgActConflict}" class="evidence-img" alt="Optimistic Concurrency 409 Conflict" />
-    <div class="caption">Figure 6.6: Optimistic Concurrency 409 Conflict Alert. When two staff members edit simultaneously, the losing update is blocked and a red warning banner prompts to reload latest data without silent data loss.</div>
+    <div class="caption">Figure 6.6: Optimistic Concurrency 409 Conflict Alert Banner ("Conflict Detected (409): This action was modified by another user while you were editing. Your changes were not saved to prevent overwriting their work. Reload Latest Data").</div>
   </div>
 </div>
 
@@ -838,7 +870,7 @@ if (result.conflict) {
 
   <div class="evidence-figure">
     <img src="${imgWfResolution}" class="evidence-img" alt="Resolution Gate Rejection Banner" />
-    <div class="caption">Figure 7.1: Strict Resolution Gate Rejection Banner on ticket TKT-2026-001233. Attempting to select RESOLVED without actions triggers an inline alert; status remains safely in OPEN.</div>
+    <div class="caption">Figure 7.1: Strict Resolution Gate Rejection Banner on ticket TKT-2026-001233. Attempting to transition status to RESOLVED without recorded/completed Actions Taken triggers an inline red alert while status remains safely in OPEN.</div>
   </div>
 
   <div class="evidence-figure">
@@ -852,7 +884,7 @@ if (result.conflict) {
 <div class="part-section">
   <div class="evidence-figure">
     <img src="${imgWfHistory}" class="evidence-img" alt="Ticket Status History Timeline (Staff View)" />
-    <div class="caption">Figure 7.3: Append-Only Ticket Status History Timeline (Staff View) rendering chronological transitions with from/to statuses, timestamps, and actor identity.</div>
+    <div class="caption">Figure 7.3: Append-Only Ticket Status History Timeline (Staff View) rendering chronological transitions (OPEN &rarr; IN_PROGRESS &rarr; WAITING_FOR_REQUESTER) with timestamps and actor identity.</div>
   </div>
 
   <div class="evidence-figure">
@@ -902,8 +934,8 @@ if (targetStatus === 'RESOLVED') {
   </p>
 
   <div class="evidence-figure">
-    <img src="${imgReqDesktop}" class="evidence-img" alt="Requester Dashboard Desktop" />
-    <div class="caption">Figure 8.1: Requester Dashboard (Desktop 1440px) displaying Personal Metric Cards (Open Tickets, Waiting for My Feedback, Recently Resolved, Closed Tickets), Attention Banner alerting the user to tickets requiring response, Recent Tickets list with status pills, and Quick Actions panel (Create Ticket, View My Tickets) matching Handout page 6.</div>
+    <img src="${imgReqDesktop}" class="evidence-img evidence-img-tall" alt="Requester Dashboard Desktop" />
+    <div class="caption">Figure 8.1: Requester Dashboard (Desktop 1440px) displaying Personal Metric Cards (Open Tickets: 4, Waiting for My Feedback: 1, Recently Resolved: 0, Closed Tickets: 1), Attention Banner alerting Jennifer Anderson to 1 ticket awaiting feedback, My Recent Tickets table, and Quick Actions panel (Create New Ticket, View All My Tickets).</div>
   </div>
 
   <div class="evidence-figure">
@@ -936,7 +968,7 @@ if (targetStatus === 'RESOLVED') {
 <div class="part-section">
   <div class="part-subtitle" style="margin-top: 0;">8.2 Ticket List and Ticket Detail Regression</div>
   <p>
-    All earlier Lab 2 features remain active and fully functional, ensuring ticket lists, filtering, and tabbed ticket details work without regression.
+    All earlier Lab 2 features remain active and fully functional, ensuring ticket lists, filtering, and ticket details work without regression.
   </p>
 
   <div class="evidence-figure">
@@ -946,7 +978,7 @@ if (targetStatus === 'RESOLVED') {
 
   <div class="evidence-figure" style="margin-top: 14px;">
     <img src="${imgRegTicketDetail}" class="evidence-img" alt="Ticket Detail View" />
-    <div class="caption">Figure 8.6: Ticket Detail View Regression (Lab 2) showing tab navigation across Overview, Attachments, Comments, Notes, and Actions Taken.</div>
+    <div class="caption">Figure 8.6: Ticket Detail View Regression (Lab 2) showing ticket metadata, status history timeline, attachments, and Actions Taken audit trail.</div>
   </div>
 </div>
 
@@ -955,17 +987,17 @@ if (targetStatus === 'RESOLVED') {
 <div class="part-section">
   <div class="part-subtitle" style="margin-top: 0;">8.3 Attachments and Communications Regression</div>
   <p>
-    Attachment handling and requester-staff communications operate securely with strict authorization boundaries and MIME type validation.
+    Attachment handling and requester-staff communications operate securely with strict authorization boundaries, size validation, and clear visual separation between shared public comments and confidential internal staff notes.
   </p>
 
   <div class="evidence-figure">
-    <img src="${imgRegAttachments}" class="evidence-img" alt="Authenticated Attachments" />
-    <div class="caption">Figure 8.7: Attachment Upload &amp; Download Authorization Regression (Lab 2) confirming file uploads, size validation, and authenticated download tokens.</div>
+    <img src="${imgRegAttachments}" class="evidence-img" alt="Authenticated Attachments and Size Validation" />
+    <div class="caption">Figure 8.7: Attachment Upload &amp; Size Validation Regression (Lab 2) confirming uploaded file listing (<code>battery_diagnostics_report.pdf</code>, 45.0 KB, Download button) alongside inline size-limit rejection banner ("File high_res_screen_capture.pdf exceeds the 5 MB size limit (6.20 MB)").</div>
   </div>
 
   <div class="evidence-figure" style="margin-top: 14px;">
-    <img src="${imgRegComments}" class="evidence-img" alt="Public Comments Thread" />
-    <div class="caption">Figure 8.8: Public Comments Section Regression (Lab 3) displaying real-time collaborative communication between Requester and IT Staff.</div>
+    <img src="${imgRegComments}" class="evidence-img" alt="Public Comments vs Private Internal Notes Comparison" />
+    <div class="caption">Figure 8.8: Public Comments vs. Private Internal Notes Visual Distinction (Lab 3 &amp; Handout &sect;7) showing shared Public Comments (Zen Green <code>#006B3C</code> top border, "SHARED &bull; Visible to Requester" badge) alongside confidential Internal Notes (Warm Amber <code>#FFFBEB</code> surface, <code>#D97706</code> border, lock icon, "CONFIDENTIAL &bull; IT Staff &amp; Admins Only" badge).</div>
   </div>
 </div>
 
@@ -974,12 +1006,12 @@ if (targetStatus === 'RESOLVED') {
 <div class="part-section">
   <div class="part-subtitle" style="margin-top: 0;">8.4 Internal Notes &amp; Role-Based Administration Regression</div>
   <p>
-    IT Staff internal notes remain strictly confidential from requesters, while administrators maintain full role and account lifecycle control.
+    IT Staff internal notes remain strictly confidential from requesters with high-contrast amber visual cues, while administrators maintain full role and account lifecycle control.
   </p>
 
   <div class="evidence-figure">
-    <img src="${imgRegInternalNotes}" class="evidence-img" alt="Private Internal Notes" />
-    <div class="caption">Figure 8.9: Private Internal Notes Regression (Lab 3) enforcing staff-only confidentiality and invisible isolation from requesters.</div>
+    <img src="${imgRegInternalNotes}" class="evidence-img" alt="Private Internal Notes Close-Up" />
+    <div class="caption">Figure 8.9: Private Internal Notes Card (Close-Up) highlighting the distinct warm amber surface (<code>#FFFBEB</code>), dashed amber border (<code>#F59E0B</code>), lock icon, and "INTERNAL STAFF NOTE &mdash; HIDDEN FROM REQUESTER" badge per Handout &sect;7.</div>
   </div>
 
   <div class="evidence-figure" style="margin-top: 14px;">
@@ -1025,7 +1057,7 @@ if (targetStatus === 'RESOLVED') {
 <div class="part-section">
   <div class="part-title">Answer Part 9: Zen Green UI, Responsive, Accessibility, and Final Polish (5 pt)</div>
   <p>
-    The application extends the Zen Green design system across all screens, enforcing brand design tokens, touch-friendly interactive targets, multi-viewport responsiveness, and WCAG 2.1 AA accessibility.
+    The application extends the Zen Green design system across all screens, enforcing brand design tokens, visual separation between shared public comments and confidential internal notes, touch-friendly interactive targets, multi-viewport responsiveness, and WCAG 2.1 AA accessibility.
   </p>
 
   <div class="part-subtitle">9.1 Zen Green Design System Tokens (index.css)</div>
@@ -1034,9 +1066,10 @@ if (targetStatus === 'RESOLVED') {
       <tr><th>Token Name</th><th>Color / Value</th><th>Visual Preview</th><th>Semantic Purpose</th></tr>
     </thead>
     <tbody>
-      <tr><td><code>--color-primary-forest</code></td><td><code>#006B3C</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#006B3C;border-radius:2px;"></span></td><td>Brand primary, header gradients, active nav tabs, focus rings</td></tr>
+      <tr><td><code>--color-primary-forest</code></td><td><code>#006B3C</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#006B3C;border-radius:2px;"></span></td><td>Brand primary, header gradients, shared Public Comments header accent</td></tr>
       <tr><td><code>--color-primary-accent</code></td><td><code>#008751</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#008751;border-radius:2px;"></span></td><td>Button hover states, interactive badges, positive metrics</td></tr>
       <tr><td><code>--color-surface-mint</code></td><td><code>#F0FDF4</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#F0FDF4;border:1px solid #bbf7d0;border-radius:2px;"></span></td><td>Card background tint, active table row highlights</td></tr>
+      <tr><td><code>--color-confidential-amber</code></td><td><code>#FFFBEB / #D97706</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#FFFBEB;border:2px solid #D97706;border-radius:2px;"></span></td><td>Private Internal Notes confidential surface &amp; border (distinct from shared comments)</td></tr>
       <tr><td><code>--color-surface-card</code></td><td><code>#FFFFFF</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#FFFFFF;border:1px solid #cbd5e1;border-radius:2px;"></span></td><td>Standard card container surface</td></tr>
       <tr><td><code>--color-text-charcoal</code></td><td><code>#1E293B</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#1E293B;border-radius:2px;"></span></td><td>Primary body copy (contrast ratio &gt; 7:1)</td></tr>
       <tr><td><code>--color-text-slate</code></td><td><code>#64748B</code></td><td><span style="display:inline-block;width:24px;height:12px;background:#64748B;border-radius:2px;"></span></td><td>Secondary metadata, helper labels, table headers</td></tr>
@@ -1248,6 +1281,12 @@ if (targetStatus === 'RESOLVED') {
         <td>@supa-gif173</td>
         <td>Review, approval, and merge of PR #55 (Commit <code>84720dc</code>) and PR #56 (Commit <code>86f4516</code>)</td>
         <td><span class="badge badge-pass">Approved &amp; Merged</span></td>
+      </tr>
+      <tr>
+        <td><strong>Hotfix PR #57 (SVG Dimensions &amp; Final QA)</strong></td>
+        <td>@pimchayasupr-hash &rarr; @supa-gif173</td>
+        <td>PR #57 opened on branch <code>hotfix/lab4-icon-dimensions-and-audit</code> awaiting peer review &amp; merge</td>
+        <td><span class="badge badge-warn">Open (Pending Merge)</span></td>
       </tr>
     </tbody>
   </table>

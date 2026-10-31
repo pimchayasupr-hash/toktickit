@@ -455,7 +455,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
             onClick={() => setActiveTab('attachments')}
             className={`tkt-tab-nav-btn ${activeTab === 'attachments' ? 'active' : ''}`}
           >
-            <span>📎</span> Attachments ({activeAttachments.length})
+            Attachments ({activeAttachments.length})
           </button>
         </div>
 
@@ -571,7 +571,7 @@ export const TicketDetail: React.FC<TicketDetailProps> = ({ ticketId, onBack }) 
                           onClick={() => handleDownloadAttachment(a.id, a.originalFilename)}
                           style={{ background: 'none', border: 'none', padding: 0, color: '#006B3C', fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', textDecoration: 'underline' }}
                         >
-                          📎 {a.originalFilename}
+                          {a.originalFilename}
                         </button>
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: '0.5rem' }}>
                           ({(a.sizeBytes / 1024).toFixed(1)} KB)

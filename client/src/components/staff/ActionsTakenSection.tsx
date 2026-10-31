@@ -291,7 +291,7 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm mt-6">
+    <div data-testid="actions-taken-card" className="tkt-actions-taken-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm mt-6">
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
@@ -402,10 +402,10 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                 onChange={(e) => setStatus(e.target.value as ActionStatus)}
                 className="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold"
               >
-                <option value="PENDING">⏳ Pending</option>
-                <option value="IN_PROGRESS">⚙ In Progress</option>
-                <option value="COMPLETED">✓ Completed</option>
-                {editingActionId && <option value="CANCELLED">✕ Cancelled</option>}
+                <option value="PENDING">Pending</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                {editingActionId && <option value="CANCELLED">Cancelled</option>}
               </select>
             </div>
 
@@ -600,8 +600,11 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
                     {act.assignee && (
                       <>
                         <span className="text-xs text-slate-400">•</span>
-                        <span className="text-xs text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                          👤 Assignee: {act.assignee.name}
+                        <span className="text-xs text-emerald-800 font-medium bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 inline-flex items-center gap-1">
+                          <svg width="12" height="12" className="w-3 h-3 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          Assignee: {act.assignee.name}
                         </span>
                       </>
                     )}
@@ -695,8 +698,11 @@ export const ActionsTakenSection: React.FC<ActionsTakenSectionProps> = ({
 
                 {/* Attachment Notes */}
                 {act.attachmentNotes && (
-                  <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2 font-mono">
-                    📎 {act.attachmentNotes}
+                  <div className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-2 mt-2 font-mono flex items-center gap-1.5">
+                    <svg width="14" height="14" className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    <span>{act.attachmentNotes}</span>
                   </div>
                 )}
               </div>

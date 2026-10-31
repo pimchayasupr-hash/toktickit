@@ -308,7 +308,11 @@ export const StaffTicketQueue: React.FC<StaffTicketQueueProps> = ({ onSelectTick
         </div>
       ) : tickets.length === 0 ? (
         <div style={{ background: '#ffffff', padding: '3rem', textAlign: 'center', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '2.5rem' }}>📭</span>
+          <div style={{ width: '48px', height: '48px', margin: '0 auto 0.5rem', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="24" height="24" className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.5rem 0 0.25rem 0', color: '#0f172a' }}>No Tickets Found</h3>
           <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Try resetting your filters or search terms.</p>
         </div>

@@ -32,7 +32,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(db): add ActionTaken model, Ticket version field, non-destructive migration, and idempotent seed`
 - **Labels**: `database`, `prisma`, `tdd`, `sprint-4`
 - **Target Branch**: `feature/lab4-db-schema`
-- **Kanban Status**: **In Progress**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-01`, `AC-12`, `AC-14`, `AC-27`, `FR-01`, `FR-08`, `FR-15`, `BR-01`, `BR-10`, `BR-14`, `BR-26`
 - **Linked Tests**: `TEST-ACT-01`, `TEST-ACT-14`, `TEST-MIG-SEED-01`
 - **Body**:
@@ -57,7 +57,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(api): Actions Taken CRUD endpoints with session binding, validation, and optimistic concurrency`
 - **Labels**: `backend`, `api`, `security`, `sprint-4`
 - **Target Branch**: `feature/lab4-actions-backend`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-01..AC-14`, `FR-01..FR-09`, `BR-01..BR-11`, `BR-14`
 - **Linked Tests**: `TEST-ACT-01` through `TEST-ACT-17`
 - **Body**:
@@ -83,7 +83,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(ui): Actions Taken section on Ticket Detail with create/edit modes, conflict handling, and Requester view`
 - **Labels**: `frontend`, `ui`, `accessibility`, `sprint-4`
 - **Target Branch**: `feature/lab4-actions-frontend`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-01`, `AC-10`, `AC-12`, `AC-13`, `AC-25`, `FR-01`, `FR-05`, `FR-07`, `FR-08`, `BR-06`, `BR-10`, `BR-14`
 - **Linked Tests**: `TEST-UI-ACT-01`, `TEST-UI-ACT-02`, `TEST-UI-ACT-03`, `TEST-E2E-01`
 - **Body**:
@@ -109,7 +109,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(workflow): Status transition engine with backend Resolution Gate and optimistic concurrency`
 - **Labels**: `backend`, `workflow`, `security`, `sprint-4`
 - **Target Branch**: `feature/lab4-workflow-gate`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-15..AC-19`, `FR-10..FR-13`, `BR-12`, `BR-13`, `BR-14`
 - **Linked Tests**: `TEST-WFK-01` through `TEST-WFK-06`, `TEST-UI-WFK-01`, `TEST-E2E-02`
 - **Body**:
@@ -139,7 +139,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(dashboard): Requester dashboard with backend-computed metrics, attention banner, and filter drill-down`
 - **Labels**: `frontend`, `backend`, `dashboard`, `sprint-4`
 - **Target Branch**: `feature/lab4-requester-dashboard`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-20`, `AC-21`, `AC-24`, `FR-17`, `FR-20`, `BR-16..BR-19`
 - **Linked Tests**: `TEST-DSH-REQ-01`, `TEST-DSH-REQ-02`, `TEST-DSH-REQ-03`, `TEST-UI-DSH-02`, `TEST-E2E-03`
 - **Body**:
@@ -163,7 +163,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `feat(dashboard): IT Staff & Admin operational dashboard with queue metrics, personal actions, and admin overview`
 - **Labels**: `frontend`, `backend`, `dashboard`, `sprint-4`
 - **Target Branch**: `feature/lab4-staff-dashboard`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-22`, `AC-23`, `AC-24`, `FR-18`, `FR-19`, `FR-20`, `BR-20..BR-25`
 - **Linked Tests**: `TEST-DSH-STF-01`, `TEST-DSH-STF-02`, `TEST-DSH-ADM-01`, `TEST-DSH-ADM-02`, `TEST-UI-DSH-01`
 - **Body**:
@@ -188,7 +188,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `test(regression): comprehensive regression verification across Labs 1-3 test suites`
 - **Labels**: `testing`, `regression`, `ci`, `sprint-4`
 - **Target Branch**: `feature/lab4-regression`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-27`, `AC-28`, `FR-15`, `BR-26`
 - **Linked Tests**: `TEST-MIG-SEED-01`, `TEST-REGR-ALL`
 - **Body**:
@@ -211,7 +211,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `fix(a11y): WCAG 2.1 AA accessibility audit, focus rings, modal focus traps, and screen reader labels`
 - **Labels**: `accessibility`, `a11y`, `hardening`, `sprint-4`
 - **Target Branch**: `feature/lab4-a11y`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-26`, `FR-21`, `FR-22`
 - **Linked Tests**: `TEST-E2E-04`
 - **Body**:
@@ -235,7 +235,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `fix(responsive): responsive layout verification at 360px, 768px, and 1280px viewports`
 - **Labels**: `responsive`, `css`, `ui`, `sprint-4`
 - **Target Branch**: `feature/lab4-responsive`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-26`, `FR-21`
 - **Linked Tests**: `TEST-UI-RESP-01`
 - **Body**:
@@ -258,7 +258,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `chore(hardening): clean console logs, error handling sanitization, and dependency audit`
 - **Labels**: `hardening`, `security`, `quality`, `sprint-4`
 - **Target Branch**: `feature/lab4-hardening`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `FR-21`, `FR-22`, `BR-05`
 - **Linked Tests**: `TEST-ACT-16`
 - **Body**:
@@ -281,7 +281,7 @@ This document contains ready-to-paste GitHub Issue templates for Sprint 4. Each 
 - **Title**: `release: integrate Sprint 4 increment, human peer review, and submission bundle`
 - **Labels**: `release`, `review`, `sprint-4`
 - **Target Branch**: `lab4-staging` $\rightarrow$ `main`
-- **Kanban Status**: **To Do**
+- **Kanban Status**: **Done (Closed on GitHub)**
 - **Linked Requirements**: `AC-01..AC-28`
 - **Body**:
   ```markdown
