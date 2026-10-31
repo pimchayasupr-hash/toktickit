@@ -269,7 +269,7 @@ async function buildPdf() {
   <div class="meta-grid">
     <div class="meta-item">
       <strong>Pull Requests &amp; Repository Links</strong>
-      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (Merged: <code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (Merged: <code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (Open &rarr; <code>lab4-staging</code>)
+      <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (Merged: <code>84720dc</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (Merged: <code>86f4516</code>) &bull; <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (Approved: <code>PRR_kwDOTzBGN88AAAABVROROQ</code> &rarr; <code>lab4-staging</code>)
     </div>
     <div class="meta-item">
       <strong>Branch Architecture &amp; Staging Flow</strong>
@@ -397,8 +397,8 @@ artifacts/lab-04/backups/
         <td><strong><a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a></strong></td>
         <td><code>hotfix/lab4-icon-dimensions-and-audit</code> &rarr; <code>lab4-staging</code></td>
         <td>Author: @pimchayasupr-hash<br>Reviewer: @supa-gif173</td>
-        <td>Retargeted to <code>lab4-staging</code> per staging flow: explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots.</td>
-        <td><span class="badge badge-pending">OPEN (&rarr; lab4-staging)</span></td>
+        <td>Retargeted to <code>lab4-staging</code> per staging flow: explicit SVG dimensions across all 52 icons, unified dashboard formulas (<code>ACTIVE_OPEN_STATUSES</code> &amp; 30-day resolved window), committed <code>artifacts/lab-04/test-output/*.txt</code>, renamed <code>dashboards.spec.ts</code>, and recaptured real 2-session 409 &amp; 403 screenshots. Approved by @supa-gif173 (Review <code>PRR_kwDOTzBGN88AAAABVROROQ</code>).</td>
+        <td><span class="badge badge-pass">APPROVED (&rarr; lab4-staging)</span></td>
       </tr>
       <tr>
         <td><strong><a href="https://github.com/supa-gif173/toktickit/pull/38">Outgoing PR #38</a> &amp; <a href="https://github.com/supa-gif173/toktickit/pull/44">PR #44</a></strong></td>
@@ -1001,7 +1001,7 @@ if (targetStatus === 'RESOLVED') {
     <tbody>
       <tr><td><strong>Author</strong></td><td><a href="https://github.com/pimchayasupr-hash">@pimchayasupr-hash</a></td><td>Full Spec DD, Test DD (196 tests / 220 runs PASS), committed raw logs, and verified screenshots</td><td><span class="badge badge-pass">Verified &amp; Packaged</span></td></tr>
       <tr><td><strong>Peer Reviewer 1</strong></td><td><a href="https://github.com/MiMikoChAn913">@MiMikoChAn913</a></td><td>Reviewed <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>PRR_kwDOTzBGN88AAAABVHAK1A</code>); all 5 P1/P2 findings resolved and re-verified</td><td><span class="badge badge-pass">Approved (Round 2)</span></td></tr>
-      <tr><td><strong>Peer Reviewer 2</strong></td><td><a href="https://github.com/supa-gif173">@supa-gif173</a></td><td>Approved &amp; merged <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>84720dc</code>) and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>86f4516</code>); assigned reviewer on <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (targeting <code>lab4-staging</code>)</td><td><span class="badge badge-pass">PR #55/#56 Merged &bull; PR #57 Open</span></td></tr>
+      <tr><td><strong>Peer Reviewer 2</strong></td><td><a href="https://github.com/supa-gif173">@supa-gif173</a></td><td>Approved &amp; merged <a href="https://github.com/pimchayasupr-hash/toktickit/pull/55">PR #55</a> (<code>84720dc</code>) and <a href="https://github.com/pimchayasupr-hash/toktickit/pull/56">PR #56</a> (<code>86f4516</code>); Approved <a href="https://github.com/pimchayasupr-hash/toktickit/pull/57">PR #57</a> (<code>PRR_kwDOTzBGN88AAAABVROROQ</code>, targeting <code>lab4-staging</code>)</td><td><span class="badge badge-pass">PR #55/#56 Merged &bull; PR #57 Approved</span></td></tr>
     </tbody>
   </table>
 </div>

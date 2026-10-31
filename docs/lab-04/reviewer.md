@@ -89,6 +89,23 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
 
 ---
 
+### PR #3: Final Visual Hardening, Telemetry Unification, and Evidence Audit (PR #57)
+- **Title**: `fix(ui,pdf): enforce explicit SVG dimensions, fix visual bugs, and update submission evidence`
+- **Branch**: `hotfix/lab4-icon-dimensions-and-audit` $\rightarrow$ `lab4-staging`
+- **PR Link**: https://github.com/pimchayasupr-hash/toktickit/pull/57
+- **Review URL**: https://github.com/pimchayasupr-hash/toktickit/pull/57#pullrequestreview-5722313017 (`PRR_kwDOTzBGN88AAAABVROROQ`)
+- **Author**: `@pimchayasupr-hash`
+- **Reviewer**: `@supa-gif173`
+- **Submitted At**: `2026-10-31T10:16:15Z`
+- **Reviewer Verification Summary (Review ID 5722313017 / `PRR_kwDOTzBGN88AAAABVROROQ`)**:
+  - [x] Explicit SVG dimensions (`width` and `height` HTML attributes across all 52 inline SVGs) and Playwright E2E bounding-box guardrail (`<= 64px` in `e2e/lab-04/dashboards.spec.ts`).
+  - [x] Unified `ACTIVE_OPEN_STATUSES` and 30-day rolling window (`recentlyResolvedCount`) across Staff and Requester Dashboards (`artifacts/lab-04/metrics-vs-db.txt`).
+  - [x] Committed raw test output logs (`artifacts/lab-04/test-output/*.txt`) and verified 196 unique tests / 220 total cross-browser executions (144 Server + 40 Client + 36 Playwright E2E across Chromium, Firefox, WebKit = 100% PASS).
+  - [x] Authentic two-session HTTP 409 Conflict capture on Edit mode, real Requester HTTP 403 Forbidden captures, and 17-page `LAB4_SUBMISSION.pdf`.
+- **Approval Status**: `APPROVED` (Awaiting Reviewer Merge into `lab4-staging`)
+
+---
+
 ### PR #3 (Outgoing Review): Teammate's Sprint 4 Engineering Contract PR
 - **Title**: `docs(spec): Sprint 4 Engineering Contract and Specifications (Resolves #37)`
 - **Repository**: `supa-gif173/toktickit`
