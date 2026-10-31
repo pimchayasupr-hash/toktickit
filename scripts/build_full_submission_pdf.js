@@ -273,15 +273,20 @@ async function buildPdf() {
   </p>
 
   <div class="part-subtitle">1.1 Verbatim Git Commit Log Graph (main)</div>
-  <pre><code>* 8755cb5 (HEAD -> main) docs(submission): generate final submission PDF, AI reflection, and overnight report
-*   0c18ec8 release(lab4): integrate Actions Taken, dashboards, resolution gate, concurrency, and submission evidence
-|\\  
-| * c09ada9 (lab4-staging, feature/lab4-hardening) docs(evidence): capture dashboard screenshots, metrics-vs-db audit, and progress log
+  <pre><code>*   86f4516 (HEAD -> main, origin/main) Merge pull request #56 from pimchayasupr-hash/lab4-staging
+|\  
+| * 84720dc (origin/lab4-staging) Merge pull request #55 from pimchayasupr-hash/feature/lab4-hardening
+|/| 
+| * 6e46497 (origin/feature/lab4-hardening, feature/lab4-hardening) fix(ui,pdf): enforce explicit dimensions on 403 Forbidden lock icon and update Figure 5.6 in PDF
+| * f1d38ba feat(ui,pdf): polish dashboards and navbar to Zen Green, eliminate all emojis, support KMUTT login aliases, and expand submission report to 24 pages
+| * 8ee15ce feat(ui): redesign staff dashboard with modern Zen Green layout, metric icons, quick actions, and status distribution grid
+| * 9687b60 feat(lab4): comprehensive evidence, WCAG contrast compliance, UI state skeletons, and clean seed data
+| * c09ada9 docs(evidence): capture dashboard screenshots, metrics-vs-db audit, and progress log
 | * 60ff56b docs(readme): finalize Lab 4 documentation, demo script, and test commands
 | * 638d62d docs(workflow): update created-issues status to Done
 | * 7e4fc4b docs(spec): align ui-spec and api-spec with action lifecycle and status history
 | * 6d20aca fix(lab4): action lifecycle, atomic concurrency, status history, deterministic e2e, and engineering report
-| * e9bc80d (origin/feature/lab4-hardening) docs(review): record PR #55 URL in reviewer.md and pr-body.md
+| * e9bc80d docs(review): record PR #55 URL in reviewer.md and pr-body.md
 | * a0f5420 docs(review): update Lab 4 reviewer guide with PR branch and verified test counts
 | * 0a81173 test(e2e): end-to-end regression, dashboard audit, and resolution gate verification (fixes #52)
 | * c083efa (origin/feature/lab4-frontend, feature/lab4-frontend) feat(ui): Dashboards, Actions Taken section, and ticket workflow controls (fixes #46, #50, #51)
@@ -291,7 +296,7 @@ async function buildPdf() {
 | * 77d8f2e test(plan): add Lab 4 test register and failing tests (Red)
 | * cf54f91 (origin/lab4/spec, lab4/spec) docs(spec): add Lab 4 specification, ui-spec, and api-spec
 |/  
-*   7ea5af2 (tag: pre-lab4-backup, origin/main, origin/lab4-staging, origin/HEAD) Merge pull request #42 from pimchayasupr-hash/fix/lab3-review-fixes</code></pre>
+*   7ea5af2 (tag: pre-lab4-backup) Merge pull request #42 from pimchayasupr-hash/fix/lab3-review-fixes</code></pre>
 </div>
 
 <!-- ========================================================================== -->
@@ -312,8 +317,9 @@ async function buildPdf() {
       <tr><td><strong>DB &amp; Schema</strong></td><td><code>feature/lab4-db-schema</code></td><td><code>65f54aa</code></td><td>Prisma schema evolution, non-destructive migrations, idempotent seeder</td></tr>
       <tr><td><strong>Backend API</strong></td><td><code>feature/lab4-backend</code></td><td><code>d6835b1</code></td><td>Express REST routes, resolution gate logic, server-side aggregations</td></tr>
       <tr><td><strong>Frontend UI</strong></td><td><code>feature/lab4-frontend</code></td><td><code>c083efa</code></td><td>React 19 components, Zen Green tokens, accessible form controls</td></tr>
-      <tr><td><strong>Hardening</strong></td><td><code>feature/lab4-hardening</code></td><td><code>6d20aca</code>, <code>c09ada9</code></td><td>Resolved all 5 reviewer comments (P1/P2); added 8 regression tests</td></tr>
-      <tr><td><strong>Production Merge</strong></td><td><code>main</code></td><td><code>0c18ec8</code></td><td>Merged from <code>lab4-staging</code> via <code>--no-ff</code> with full pipeline verification</td></tr>
+      <tr><td><strong>Hardening</strong></td><td><code>feature/lab4-hardening</code></td><td><code>6d20aca</code>, <code>c09ada9</code>, <code>6e46497</code></td><td>Resolved all 5 reviewer comments (P1/P2); added 8 regression tests and WCAG bounds</td></tr>
+      <tr><td><strong>Staging Merge (PR #55)</strong></td><td><code>lab4-staging</code></td><td><code>84720dc</code></td><td>Merged from <code>feature/lab4-hardening</code> by @supa-gif173 with full regression pass</td></tr>
+      <tr><td><strong>Production Merge (PR #56)</strong></td><td><code>main</code></td><td><code>86f4516</code></td><td>Merged from <code>lab4-staging</code> by @supa-gif173 with 205 passing tests</td></tr>
     </tbody>
   </table>
 
@@ -1218,10 +1224,10 @@ if (targetStatus === 'RESOLVED') {
         <td><span class="badge badge-pass">Approved (Round 2)</span></td>
       </tr>
       <tr>
-        <td><strong>Course Teammate</strong></td>
-        <td>[PENDING – to be added by student: @Beethoven190 or @supa-gif173]</td>
-        <td>Final release PR #2 inspection and LMS submission review</td>
-        <td><span class="badge badge-pending">PENDING Sign-off</span></td>
+        <td><strong>Peer Reviewer &amp; Release Lead</strong></td>
+        <td>@supa-gif173</td>
+        <td>Review, approval, and merge of PR #55 (Review ID 5721834475) and PR #56 (Review ID 5721962382)</td>
+        <td><span class="badge badge-pass">Approved &amp; Merged</span></td>
       </tr>
     </tbody>
   </table>

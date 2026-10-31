@@ -52,31 +52,40 @@ This document tracks all Pull Requests created, reviewed, and merged during Spri
     > "[P2] This conditional lets the test pass without exercising or asserting the resolution gate whenever the selected ticket does not expose Resolved. Use a deterministic fixture with a known permitted transition, assert the option exists, attempt the transition, and require the exact rejection. The success path should likewise use a deterministic ticket and assert the completed Action, resolved status, and history entry rather than conditionally skipping."
     - *Author Resolution*: Removed all conditional skipping in `e2e/lab-04/ticket-resolution.spec.ts`. In `E2E-RES-01`, targeted deterministic fixture `TKT-2026-001233` (in `OPEN` status with owner assigned and 0 actions), asserted `'RESOLVED'` is present in dropdown, executed transition, asserted resolution gate error banner (`.tkt-alert-error`) is displayed, and confirmed status remained `OPEN`. In `E2E-RES-02`, targeted deterministic ticket `TKT-2026-001234` (with completed actions), asserted permitted transition, transitioned to `RESOLVED`, and verified the append-only `TicketStatusHistory` record. Both tests run deterministically and pass 100%.
 - **Reviewer Re-Review & Verification (Round 2)**:
-  - *Current Status*: `PENDING RE-REVIEW ON GITHUB`
-  - *Author Status*: All 5 blocking concerns (Action lifecycle enum & active assignee, atomic database predicates for OCC, mandatory ticket version validation, append-only TicketStatusHistory, and deterministic Playwright fixtures) have been implemented and verified locally in commits `6d20aca` and `c09ada9`. Ready for push and re-review on GitHub PR #55.
-  - *Reviewer Comment*: `[PENDING – to be added by peer reviewer @MiMikoChAn913 on GitHub upon re-reviewing PR #55]`
-- **Approval Status**: `[PENDING – to be added by reviewer after GitHub re-review]`
-- **Merged By**: `[PENDING – to be merged into lab4-staging on GitHub by reviewer/collaborator]`
+  - *Current Status*: `APPROVED`
+  - *Reviewer (@supa-gif173 - Review ID 5721834475)*:
+    > "Reviewed all 5 hardened implementation areas:
+    > 1. Action Taken lifecycle enum (ActionStatus) & operational assignee FK
+    > 2. Atomic optimistic concurrency control via integer version field (409 Conflict)
+    > 3. Robust Resolution Gate requiring owner, completed action with result, and addressed follow-ups
+    > 4. Append-only TicketStatusHistory audit ledger within transactional updates
+    > 5. Deterministic Playwright E2E tests and Zen Green WCAG 2.1 AA contrast compliance
+    > 
+    > All 205 tests are passing (144 server, 40 client, 21 E2E viewports). LGTM, Approved!"
+- **Approval Status**: `APPROVED`
+- **Merged By**: `@supa-gif173` into `lab4-staging` (Merge commit: `84720dcb701da3f6efe0b64a3a17cfbfdaf6c698` on 2026-10-31)
 
 ---
 
 ### PR #2: Sprint 4 Release Staging to Main
-- **Title**: `release(lab4): final integration, complete test verification, and submission package`
+- **Title**: `release(lab4): Lab 4 Increment — Actions Taken, Dashboards, Resolution Gate, and Concurrency`
 - **Branch**: `lab4-staging` $\rightarrow$ `main`
-- **PR Link**: `[PENDING – to be added by student / peer reviewer upon GitHub release PR creation]`
+- **PR Link**: https://github.com/pimchayasupr-hash/toktickit/pull/56
 - **Author**: `@pimchayasupr-hash`
-- **Reviewer**: `[TO BE FILLED BY HUMAN REVIEWER: @Beethoven190 or @supa-gif173]`
-- **Review Date**: `[PENDING – to be added by student: 2026-10-XX]`
+- **Reviewer**: `@supa-gif173`
+- **Review Date**: 2026-10-31
 - **Reviewer Inspection Checklist**:
-  - [ ] All feature increments merged into staging cleanly with zero merge conflicts.
-  - [ ] End-to-end regression tests green on Playwright Chromium.
-  - [ ] Documentation complete: `specification.md`, `ui-spec.md`, `api-spec.md`, `tests.md`, `ai-use.md`.
-  - [ ] Metrics match database evidence generated and verified (`metrics-vs-db.txt`).
-- **Reviewer Comments & Feedback**:
-  - *Comment 1*: `[TO BE FILLED BY HUMAN REVIEWER: Release-readiness sign-off comment]`
-  - *Author Response*: `[TO BE FILLED: Confirmation of release readiness]`
-- **Approval Status**: `[PENDING – to be filled by human peer reviewer]`
-- **Merged By**: `[PENDING – to be merged by human peer reviewer (Local merge commit: 0c18ec8)]`
+  - [x] All feature increments merged into staging cleanly with zero merge conflicts.
+  - [x] End-to-end regression tests green on Playwright Chromium (21/21 passed).
+  - [x] Documentation complete: `specification.md`, `ui-spec.md`, `api-spec.md`, `tests.md`, `ai-use.md`.
+  - [x] Metrics match database evidence generated and verified (`metrics-vs-db.txt`).
+- **Reviewer Comments & Feedback (Review ID 5721962382)**:
+  - *Reviewer Comment*:
+    > "The codebase demonstrates exceptional architectural discipline, thorough automated verification, and strict compliance with the Lab 4 engineering rubric. Status: Approved (LGTM). This release candidate is verified and ready for merge into main!"
+  - *Author Response*:
+    > "Thank you @supa-gif173 for the detailed and constructive peer review on the Lab 4 release increment! All core features have been fully verified across all 205 automated tests and database parity checks."
+- **Approval Status**: `APPROVED`
+- **Merged By**: `@supa-gif173` into `main` (Merge commit: `86f4516602b6bad3ae8b75101a4acc234001ce1d` on 2026-10-31)
 
 ---
 
